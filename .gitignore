@@ -37,6 +37,11 @@ bower_components
 # Compiled binary addons (https://nodejs.org/api/addons.html)
 build/Release
 
+# UserAdd
+.idea
+package-lock.json
+.vscode
+
 # Dependency directories
 node_modules/
 jspm_packages/
@@ -137,3 +142,4 @@ dist
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+/package-lock.json
