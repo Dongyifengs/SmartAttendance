@@ -7,10 +7,10 @@
           <el-input v-model="LoginForm.Username" placeholder="请输入账号" prefix-icon="User"/>
         </el-form-item>
         <el-form-item>
-          <el-input v-model="LoginForm.DeviceId" placeholder="请输入设备ID" prefix-icon="Cpu"/>
+          <el-input v-model="LoginForm.Password" placeholder="请输入密码" show-password prefix-icon="Lock"/>
         </el-form-item>
         <el-form-item>
-          <el-input v-model="LoginForm.Password" placeholder="请输入密码" show-password prefix-icon="Lock"/>
+          <el-input v-model="LoginForm.DeviceId" placeholder="请输入设备ID" prefix-icon="Cpu"/>
         </el-form-item>
         <div class="options">
           <el-checkbox v-model="LoginForm.Remember">记住账号</el-checkbox>

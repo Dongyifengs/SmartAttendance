@@ -20,6 +20,13 @@ export default defineConfig({
   server: {
       port: 3000,
       host: '0.0.0.0',
-      open: true
+      open: true,
+      proxy: {
+          '/api': {
+              target: 'https://rollcall.anlaxy.com.cn',
+              changeOrigin: true,
+              rewrite: (path) => path.replace(/^\/api/, '/SerApi/v02'),
+          }
+      }
   }
 })

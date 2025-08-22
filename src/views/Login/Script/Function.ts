@@ -1,18 +1,26 @@
-import {ElMessage} from "element-plus";
 import {LoginForm} from "./Defined";
+import {UserLogin} from "../API/Login.ts";
+import {ElMessage} from "element-plus";
 
 // 用户登录按钮
-export const UserLoginSubmit = () => {
-    if (!LoginForm.Username || !LoginForm.Password) {
-        ElMessage.warning("请输入账号和密码");
-        return;
-    }
-    if (LoginForm.Remember) {
-        localStorage.setItem("SA-LoginForm", JSON.stringify(LoginForm));
+export const UserLoginSubmit = async () => {
+    const response = await UserLogin(
+        LoginForm.Username,
+        LoginForm.Password,
+        LoginForm.DeviceId,
+    )
+    if (response.state != '1') {
+        ElMessage({
+            type: "error",
+            message: response.info,
+        })
     } else {
-        localStorage.removeItem("SA-LoginForm");
+        ElMessage({
+            type: "success",
+            message: "登录成功！",
+        })
+        console.log(response)
     }
-    ElMessage.success("登录成功");
 };
 
 // 读取本地存储
