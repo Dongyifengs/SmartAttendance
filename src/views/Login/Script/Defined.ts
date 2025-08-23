@@ -5,5 +5,5 @@ export const LoginForm = reactive({
     Username: "",       // 用户学号
     DeviceId: "",       // 设备ID
     Password: "",       // 用户密码
-    Remember: false,    // 是否记住设备
+    Remember: true,    // 是否记住设备
 });

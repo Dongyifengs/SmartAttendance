@@ -1,4 +1,4 @@
-import { createRouter, createWebHashHistory } from "vue-router";
+import {createRouter, createWebHashHistory} from "vue-router";
 
 import Login from '../views/Login/Login.vue'
 import Index from '../views/Index/Index.vue'
@@ -8,7 +8,7 @@ import Error from '../views/404/404.vue'
 // 路由配置
 export const routes = [
     {
-        path: '/',
+        path: '/index',
         component: Index,
         meta: {
             requiresAuth: true,
@@ -32,11 +32,11 @@ export const routes = [
         }
     },
     {
-        path: '/login',
+        path: '/',
         component: Login,
         meta: {
             requiresAuth: true,
-            title: "Index"
+            title: "Login"
         }
     },
 ]
