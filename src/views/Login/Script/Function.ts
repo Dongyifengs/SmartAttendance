@@ -19,11 +19,15 @@ export const UserLoginSubmit = async () => {
             // 登录成功
             localStorage.setItem('SA-UserInfo', JSON.stringify(response))  // 保存服务器数据返回的用户信息
             if (LoginForm.Remember) {
+                const now = new Date();
+                const LoginTime = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")} `
+                    + `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}:${String(now.getSeconds()).padStart(2, "0")}`;
                 localStorage.setItem('SA-LoginFrom', JSON.stringify({
                     username: LoginForm.Username,
                     password: LoginForm.Password,
                     deviceId: LoginForm.DeviceId,
                     Remember: LoginForm.Remember,
+                    LoginTime: LoginTime
                 }))
             } else {
                 localStorage.removeItem('SA-LoginFrom');
@@ -38,12 +42,12 @@ export const UserLoginSubmit = async () => {
 
 // 读取本地存储
 export const UserSaveForm = () => {
-    const savedUser = localStorage.getItem("SA-LoginForm");
+    const savedUser = localStorage.getItem("SA-LoginFrom");  // ⚡这里改成一致的
     if (savedUser) {
         const UserInfo = JSON.parse(savedUser);
-        LoginForm.Username = UserInfo.Username;
-        LoginForm.DeviceId = UserInfo.DeviceId;
-        LoginForm.Password = UserInfo.Password;
-        LoginForm.Remember = true;
+        LoginForm.Username = UserInfo.username;
+        LoginForm.DeviceId = UserInfo.deviceId;
+        LoginForm.Password = UserInfo.password;
+        LoginForm.Remember = UserInfo.Remember;
     }
 }
