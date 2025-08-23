@@ -4,22 +4,24 @@ import {ElMessage} from "element-plus";
 
 // 用户登录按钮
 export const UserLoginSubmit = async () => {
-    const response = await UserLogin(
-        LoginForm.Username,
-        LoginForm.Password,
-        LoginForm.DeviceId,
-    )
-    if (response.state != '1') {
-        ElMessage({
-            type: "error",
-            message: response.info,
-        })
-    } else {
-        ElMessage({
-            type: "success",
-            message: "登录成功！",
-        })
-        console.log(response)
+    try {
+        // 构建请求体，并且发送请求
+        const response = await UserLogin(
+            LoginForm.Username,
+            LoginForm.Password,
+            LoginForm.DeviceId,
+        )
+        // 非1的情况为异常情况，输出错误信息
+        if (response.state != '1') {
+            ElMessage.error(response.message);
+        } else {
+            // 登录成功
+            localStorage.setItem('UserInfo', JSON.stringify(response))
+            ElMessage.success("登录成功！")
+            console.log(response)
+        }
+    } catch (error) {
+        console.error(error)
     }
 };
 

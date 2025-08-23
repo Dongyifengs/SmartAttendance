@@ -6,7 +6,6 @@ export async function UserLogin(username: string, password: string, deviceId: st
     try {
         // 密码加密处理
         const encryptedPwd = encrypt(password)
-        console.log(encryptedPwd);
         // 返回API结果
         return apiCall("Member_Login", {
             // 用户学号
