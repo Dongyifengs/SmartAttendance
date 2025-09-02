@@ -1,8 +1,14 @@
 {
   "name": "smart-attendance",
   "private": true,
-  "version": "0.0.0",
+  "version": "beta-0.0.1",
   "type": "module",
+  "description": "一个智能签到签退的程序，集成了校园一卡通。使用Vue3+Vite+TypeScript开发。",
+  "author": {
+    "name": "MoYiJiangNan",
+    "email": "1545929126@qq.com",
+    "url": "http://moyijiangnan.cn"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc -b && vite build",

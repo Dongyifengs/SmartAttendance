@@ -1,4 +1,4 @@
-# Logs
+# 日志文件
 logs
 *.log
 npm-debug.log*
@@ -7,18 +7,95 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-*.local
+# 运行时数据
+pids
+*.pid
+*.seed
+*.pid.lock
 
-# Editor directories and files
+# 依赖目录
+node_modules/
+jspm_packages/
+
+# TypeScript 缓存
+*.tsbuildinfo
+
+# 可选的 npm 缓存目录
+.npm
+
+# 可选的 eslint 缓存
+.eslintcache
+
+# 微妙的 npm 缓存目录
+.npmrc
+
+# 可选 REPL 历史
+.node_repl_history
+
+# 输出目录 'dist'
+dist/
+build/
+
+# 缓存文件
+.tmp/
+.temp/
+.cache/
+.parcel-cache/
+
+# 通用忽略
+*.tgz
+.idea/
+*.swp
+*.swo
+*~
+
+# 环境变量文件
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Vue CLI 生成的文件
+.vscode/
+.history/
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+ehthumbs.db
+
+# Vite 特定文件
+.vite/
+
+# 单元测试覆盖率
+coverage/
+*.lcov
+
+# nyc 测试覆盖率
+.nyc_output
+
+# 依赖树
+yarn.lock
+package-lock.json
+npm-shrinkwrap.json
+
+# 可选的编译存在
+*.sublime-project
+*.sublime-workspace
+
+# IDEs
 .vscode/*
 !.vscode/extensions.json
 .idea
-.DS_Store
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+
+# 生产环境构建
+/client/dist/
+/.vscode/
