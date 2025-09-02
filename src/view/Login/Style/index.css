@@ -1,0 +1,73 @@
+.mainBox {
+    width: 100vw;
+    height: 100vh;
+    background: linear-gradient(135deg, #fcb69f 0%, #ffdde1 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.loginContainer {
+    width: 92vw;
+    max-width: 370px;
+    background: #fff;
+    border-radius: 28px;
+    box-shadow: 0 8px 32px rgba(255, 120, 170, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06);
+    padding: 32px 18px 16px 18px;
+}
+
+.brand {
+    text-align: center;
+    font-size: 1.45rem;
+    font-weight: 600;
+    color: #ff7e5f;
+    margin-bottom: 26px;
+    letter-spacing: 3px;
+}
+
+.loginTabs {
+    --el-color-primary: #ff7e5f;
+}
+
+::v-deep(.el-tabs__nav-scroll) {
+    display: flex;
+}
+
+::v-deep(.el-tabs__nav) {
+    flex: 1;
+    justify-content: center;
+}
+
+::v-deep(.el-tabs__item) {
+    flex: 1;
+}
+
+::v-deep(.el-tabs__item.is-active) {
+    border-bottom-color: #ff7e5f !important;
+}
+
+.loginForm {
+    margin-top: 18px;
+}
+
+.loginBtn {
+    margin-top: 12px;
+    background: linear-gradient(90deg, #ff7e5f 0%, #feb47b 100%);
+    border: none;
+    color: #fff;
+    font-weight: 600;
+    font-size: 1.07rem;
+    box-shadow: 0 2px 8px rgba(255, 120, 170, 0.15);
+    transition: box-shadow .2s;
+}
+
+.loginBtn:active {
+    box-shadow: 0 1px 4px rgba(255, 120, 170, 0.10);
+}
+
+@media screen and (max-width: 768px) {
+    .mainBox {
+        align-items: start;
+        padding-top: 10vh;
+    }
+}
