@@ -1,6 +1,7 @@
 import {createRouter, createWebHashHistory} from "vue-router";
 
 import Login from "../view/Login/Login.vue";
+import Home from "../view/Home/Home.vue"
 
 // 路由配置
 export const routes = [
@@ -10,6 +11,14 @@ export const routes = [
         meta: {
             requiresAuth: true,
             title: "Login"
+        },
+    },
+    {
+        path: '/home',
+        component: Home,
+        meta: {
+            requiresAuth: true,
+            title: "Home"
         },
     }
 ]
