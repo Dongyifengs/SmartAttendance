@@ -2,7 +2,11 @@
   <div class="mainBox">
     <div class="loginContainer">
 
-      <div class="brand">欢迎使用SmartAttendance
+      <div class="brand">
+        <span v-for="(char, i) in '欢迎使用SmartAttendance'" :key="i" class="brand-char"
+              :style="{ animationDelay: (i * 0.08) + 's' }">
+          {{ char }}
+        </span>
         <el-tag type="danger">{{ isDev }}</el-tag>
       </div>
 
