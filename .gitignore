@@ -101,3 +101,8 @@ npm-shrinkwrap.json
 /.vscode/
 /auto-imports.d.ts
 /components.d.ts
+
+/.env.development
+.env.development
+/.env.production
+.env.production
