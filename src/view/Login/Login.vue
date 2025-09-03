@@ -22,6 +22,7 @@
               <el-input v-model="zhkqForm.password" type="password" placeholder="请输入密码" :prefix-icon="Lock"
                         show-password clearable/>
             </el-form-item>
+            <el-alert title="手机拨号键*#06#的IMEI1" type="warning" :closable="false" center />
             <el-form-item prop="deviceId">
               <el-input v-model="zhkqForm.deviceId" placeholder="请输入设备ID" :prefix-icon="Cellphone" clearable/>
             </el-form-item>

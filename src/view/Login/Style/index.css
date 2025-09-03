@@ -90,3 +90,8 @@
         padding-top: 10vh;
     }
 }
+
+/*添加alter弹窗边框*/
+.el-alert {
+    margin: 0 0 18px 0;
+}
