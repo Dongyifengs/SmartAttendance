@@ -8,7 +8,6 @@ import {Buffer} from 'buffer';
 const api = axios.create({
     baseURL: 'https://rollcall.anlaxy.com.cn/SerApi/v02',
     headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; WOW64; rv:27.0) Gecko/20100101 Firefox/27.0',
         'Content-Type': 'application/x-www-form-urlencoded'
     }
 });

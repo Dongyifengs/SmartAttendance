@@ -71,37 +71,32 @@ const ocForm = ref({
   password: import.meta.env.VITE_OC_PASSWORD || ''
 })
 
-
+// 登录按钮登录事件
 function onLogin(type: 1 | 2) {
-  // 1为智慧考勤登录，2为一卡通登录
   if (type === 1) {
+    // 判断信息是否填写完整
     if (!zhkqForm.value.username || !zhkqForm.value.password || !zhkqForm.value.deviceId) {
-      ElMessage({showClose: true, message: '请填写完整信息！', type: 'warning', grouping: true})
+      ElMessage.warning("请填写完整信息！")
       return
     } else {
       ZHKQ_LOGIN(zhkqForm.value.username, zhkqForm.value.password, zhkqForm.value.deviceId).then(res => {
         if (res.state === "1") {
-          ElMessage({type: 'success', message: '登录成功！'})
+          ElMessage.success("智慧考勤登录成功！")
         } else {
-          ElMessage({type: 'error', message: res.info})
-          zhkqForm.value.password = ""
-          zhkqForm.value.username = ""
-          zhkqForm.value.deviceId = ""
+          ElMessage.error("智慧考勤登录失败：" + res.info)
         }
       })
     }
   } else if (type === 2) {
     if (!ocForm.value.username || !ocForm.value.password) {
-      ElMessage({showClose: true, message: '请填写完整信息！', type: 'warning', grouping: true})
+      ElMessage.warning("请填写完整信息！")
       return
     } else {
       OC_LOGIN(ocForm.value.username, ocForm.value.password).then(res => {
         if (res.code === 200) {
-          ElMessage({type: 'success', message: '登录成功！'})
+          ElMessage.success("登录成功！")
         } else {
-          ElMessage({type: 'error', message: res.msg})
-          ocForm.value.password = ""
-          ocForm.value.username = ""
+          ElMessage.error("一卡通登录失败：" + res.msg)
         }
       })
     }
