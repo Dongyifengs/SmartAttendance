@@ -4,7 +4,7 @@
 
       <div class="brand">欢迎使用SmartAttendance</div>
 
-      <el-tabs v-model="activeTab" type="card" class="loginTabs">
+      <el-tabs v-model="activeTab" type="card" class="loginTabs" :class="activeTab === 'ocLogin' ? 'dy_item' : ''">
 
         <el-tab-pane label="智慧考勤登录" name="zhkqLogin">
           <el-form :model="zhkqForm" class="loginForm" @submit.prevent="onLogin(1)">
