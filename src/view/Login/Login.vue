@@ -22,7 +22,7 @@
               <el-input v-model="zhkqForm.password" type="password" placeholder="请输入密码" :prefix-icon="Lock"
                         show-password clearable/>
             </el-form-item>
-            <el-alert title="手机拨号键*#06#的IMEI1" type="warning" :closable="false" center />
+            <el-alert title="手机拨号键*#06#的IMEI1" type="warning" :closable="false" center/>
             <el-form-item prop="deviceId">
               <el-input v-model="zhkqForm.deviceId" placeholder="请输入设备ID" :prefix-icon="Cellphone" clearable/>
             </el-form-item>
@@ -45,7 +45,6 @@
               登录一卡通
             </el-button>
           </el-form>
-
         </el-tab-pane>
       </el-tabs>
     </div>
@@ -58,10 +57,11 @@ import {ElMessage} from 'element-plus'
 import {User, Lock, Cellphone} from "@element-plus/icons-vue";
 import {OC_LOGIN} from "../../API/ocAPI";
 import {ZHKQ_LOGIN} from '../../API/zhkqAPI';
+import router from "../../router";
 
 // 开发环境
 const isDev = import.meta.env.VITE_TEXT
-const activeTab = ref('ocLogin')
+const activeTab = ref('zhkqLogin')
 const zhkqForm = ref({
   username: import.meta.env.VITE_ZHKQAPI_USERNAME || '',
   password: import.meta.env.VITE_ZHKQAPI_PASSWORD || '',
@@ -72,6 +72,11 @@ const ocForm = ref({
   password: import.meta.env.VITE_OC_PASSWORD || ''
 })
 
+// 获取当前时间戳（毫秒级）
+const getTimestamp = () => {
+  return new Date().getTime()
+}
+
 // 登录按钮登录事件
 function onLogin(type: 1 | 2) {
   if (type === 1) {
@@ -80,9 +85,15 @@ function onLogin(type: 1 | 2) {
       ElMessage.warning("请填写完整信息！")
       return
     } else {
-      ZHKQ_LOGIN(zhkqForm.value.username, zhkqForm.value.password, zhkqForm.value.deviceId).then(res => {
+      ZHKQ_LOGIN(zhkqForm.value.username, zhkqForm.value.password, zhkqForm.value.deviceId).then(async res => {
         if (res.state === "1") {
           ElMessage.success("智慧考勤登录成功！")
+          localStorage.setItem("SA-ZHKQ-USERINFO", JSON.stringify(res))
+          localStorage.setItem("SA-ZHKQ-TIMESTAMP", getTimestamp().toString())
+          // 检查两个数据都存在，则跳转
+          if (localStorage.getItem("SA-ZHKQ-USERINFO") && localStorage.getItem("SA-OC-USERINFO")) {
+            await router.push("/home")
+          }
         } else {
           ElMessage.error("智慧考勤登录失败：" + res.info)
         }
@@ -93,9 +104,15 @@ function onLogin(type: 1 | 2) {
       ElMessage.warning("请填写完整信息！")
       return
     } else {
-      OC_LOGIN(ocForm.value.username, ocForm.value.password).then(res => {
+      OC_LOGIN(ocForm.value.username, ocForm.value.password).then(async res => {
         if (res.code === 200) {
           ElMessage.success("登录成功！")
+          localStorage.setItem("SA-OC-USERINFO", JSON.stringify(res))
+          localStorage.setItem("SA-OC-TIMESTAMP", getTimestamp().toString())
+          // 检查两个数据都存在，则跳转
+          if (localStorage.getItem("SA-ZHKQ-USERINFO") && localStorage.getItem("SA-OC-USERINFO")) {
+            await router.push("/home")
+          }
         } else {
           ElMessage.error("一卡通登录失败：" + res.msg)
         }
