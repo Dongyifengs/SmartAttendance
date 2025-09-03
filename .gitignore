@@ -104,5 +104,3 @@ npm-shrinkwrap.json
 
 /.env.development
 .env.development
-/.env.production
-.env.production

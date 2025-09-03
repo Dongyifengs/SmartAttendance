@@ -1,6 +1,6 @@
 import {createRouter, createWebHashHistory} from "vue-router";
 
-import Login from "../view/Login/login.vue";
+import Login from "../view/Login/Login.vue";
 
 // 路由配置
 export const routes = [

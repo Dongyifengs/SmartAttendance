@@ -16,7 +16,10 @@
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.3.2",
+    "axios": "^1.11.0",
+    "buffer": "^6.0.3",
     "element-plus": "^2.11.1",
+    "jsencrypt": "^3.5.4",
     "unplugin-icons": "^22.2.0",
     "vue": "^3.5.18",
     "vue-router": "^4.5.1"
