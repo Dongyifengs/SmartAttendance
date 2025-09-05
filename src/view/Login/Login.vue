@@ -52,7 +52,7 @@
 </template>
 
 <script setup lang="ts">
-import {ref} from 'vue'
+import {onMounted, ref} from 'vue'
 import {ElMessage} from 'element-plus'
 import {User, Lock, Cellphone} from "@element-plus/icons-vue";
 import {OC_LOGIN} from "../../API/ocAPI";
@@ -120,6 +120,20 @@ function onLogin(type: 1 | 2) {
     }
   }
 }
+
+// 检查是否是否已经登录
+const checkLogin = () => {
+  const zhkqUserInfo = localStorage.getItem("SA-ZHKQ-TIMESTAMP")
+  const ocUserInfo = localStorage.getItem("SA-OC-TIMESTAMP")
+  if (zhkqUserInfo && ocUserInfo) {
+    router.push("/home")
+  }
+}
+
+// 组件挂载时检查登录状态
+onMounted(() => {
+  checkLogin()
+})
 </script>
 
 <style scoped>
