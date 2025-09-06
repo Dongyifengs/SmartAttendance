@@ -11,6 +11,7 @@
           </div>
           <div class="logBtn">
             <el-button @click="logout">退出登录</el-button>
+            <el-button @click="logoutTest">测试退出</el-button>
           </div>
         </div>
       </el-header>
@@ -32,6 +33,14 @@ import router from "../../router";
 // 退出登录
 const logout = () => {
   localStorage.clear()
+  router.push('/')
+}
+
+const logoutTest = () => {
+  localStorage.removeItem('SA-ZHKQ-TIMESTAMP')
+  localStorage.removeItem('SA-ZHKQ-USERINFO')
+  localStorage.removeItem('SA-OC-USERINFO')
+  localStorage.removeItem('SA-OC-TIMESTAMP')
   router.push('/')
 }
 

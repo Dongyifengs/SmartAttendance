@@ -10,9 +10,7 @@
         <el-tag type="danger">{{ isDev }}</el-tag>
       </div>
 
-
       <el-tabs v-model="activeTab" type="card" class="loginTabs" :class="activeTab === 'ocLogin' ? 'dy_item' : ''">
-
         <el-tab-pane label="智慧考勤登录" name="zhkqLogin">
           <el-form :model="zhkqForm" class="loginForm" @submit.prevent="onLogin(1)">
             <el-form-item prop="username">
@@ -52,35 +50,86 @@
 </template>
 
 <script setup lang="ts">
-import {onMounted, ref} from 'vue'
-import {ElMessage} from 'element-plus'
-import {User, Lock, Cellphone} from "@element-plus/icons-vue";
-import {OC_LOGIN} from "../../API/ocAPI";
-import {ZHKQ_LOGIN} from '../../API/zhkqAPI';
+import { onMounted, ref } from 'vue'
+import { ElMessage } from 'element-plus'
+import { User, Lock, Cellphone } from "@element-plus/icons-vue";
+import { OC_LOGIN } from "../../API/ocAPI";
+import { ZHKQ_LOGIN } from '../../API/zhkqAPI';
 import router from "../../router";
 
 // 开发环境
 const isDev = import.meta.env.VITE_TEXT
 const activeTab = ref('zhkqLogin')
 const zhkqForm = ref({
-  username: import.meta.env.VITE_ZHKQAPI_USERNAME || '',
-  password: import.meta.env.VITE_ZHKQAPI_PASSWORD || '',
-  deviceId: import.meta.env.VITE_ZHKQAPI_DEVICEID || ''
+  username: '',
+  password: '',
+  deviceId: ''
 })
 const ocForm = ref({
-  username: import.meta.env.VITE_OC_USERNAME || '',
-  password: import.meta.env.VITE_OC_PASSWORD || ''
+  username: '',
+  password: ''
 })
 
-// 获取当前时间戳（毫秒级）
-const getTimestamp = () => {
-  return new Date().getTime()
+// 四小时（毫秒）
+const FOUR_HOURS = 4 * 60 * 60 * 1000
+// 获取当前时间戳
+const getTimestamp = () => new Date().getTime()
+
+// 1. 自动填充表单（优先localStorage，其次环境变量）
+function fillFormFromStorage() {
+  // 智慧考勤
+  const zhkqAccount = localStorage.getItem("SA-ZHKQ-ACCOUNT")
+  if (zhkqAccount) {
+    try {
+      const account = JSON.parse(zhkqAccount)
+      zhkqForm.value.username = account.username || ''
+      zhkqForm.value.password = account.password || ''
+      zhkqForm.value.deviceId = account.deviceId || ''
+    } catch {}
+  } else {
+    zhkqForm.value.username = import.meta.env.VITE_ZHKQAPI_USERNAME || ''
+    zhkqForm.value.password = import.meta.env.VITE_ZHKQAPI_PASSWORD || ''
+    zhkqForm.value.deviceId = import.meta.env.VITE_ZHKQAPI_DEVICEID || ''
+  }
+  // 一卡通
+  const ocAccount = localStorage.getItem("SA-OC-ACCOUNT")
+  if (ocAccount) {
+    try {
+      const account = JSON.parse(ocAccount)
+      ocForm.value.username = account.username || ''
+      ocForm.value.password = account.password || ''
+    } catch {}
+  } else {
+    ocForm.value.username = import.meta.env.VITE_OC_USERNAME || ''
+    ocForm.value.password = import.meta.env.VITE_OC_PASSWORD || ''
+  }
 }
 
-// 登录按钮登录事件
+// 2. 超时自动登录
+function autoLoginIfExpired() {
+  checkZHKQLogin()
+  checkOCLogin()
+}
+
+// 检查智慧考勤登录状态
+function checkZHKQLogin() {
+  const zhkqTimestamp = Number(localStorage.getItem("SA-ZHKQ-TIMESTAMP") || "0")
+  if (getTimestamp() - zhkqTimestamp > FOUR_HOURS) {
+    onLogin(1)
+  }
+}
+
+// 检查一卡通登录状态
+function checkOCLogin() {
+  const ocTimestamp = Number(localStorage.getItem("SA-OC-TIMESTAMP") || "0")
+  if (getTimestamp() - ocTimestamp > FOUR_HOURS) {
+    onLogin(2)
+  }
+}
+
+// 3. 登录事件（成功后自动保存账户信息和时间戳）
 function onLogin(type: 1 | 2) {
-  if (type === 1) {
-    // 判断信息是否填写完整
+  if (type == 1) {
     if (!zhkqForm.value.username || !zhkqForm.value.password || !zhkqForm.value.deviceId) {
       ElMessage.warning("请填写完整信息！")
       return
@@ -90,16 +139,23 @@ function onLogin(type: 1 | 2) {
           ElMessage.success("智慧考勤登录成功！")
           localStorage.setItem("SA-ZHKQ-USERINFO", JSON.stringify(res))
           localStorage.setItem("SA-ZHKQ-TIMESTAMP", getTimestamp().toString())
-          // 检查两个数据都存在，则跳转
-          if (localStorage.getItem("SA-ZHKQ-USERINFO") && localStorage.getItem("SA-OC-USERINFO")) {
+          localStorage.setItem("SA-ZHKQ-ACCOUNT", JSON.stringify({
+            username: zhkqForm.value.username,
+            password: zhkqForm.value.password,
+            deviceId: zhkqForm.value.deviceId
+          }))
+          // 检查一卡通是否已登录
+          if (localStorage.getItem("SA-OC-USERINFO")) {
             await router.push("/home")
+          } else {
+            activeTab.value = 'ocLogin'
           }
         } else {
           ElMessage.error("智慧考勤登录失败：" + res.info)
         }
       })
     }
-  } else if (type === 2) {
+  } else if (type == 2) {
     if (!ocForm.value.username || !ocForm.value.password) {
       ElMessage.warning("请填写完整信息！")
       return
@@ -109,9 +165,15 @@ function onLogin(type: 1 | 2) {
           ElMessage.success("登录成功！")
           localStorage.setItem("SA-OC-USERINFO", JSON.stringify(res))
           localStorage.setItem("SA-OC-TIMESTAMP", getTimestamp().toString())
-          // 检查两个数据都存在，则跳转
-          if (localStorage.getItem("SA-ZHKQ-USERINFO") && localStorage.getItem("SA-OC-USERINFO")) {
+          localStorage.setItem("SA-OC-ACCOUNT", JSON.stringify({
+            username: ocForm.value.username,
+            password: ocForm.value.password
+          }))
+          // 检查智慧考勤是否已登录
+          if (localStorage.getItem("SA-ZHKQ-USERINFO")) {
             await router.push("/home")
+          } else {
+            activeTab.value = 'zhkqLogin'
           }
         } else {
           ElMessage.error("一卡通登录失败：" + res.msg)
@@ -121,18 +183,10 @@ function onLogin(type: 1 | 2) {
   }
 }
 
-// 检查是否是否已经登录
-const checkLogin = () => {
-  const zhkqUserInfo = localStorage.getItem("SA-ZHKQ-TIMESTAMP")
-  const ocUserInfo = localStorage.getItem("SA-OC-TIMESTAMP")
-  if (zhkqUserInfo && ocUserInfo) {
-    router.push("/home")
-  }
-}
-
-// 组件挂载时检查登录状态
+// 页面加载时自动填充+自动登录
 onMounted(() => {
-  checkLogin()
+  fillFormFromStorage()
+  autoLoginIfExpired()
 })
 </script>
 
