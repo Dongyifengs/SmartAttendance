@@ -29,3 +29,13 @@ jobs:
     - run: npm install -g pnpm
     - run: pnpm install
     - run: pnpm run build
+    - name: pacakge dist
+      run: |
+        tar -czvf smartAttendance.tar.gz -C dist .
+    - name: create github release
+      id: new_release
+      uses: softprops/action-gh-release@v2.0.8
+      with:
+        name: latest
+        make_latest: true
+        files: smartAttendance.tar.gz
