@@ -4,8 +4,6 @@
       v-model="selectedDate"
       type="date"
       placeholder="选择日期"
-      format="yyyy-MM-dd"
-      value-format="yyyy-MM-dd"
       style="margin-right: 10px"
     />
 
@@ -88,17 +86,18 @@
 import { ref } from 'vue'
 import {ElMessage} from 'element-plus'
 import { getDayCourseList, getDaySignList } from '../../API/zhkqAPI'
+import dayjs from "dayjs";
 
 // 日期选择器，默认今天
-const getCurrentDate = (): string => {
-  const date = new Date()
-  const year = date.getFullYear()
-  const month = (date.getMonth() + 1).toString().padStart(2, '0')
-  const day = date.getDate().toString().padStart(2, '0')
-  return `${year}-${month}-${day}`
-}
+// const getCurrentDate = (): string => {
+//   const date = new Date()
+//   const year = date.getFullYear()
+//   const month = (date.getMonth() + 1).toString().padStart(2, '0')
+//   const day = date.getDate().toString().padStart(2, '0')
+//   return `${year}-${month}-${day}`
+// }
 
-const selectedDate = ref<Date>(new Date()) // 默认今天
+const selectedDate = ref<Date>(dayjs().toDate()) // 默认今天
 
 // 数据
 const todayCourseList = ref<any[]>([])
@@ -153,7 +152,7 @@ const fetchCheckInRecords = async (date: string) => {
 
 // 根据选择日期获取两个接口信息
 const fetchDataByDate = () => {
-  const date = selectedDate.value ? selectedDate.value.toISOString().slice(0,10) : getCurrentDate()
+  const date = dayjs(selectedDate.value).format('YYYY-MM-DD')
   fetchTodayCourses(date)
   fetchCheckInRecords(date)
 }
