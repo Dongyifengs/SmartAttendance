@@ -89,6 +89,9 @@ import { getDayCourseList, getDaySignList } from '../../API/zhkqAPI'
 import dayjs from "dayjs";
 
 // 日期选择器，默认今天
+const getCurrentDate = (): string => {
+  return dayjs().format('YYYY-MM-DD')
+}
 // const getCurrentDate = (): string => {
 //   const date = new Date()
 //   const year = date.getFullYear()
@@ -152,7 +155,7 @@ const fetchCheckInRecords = async (date: string) => {
 
 // 根据选择日期获取两个接口信息
 const fetchDataByDate = () => {
-  const date = dayjs(selectedDate.value).format('YYYY-MM-DD')
+  const date = selectedDate.value ? dayjs(selectedDate.value).format('YYYY-MM-DD') : getCurrentDate()
   fetchTodayCourses(date)
   fetchCheckInRecords(date)
 }
