@@ -2,6 +2,7 @@ import {createRouter, createWebHashHistory} from "vue-router";
 
 import Login from "../view/Login/Login.vue";
 import Home from "../view/Home/Home.vue"
+import ClassListDev from "../view/ClassListDev/ClassListDev.vue"
 
 // 路由配置
 export const routes = [
@@ -20,6 +21,14 @@ export const routes = [
             requiresAuth: true,
             title: "Home"
         },
+    },
+    {
+        path: '/classListDev',
+        component: ClassListDev,
+        meta: {
+            requiresAuth: true,
+            title: "ClassListclassListDev"
+        }
     }
 ]
 

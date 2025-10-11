@@ -12,6 +12,7 @@
           <div class="logBtn">
             <el-button @click="logout">退出登录</el-button>
             <el-button @click="logoutTest">测试退出</el-button>
+            <el-button @click="classListTest">课程表测试</el-button>
           </div>
         </div>
       </el-header>
@@ -42,6 +43,10 @@ const logoutTest = () => {
   localStorage.removeItem('SA-OC-USERINFO')
   localStorage.removeItem('SA-OC-TIMESTAMP')
   router.push('/')
+}
+
+const classListTest = () => {
+  router.push('/ClassListDev')
 }
 
 // 获取登录时间
