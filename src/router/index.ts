@@ -11,7 +11,7 @@ export const routes = [
         component: Login,
         meta: {
             requiresAuth: true,
-            title: "Login"
+            title: "登录"
         },
     },
     {
@@ -19,7 +19,7 @@ export const routes = [
         component: Home,
         meta: {
             requiresAuth: true,
-            title: "Home"
+            title: "主页"
         },
     },
     {
@@ -27,7 +27,7 @@ export const routes = [
         component: ClassListDev,
         meta: {
             requiresAuth: true,
-            title: "ClassListclassListDev"
+            title: "开发者课程详细列表"
         }
     }
 ]
