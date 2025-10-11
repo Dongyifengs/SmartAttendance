@@ -12,7 +12,9 @@
           <div class="logBtn">
             <el-button @click="logout">退出登录</el-button>
             <el-button @click="logoutTest">测试退出</el-button>
-            <el-button @click="classListTest">课程表测试</el-button>
+            <el-button @click="classListTest">课程表测试 [开发者模式]</el-button>
+            <el-button @click="AttendanceListTest">考勤查询测试 [开发者模式]</el-button>
+            <el-button @click="LeaveListTest">请假页面测试 [开发者模式]</el-button>
           </div>
         </div>
       </el-header>
@@ -47,6 +49,14 @@ const logoutTest = () => {
 
 const classListTest = () => {
   router.push('/ClassListDev')
+}
+
+const AttendanceListTest = () => {
+  router.push('/AttendanceDev')
+}
+
+const LeaveListTest = () => {
+  router.push('/LeaveDev')
 }
 
 // 获取登录时间
