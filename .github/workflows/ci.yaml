@@ -3,7 +3,7 @@ name: Build and Deploy Static Site
 on:
   push:
     branches:
-      - main  # 监听 main 分支的更新
+      - master  # 监听 master 分支的更新
 
 jobs:
   build-and-deploy:
