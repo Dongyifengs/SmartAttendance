@@ -72,6 +72,7 @@ const getUserToken = (): string => {
     const info = localStorage.getItem("SA-ZHKQ-USERINFO");
     return info ? JSON.parse(info).token || "" : "";
   } catch {
+    console.warn("用户 Token 解析失败");
     return "";
   }
 };
@@ -94,6 +95,7 @@ const displayedStudents = computed(() => {
 const loadUserClassAndStudents = async () => {
   const token = getUserToken();
   if (!token) {
+    console.warn("未获取到用户 Token");
     return;
   }
 
@@ -101,6 +103,7 @@ const loadUserClassAndStudents = async () => {
     const classRes = await getUserClass(token);
     const classInfo = classRes.class_list?.[0];
     if (!classInfo) {
+      console.warn("未获取到班级信息");
       return;
     }
 
@@ -109,7 +112,9 @@ const loadUserClassAndStudents = async () => {
 
     const studentRes = await getClassStudent(token, classInfo.class_id);
     students.value = studentRes.group_members || [];
+    console.info("班级学生信息加载成功:", students.value);
   } catch (err) {
+    console.error("加载班级或学生信息失败:", err);
   }
 };
 
