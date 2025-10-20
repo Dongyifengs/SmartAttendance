@@ -25,7 +25,14 @@ export default defineConfig({
     server: {
         port: 3000,
         host: '0.0.0.0',
-        open: true
+        open: true,
+        proxy: {
+            '/PairAPI': {
+                target: 'https://api.anlaxy.com.cn/SerApi/v02',
+                changeOrigin: true,
+                rewrite: (path) => path.replace(/^\/PairAPI/, ''),
+            }
+        }
     },
     base: './',
 })
