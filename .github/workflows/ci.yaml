@@ -44,6 +44,9 @@ jobs:
         run: |
           git rm -rf .  # 删除 static 分支的旧内容
           cp -r dist/* .  # 将新生成的静态页面拷贝到根目录
+          rm -rf node_modules
+          rm -rf dist
+          rm -rf *.d.ts
           git add .
           git commit -m "Deploy static site from main branch"
 
