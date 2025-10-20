@@ -3,14 +3,24 @@ import {encrypt} from './crypto';
 import {Buffer} from 'buffer';
 
 /**
- * 创建配置好的 Axios 实例
+ * 创建核心 Axios 实例 - RollCallAPI
  */
-const api = axios.create({
+const RollCallAPI = axios.create({
     baseURL: 'https://rollcall.anlaxy.com.cn/SerApi/v02',
     headers: {
         'Content-Type': 'application/x-www-form-urlencoded'
     }
 });
+
+/*
+* 创建次要 Axios 实例 - PairAPI
+* */
+const PairAPI = axios.create({
+    baseURL: '/PairAPI',
+    headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+    }
+})
 
 /**
  * 生成接口参数（双重Base64编码）
@@ -33,7 +43,7 @@ function generateInterfaceParams(data: object): string {
  */
 export async function apiCall(
     func: string,
-    param: Record<string, any>,
+    param: Record<string, any> | null = null,
     userKey: string | null = null
 ): Promise<any> {
     // 构造请求负载
@@ -55,13 +65,61 @@ export async function apiCall(
     const formData = generateInterfaceParams(payload);
 
     try {
-        const response = await api.post('', formData);
+        const response = await RollCallAPI.post('', formData);
         return response.data;
     } catch (error) {
         console.error('API调用失败:', error);
         throw error;
     }
 }
+
+/**
+ * 次要API - 2调用方法
+ * @param func - 接口功能名称
+ * @param param - 接口参数对象
+ * @param userKey - 用户认证密钥，可选
+ * @param group_id - 班级ID，可选
+ * @returns 返回接口响应数据
+ * @throws 当请求失败时抛出错误
+ */
+export async function apiRollCall(
+    func: string,
+    param: Record<string, any> | null = null,
+    userKey: string | null = null,
+    group_id: string | null = null
+): Promise<any> {
+    // 构造请求负载
+    const payload: Record<string, any> = {
+        CommType: "function",   // 固定为"function"
+        Comm: func,             // 接口功能名称
+        Param: {
+            ...param,           // 展开传入的参数
+            Source_PlatForm: 2, // 固定为2，表示平台类型
+            group_id: group_id  // 班级ID
+        }
+    };
+
+    // 如果提供了userKey，添加到参数中
+    if (userKey) {
+        payload.Param.userKey = userKey;
+    }
+
+    if (group_id) {
+        payload.Param.group_id = group_id;
+    }
+
+    // 生成双重Base64编码的表单数据
+    const formData = generateInterfaceParams(payload);
+
+    try {
+        const response = await PairAPI.post('', formData);
+        return response.data;
+    } catch (error) {
+        console.error('API调用失败:', error);
+        throw error;
+    }
+}
+
 
 /**
  * 用户登录接口
@@ -181,5 +239,38 @@ export async function getEndTime(
         "RollCall_Get_Change_EndTime",
         {lesson_change_list: lessonId},
         userKey
+    );
+}
+
+/*
+* 获取用户班级
+* @param userKey - 用户认证密钥
+* @returns 返回用户班级信息
+* */
+export async function getUserClass(
+    userKey: string
+): Promise<any> {
+    return apiRollCall(
+        "Member_Get_Class",
+        {},
+        userKey
+    );
+}
+
+/*
+* 获取班级学生
+* @param userKey - 用户认证密钥
+* @param classId - 班级ID
+* @returns 返回班级学生信息
+* */
+export async function getClassStudent(
+    userKey: string,
+    classId: string
+): Promise<any> {
+    return apiRollCall(
+        "Member_Get_Group",
+        {},
+        userKey,
+        classId
     );
 }
