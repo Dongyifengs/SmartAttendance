@@ -3,7 +3,7 @@ name: Build and Deploy Static Site
 on:
   push:
     branches:
-      - master  # 监听 master 分支的更新
+      - main  # 当 main 分支更新时触发
 
 jobs:
   build-and-deploy:
@@ -11,49 +11,44 @@ jobs:
 
     steps:
       # Step 1: 检出代码
-      - name: Checkout code
+      - name: Checkout main branch
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0  # 确保可以访问完整的 Git 历史记录
+          fetch-depth: 0  # 获取完整的 git 历史记录，确保可以创建新分支
 
-      # Step 2: 设置 Node.js 环境
-      - name: Set up Node.js
+      # Step 2: 设置 Node.js 22 环境
+      - name: Set up Node.js 22
         uses: actions/setup-node@v3
         with:
-          node-version: 22  # 你可以根据项目需求更改 Node.js 版本
+          node-version: 22  # 使用 Node.js 22
 
-      # Step 3: 安装依赖
-      - name: Install dependencies
-        run: npm install
-
-      # Step 4: 编译 Vite 项目
-      - name: Build static site
-        run: npm run build  # 确保在 package.json 中配置了 "build" 脚本
-
-      # Step 5: 推送到 static 分支
-      - name: Deploy to static branch
+      # Step 3: 安装依赖并编译代码
+      - name: Install dependencies and build
         run: |
-          # 初始化 Git 仓库
+          npm install  # 安装依赖
+          npm run build  # 使用 Vite 构建静态页面
+
+      # Step 4: 切换到 static 分支（如果不存在则创建）
+      - name: Switch to static branch
+        run: |
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
-          
-          # 创建一个临时目录用于存储编译后的文件
-          BUILD_DIR=dist  # Vite 默认生成目录为 dist
-          TARGET_BRANCH=static
-          
-          # 删除旧的 static 分支内容
-          git fetch origin $TARGET_BRANCH
-          git switch $TARGET_BRANCH || git checkout --orphan $TARGET_BRANCH
-          git rm -rf . || true
-          
-          # 复制新生成的文件到工作目录
-          cp -r $BUILD_DIR/* .
-          
-          # 添加所有文件并提交
+          if git show-ref --verify --quiet refs/heads/static; then
+            git checkout static
+          else
+            git checkout --orphan static
+          fi
+
+      # Step 5: 清除旧内容并拷贝新内容
+      - name: Prepare static content
+        run: |
+          git rm -rf .  # 删除 static 分支的旧内容
+          cp -r dist/* .  # 将新生成的静态页面拷贝到根目录
           git add .
-          git commit -m "Deploy static site from main: $(date -u +'%Y-%m-%d %H:%M:%S')"
-          
-          # 强制推送到 static 分支
-          git push origin HEAD:$TARGET_BRANCH --force
+          git commit -m "Deploy static site from main branch"
+
+      # Step 6: 强制推送到 static 分支
+      - name: Push to static branch
+        run: git push origin static --force
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
