@@ -5,6 +5,9 @@ on:
     branches:
       - master
 
+permissions:
+  contents: write  # ✅ 允许写入 static 分支
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -45,10 +48,14 @@ jobs:
         run: |
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
-          git fetch origin static:static || echo "static 分支不存在，将创建新分支"
-          git checkout static || git checkout -b static
+          git fetch origin static || echo "static 分支不存在，将创建新分支"
+          if git show-ref --verify --quiet refs/remotes/origin/static; then
+            git checkout static
+          else
+            git checkout -b static
+          fi
 
-      # ✅ 还原构建内容 + 提交
+      # ✅ 替换静态文件
       - name: 更新静态文件
         run: |
           rm -rf ./*
@@ -57,10 +64,10 @@ jobs:
           git add -A
           git commit -m "🚀 部署: ${{ steps.commit_info.outputs.commit_message }} (基于 ${{ steps.commit_info.outputs.commit_hash }})" || echo "⚠️ 无文件更改，跳过提交"
 
-      # ✅ 推送到 static 分支（保留历史）
+      # ✅ 推送
       - name: 推送到 static 分支
         run: |
-          git pull origin static --rebase || echo "首次部署，无需 rebase"
+          git pull origin static --rebase || echo "首次部署，跳过 rebase"
           git push origin static
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
