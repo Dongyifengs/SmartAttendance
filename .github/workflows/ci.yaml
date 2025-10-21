@@ -10,12 +10,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 步骤 1: 检出代码（包括 static 分支）
-      - name: 检出代码
+      # 步骤 1: 检出代码
+      - name: 检出 master 分支
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0
-          ref: static  # 直接检出 static 分支
+          fetch-depth: 0  # 获取完整的 git 历史记录
 
       # 步骤 2: 设置 Node.js 22 环境
       - name: 设置 Node.js 22
@@ -27,10 +26,9 @@ jobs:
       - name: 获取提交信息
         id: commit_info
         run: |
-          git fetch origin master
-          COMMIT_MESSAGE=$(git log -1 --pretty=%B origin/master)
+          COMMIT_MESSAGE=$(git log -1 --pretty=%B)
           echo "commit_message=$COMMIT_MESSAGE" >> $GITHUB_OUTPUT
-          COMMIT_HASH=$(git log -1 --pretty=%H origin/master)
+          COMMIT_HASH=$(git log -1 --pretty=%H)
           echo "commit_hash=${COMMIT_HASH:0:7}" >> $GITHUB_OUTPUT
 
       # 步骤 4: 安装依赖并构建项目
@@ -39,33 +37,30 @@ jobs:
           npm install
           npm run build
 
-      # 步骤 5: 清理旧文件并添加新文件
-      - name: 更新静态文件
-        run: |
-          # 删除除 .git 外的所有文件
-          find . -maxdepth 1 ! -name '.git' ! -name '.' -exec rm -rf {} +
-          # 复制新的构建文件
-          cp -r dist/* .
-          # 清理不必要的目录
-          rm -rf dist
-          
-          git add .
-          git status
-
-      # 步骤 6: 提交更改
-      - name: 提交更改
+      # 步骤 5: 切换到 static 分支
+      - name: 切换到 static 分支
         run: |
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
-          # 如果有变更就提交
-          if git diff --staged --quiet; then
-            echo "没有变更需要提交"
+          if git show-ref --verify --quiet refs/heads/static; then
+            git checkout static
           else
-            git commit -m "🚀 部署: ${{ steps.commit_info.outputs.commit_message }} (基于 ${{ steps.commit_info.outputs.commit_hash }})"
+            git checkout --orphan static
           fi
+
+      # 步骤 6: 准备静态内容
+      - name: 准备静态内容
+        run: |
+          git rm -rf .
+          cp -r dist/* .
+          rm -rf node_modules
+          rm -rf dist
+          rm -rf *.d.ts
+          git add .
+          git commit -m "🚀 部署: ${{ steps.commit_info.outputs.commit_message }} (基于 ${{ steps.commit_info.outputs.commit_hash }})"
 
       # 步骤 7: 推送到 static 分支
       - name: 推送到 static 分支
-        run: git push origin static
+        run: git push origin static --force
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
