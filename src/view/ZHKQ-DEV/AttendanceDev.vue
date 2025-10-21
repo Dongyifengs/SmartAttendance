@@ -77,6 +77,7 @@
           <el-table-column label="教师名称" min-width="150" prop="teacher_name"/>
           <el-table-column label="考勤状态" prop="status" width="100"/>
           <el-table-column label="次数" prop="totalNum" width="80"/>
+          <el-table-column label="日期" min-width="220" prop="recordDates"/>
         </el-table>
         <el-empty v-else class="mt-2" description="暂无课程"/>
       </div>
@@ -96,6 +97,7 @@
           <el-table-column label="教师名称" min-width="150" prop="teacher_name"/>
           <el-table-column label="考勤状态" prop="status" width="100"/>
           <el-table-column label="次数" prop="totalNum" width="80"/>
+          <el-table-column label="日期" min-width="220" prop="recordDates"/>
         </el-table>
         <el-empty v-else class="mt-2" description="暂无课程"/>
       </div>
@@ -106,7 +108,7 @@
 <script lang="ts" setup>
 import {computed, onMounted, ref} from "vue";
 import dayjs from "dayjs";
-import {getClassStudent, getCourseStatus, getStatusCount, getUserClass} from "../../API/zhkqAPI";
+import {getAttendanceDates, getClassStudent, getCourseStatus, getStatusCount, getUserClass} from "../../API/zhkqAPI";
 
 interface Student {
   user_code: string;
@@ -123,6 +125,7 @@ interface Course {
   status: string;
   totalNum: number;
   pk_lesson: string;
+  recordDates?: string; // 新增字段
 }
 
 const userClass = ref<string>("");
@@ -197,7 +200,7 @@ const loadUserClassAndStudents = async () => {
   }
 };
 
-// 获取指定考勤类型的课程及次数（并行获取次数）
+// 获取指定考勤类型的课程及次数（并行获取次数和日期）
 const getCoursesByType = async (type: string) => {
   try {
     const token = getUserToken();
@@ -216,6 +219,8 @@ const getCoursesByType = async (type: string) => {
     if (res.list && Array.isArray(res.list)) {
       const courses: Course[] = await Promise.all(res.list.map(async (c: any) => {
         let totalNum = 0;
+        let recordDates = "";
+
         try {
           const countRes = await getStatusCount(
               token,
@@ -227,8 +232,25 @@ const getCoursesByType = async (type: string) => {
               dateRange.value[1]
           );
           totalNum = countRes.list?.[0]?.totalNum || 0;
+
+          // 🔹 新增：获取日期详情
+          const detailRes = await getAttendanceDates(
+              token,
+              userClassID.value,
+              c.pk_lesson,
+              pkUser,
+              type,
+              dateRange.value[0],
+              dateRange.value[1]
+          );
+
+          if (detailRes.state === "1" && detailRes.data?.record_list?.length) {
+            recordDates = detailRes.data.record_list
+                .map((r: any) => r.record_date)
+                .join("、");
+          }
         } catch (err) {
-          console.error(`获取课程 ${c.lesson_name} 次数失败`, err);
+          console.error(`获取课程 ${c.lesson_name} 考勤详情失败`, err);
         }
 
         return {
@@ -236,7 +258,8 @@ const getCoursesByType = async (type: string) => {
           teacher_name: c.teacher_name,
           status: attendanceTypeMap[type] || "未知",
           totalNum,
-          pk_lesson: c.pk_lesson
+          pk_lesson: c.pk_lesson,
+          recordDates
         };
       }));
 
@@ -286,7 +309,6 @@ onMounted(async () => {
 .mt-5 {
   margin-top: 40px;
 }
-
 .course-table {
   margin-top: 20px;
 }
