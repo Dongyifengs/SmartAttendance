@@ -9,6 +9,7 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
+    if: github.repository == 'Dongyifengs/SmartAttendance'
     steps:
       # 步骤 1: 检出代码
       - name: 检出 master 分支
