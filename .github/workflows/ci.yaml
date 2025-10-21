@@ -3,7 +3,7 @@ name: 构建并部署静态站点
 on:
   push:
     branches:
-      - master  # 当 master 分支有推送时触发
+      - master
 
 jobs:
   build-and-deploy:
@@ -11,19 +11,16 @@ jobs:
 
     if: github.repository == 'Dongyifengs/SmartAttendance'
     steps:
-      # 步骤 1: 检出代码
-      - name: 检出 master 分支
+      - name: 检出代码
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0  # 获取完整的 git 历史记录
+          fetch-depth: 0
 
-      # 步骤 2: 设置 Node.js 22 环境
       - name: 设置 Node.js 22
         uses: actions/setup-node@v3
         with:
           node-version: 22
 
-      # 步骤 3: 获取最新的提交信息
       - name: 获取提交信息
         id: commit_info
         run: |
@@ -32,32 +29,38 @@ jobs:
           COMMIT_HASH=$(git log -1 --pretty=%H)
           echo "commit_hash=${COMMIT_HASH:0:7}" >> $GITHUB_OUTPUT
 
-      # 步骤 4: 安装依赖并构建项目
       - name: 安装依赖并构建
         run: |
           npm install
           npm run build
 
-      # 步骤 5: 切换到 static 分支
+      # ✅ 临时保存构建结果
+      - name: 备份构建产物
+        run: |
+          mkdir ../build-temp
+          cp -r dist/* ../build-temp/
+
+      # ✅ 切换到 static 分支（保留历史）
       - name: 切换到 static 分支
         run: |
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
-          # 获取远程 static 分支（如果存在）
-          git fetch origin static:static || echo "static 分支不存在，将新建"
+          git fetch origin static:static || echo "static 分支不存在，将创建新分支"
           git checkout static || git checkout -b static
 
-      # 步骤 6: 准备静态内容
-      - name: 准备静态内容
+      # ✅ 还原构建内容 + 提交
+      - name: 更新静态文件
         run: |
-          # 清除旧构建文件，但保留 .git 历史
           rm -rf ./*
-          cp -r ../dist/* .
+          cp -r ../build-temp/* .
+          rm -rf ../build-temp
           git add -A
-          git commit -m "🚀 部署: ${{ steps.commit_info.outputs.commit_message }} (基于 ${{ steps.commit_info.outputs.commit_hash }})"
+          git commit -m "🚀 部署: ${{ steps.commit_info.outputs.commit_message }} (基于 ${{ steps.commit_info.outputs.commit_hash }})" || echo "⚠️ 无文件更改，跳过提交"
 
-      # 步骤 7: 推送到 static 分支
+      # ✅ 推送到 static 分支（保留历史）
       - name: 推送到 static 分支
-        run: git push origin static
+        run: |
+          git pull origin static --rebase || echo "首次部署，无需 rebase"
+          git push origin static
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
