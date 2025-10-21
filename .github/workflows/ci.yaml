@@ -43,25 +43,21 @@ jobs:
         run: |
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
-          if git show-ref --verify --quiet refs/heads/static; then
-            git checkout static
-          else
-            git checkout --orphan static
-          fi
+          # 获取远程 static 分支（如果存在）
+          git fetch origin static:static || echo "static 分支不存在，将新建"
+          git checkout static || git checkout -b static
 
       # 步骤 6: 准备静态内容
       - name: 准备静态内容
         run: |
-          git rm -rf .
-          cp -r dist/* .
-          rm -rf node_modules
-          rm -rf dist
-          rm -rf *.d.ts
-          git add .
+          # 清除旧构建文件，但保留 .git 历史
+          rm -rf ./*
+          cp -r ../dist/* .
+          git add -A
           git commit -m "🚀 部署: ${{ steps.commit_info.outputs.commit_message }} (基于 ${{ steps.commit_info.outputs.commit_hash }})"
 
       # 步骤 7: 推送到 static 分支
       - name: 推送到 static 分支
-        run: git push origin static --force
+        run: git push origin static
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
