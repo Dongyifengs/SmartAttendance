@@ -1,6 +1,8 @@
 import axios from 'axios';
 import {encrypt} from './crypto';
 import {Buffer} from 'buffer';
+import {computed, type Ref} from "vue";
+import {useLocalStorage} from "@vueuse/core";
 
 /**
  * @file RollCall API 模块
@@ -39,6 +41,48 @@ function generateInterfaceParams(data: object): string {
     const jsonStr = JSON.stringify(data);
     const firstEncode = Buffer.from(jsonStr).toString('base64');
     return `interface=${Buffer.from(firstEncode).toString('base64')}`;
+}
+
+type BoolString = "0" | "1";
+
+export interface UserInfo {
+    state: string;
+    birthday: string;
+    pk_group: string;
+    user_name: string;
+    orgList: OrgInfo[];
+    pk_user: string;
+    client_id: string;
+    pk_org: string;
+    user_role: number;
+    user_type: string;
+    group_easid: string;
+    user_code: string;
+    user_phone: string;
+    face_id: string;
+    pk_teacher: string;
+    group_name: string;
+    sex: string;
+    user_auth: number;
+    org_type: string;
+    curryDate: string;
+    token: string;
+    user_singlekey: string;
+    super_root: string;
+    user_pic: string;
+    org_lev: string;
+    new_join: number;
+    initUser: number;
+}
+
+export interface OrgInfo {
+    orgName: string;
+    orgPk: string;
+}
+
+export const useUserInfo = (): Ref<UserInfo | null> => {
+    const storage = useLocalStorage("SA-ZHKQ-USERINFO", null);
+    return computed(() => storage.value ? JSON.parse(storage.value) as UserInfo : null)
 }
 
 /**
@@ -261,6 +305,33 @@ export async function ZHKQ_LOGIN(
     });
 }
 
+export interface Course {
+    lesson_type: number;
+    lesson_date: string;
+    selective: number;
+    week_num: number;
+    week_item: number;
+    week_name: string;
+    begin_time: string;
+    end_time: string;
+    section_num: number;
+    pk_anlaxy_semester: string;
+    pk_anlaxy_organize: string;
+    pk_group: string;
+    pk_anlaxy_timezone: string;
+    campus: string;
+    lesson_name: string;
+    pk_anlaxy_lesson: string;
+    teacher_id: string;
+    teacher_name: string;
+    pk_teacher: string;
+    class_room_name: string;
+    pk_anlaxy_classroom: string;
+    pk_anlaxy_syllabus: string;
+    max_count: number;
+    cur_count: string;
+}
+
 /**
  * 获取当天课程列表
  *
@@ -273,12 +344,53 @@ export async function ZHKQ_LOGIN(
 export async function getDayCourseList(
     date: string,
     userKey: string
-): Promise<any> {
+): Promise<{status: string, sourcelist: Course[]}> {
     return apiCall("RollCall_SourceListDay", {
         date,
         userKey
     });
 }
+
+export interface SignRecord {
+    lesson_type: number;
+    pk_anlaxy_syllabus_user: string;
+    lesson_date: string;
+    user_id: string;
+    user_name: string;
+    before_class_time: string;
+    begin_time: string;
+    after_class_time: string;
+    u_begin_time: string;
+    before_class_over_time: string;
+    end_time: string;
+    after_class_over_time: string;
+    u_end_time: string;
+    late_time_length: number;
+    leave_ago_time_length: number;
+    absent_num: BoolString;
+    late_num: BoolString;
+    leave_num: BoolString;
+    ask_leave_num: BoolString;
+    ok_num: number;
+    get_num: number;
+    user_num: number;
+    section_num: number;
+    syllabus_status: number;
+    uuid: string;
+    srv_data: string;
+    mac: string;
+    reviewscore: number;
+    reviewcontent: string;
+    pk_user: string;
+    pk_class: string;
+    pk_lesson: string;
+    pk_teacher: string;
+    pk_class_room: string;
+    campus: string;
+    pk_anlaxy_syllabus: string;
+    teacher_pic: string;
+}
+
 
 /**
  * 获取当天签到记录
@@ -292,7 +404,7 @@ export async function getDayCourseList(
 export async function getDaySignList(
     date: string,
     userKey: string
-): Promise<any> {
+): Promise<{state: string, sign_record_list: SignRecord[]}> {
     return apiCall("RollCall_SourceSignList", {
         date,
         userKey

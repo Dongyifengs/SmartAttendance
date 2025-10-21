@@ -41,6 +41,14 @@ export const routes = [
             requiresAuth: true,
             title: "开发者请假列表"
         }
+    },
+    {
+        path: "/dev/home",
+        component: () => import("@/view/DevHome.vue"),
+        meta: {
+            requiresAuth: true,
+            title: "开发者主页"
+        }
     }
 ]
 
