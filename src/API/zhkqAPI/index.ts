@@ -3,7 +3,14 @@ import {encrypt} from './crypto';
 import {Buffer} from 'buffer';
 
 /**
- * 创建核心 Axios 实例 - RollCallAPI
+ * @file RollCall API 模块
+ * @description 封装点名系统相关接口的通用调用方法，包括登录、签到、签退、课程信息等。
+ * @module RollCallAPI
+ */
+
+/**
+ * 核心 Axios 实例 - RollCallAPI
+ * 用于访问 rollcall.anlaxy.com.cn 主接口
  */
 const RollCallAPI = axios.create({
     baseURL: 'https://rollcall.anlaxy.com.cn/SerApi/v02',
@@ -12,20 +19,21 @@ const RollCallAPI = axios.create({
     }
 });
 
-/*
-* 创建次要 Axios 实例 - PairAPI
-* */
+/**
+ * 次级 Axios 实例 - PairAPI
+ * 用于访问 PairAPI 接口（本地代理）
+ */
 const PairAPI = axios.create({
     baseURL: '/PairAPI',
     headers: {
         'Content-Type': 'application/x-www-form-urlencoded'
     }
-})
+});
 
 /**
- * 生成接口参数（双重Base64编码）
- * @param data - 需要传输的数据对象
- * @returns 双重Base64编码后的参数字符串，格式为 "interface=编码后的数据"
+ * 生成接口参数（双重 Base64 编码）
+ * @param {object} data - 需要进行编码的数据对象
+ * @returns {string} 返回双重 Base64 编码后的参数字符串，例如：`interface=xxxxx`
  */
 function generateInterfaceParams(data: object): string {
     const jsonStr = JSON.stringify(data);
@@ -34,47 +42,85 @@ function generateInterfaceParams(data: object): string {
 }
 
 /**
- * 通用API调用方法
- * @param func - 接口功能名称
- * @param param - 接口参数对象
- * @param userKey - 用户认证密钥，可选
- * @returns 返回接口响应数据
- * @throws 当请求失败时抛出错误
+ * 通用 API 调用方法（增强版）
+ *
+ * @async
+ * @function apiCall
+ * @param {string} func - 要调用的后端接口函数名（如 "Member_Login"）
+ * @param {object} [options={}] - 可选参数配置
+ * @param {Record<string, any>} [options.param=null] - 自定义参数对象
+ * @param {string|null} [options.date=null] - 日期字符串
+ * @param {string|null} [options.userid=null] - 用户ID
+ * @param {string|null} [options.userpwd=null] - 用户加密密码
+ * @param {string|null} [options.deviceId=null] - 设备唯一标识
+ * @param {string|null} [options.client_local_id=null] - 客户端本地ID
+ * @param {string|null} [options.userKey=null] - 用户会话密钥
+ * @param {string|null} [options.group_id=null] - 班级/分组ID
+ * @returns {Promise<any>} 返回后端响应数据
+ * @throws {Error} 当请求失败时抛出异常
  */
 export async function apiCall(
     func: string,
-    param: Record<string, any> | null = null,
-    userKey: string | null = null
+    options: {
+        param?: Record<string, any> | null;
+        date?: string | null;
+        userid?: string | null;
+        userpwd?: string | null;
+        deviceId?: string | null;
+        client_local_id?: string | null;
+        userKey?: string | null;
+        group_id?: string | null;
+    } = {}
 ): Promise<any> {
-    // 构造请求负载
+    const {
+        param = {},
+        date = null,
+        userid = null,
+        userpwd = null,
+        deviceId = null,
+        client_local_id = null,
+        userKey = null,
+        group_id = null
+    } = options;
+
     const payload: Record<string, any> = {
-        CommType: "function",  // 固定为"function"
-        Comm: func,            // 接口功能名称
+        CommType: "function",
+        Comm: func,
         Param: {
-            ...param,          // 展开传入的参数
-            Source_PlatForm: 2 // 固定为2，表示平台类型
+            ...param,
+            Source_PlatForm: 2,
+            ...(date ? {date} : {}),
+            ...(userid ? {userid} : {}),
+            ...(userpwd ? {userpwd} : {}),
+            ...(deviceId ? {deviceId} : {}),
+            ...(client_local_id ? {client_local_id} : {}),
+            ...(userKey ? {userKey} : {}),
+            ...(group_id ? {group_id} : {})
         }
     };
 
-    // 如果提供了userKey，添加到参数中
-    if (userKey) {
-        payload.Param.userKey = userKey;
-    }
-
-    // 生成双重Base64编码的表单数据
     const formData = generateInterfaceParams(payload);
 
     try {
         const response = await RollCallAPI.post('', formData);
         return response.data;
     } catch (error) {
-        console.error('API调用失败:', error);
+        console.error('API 调用失败:', error);
         throw error;
     }
 }
 
 /**
- * 通用 RollCall API 调用器
+ * 通用 RollCall Pair API 调用器
+ *
+ * @async
+ * @function apiRollCall
+ * @param {string} func - 要调用的后端函数名
+ * @param {object} [options={}] - 参数对象
+ * @param {Record<string, any>} [options.param=null] - 自定义参数对象
+ * @param {string|null} [options.userKey=null] - 用户密钥
+ * @param {string|null} [options.group_id=null] - 班级/分组 ID
+ * @returns {Promise<any>} 返回后端响应数据
  */
 export async function apiRollCall(
     func: string,
@@ -90,7 +136,6 @@ export async function apiRollCall(
         group_id = null
     } = options;
 
-    // 构造请求负担
     const payload: Record<string, any> = {
         CommType: "function",
         Comm: func,
@@ -102,74 +147,89 @@ export async function apiRollCall(
         }
     };
 
-    // 生成双重Base64编码
     const formData = generateInterfaceParams(payload);
 
     try {
         const response = await PairAPI.post('', formData);
         return response.data;
     } catch (error) {
-        console.error('API调用失败:', error);
+        console.error('API 调用失败:', error);
         throw error;
     }
 }
 
-
 /**
  * 用户登录接口
- * @param username - 用户名/学号
- * @param password - 密码（明文，内部会自动加密）
- * @param deviceId - 设备IMEI1
- * @returns 登录响应数据，包含用户信息和token等
- * @throws 登录失败时抛出错误
+ *
+ * @async
+ * @function ZHKQ_LOGIN
+ * @param {string} username - 用户名/账号
+ * @param {string} password - 明文密码（将在函数内加密）
+ * @param {string} deviceId - 设备唯一标识
+ * @returns {Promise<any>} 返回登录结果数据
  */
 export async function ZHKQ_LOGIN(
     username: string,
     password: string,
     deviceId: string
 ): Promise<any> {
-    const encryptedPwd = encrypt(password); // 密码加密处理
+    const encryptedPwd = encrypt(password);
     return apiCall("Member_Login", {
-        userid: username,            // 用户名
-        userpwd: encryptedPwd,       // 加密后的密码
-        client_local_id: deviceId // 固定设备ID
+        userid: username,
+        userpwd: encryptedPwd,
+        client_local_id: deviceId
     });
 }
 
 /**
  * 获取当天课程列表
- * @param date - 日期字符串，格式为YYYY-MM-DD
- * @param userKey - 用户认证密钥
- * @returns 返回当天课程列表数据
- * @throws 请求失败时抛出错误
+ *
+ * @async
+ * @function getDayCourseList
+ * @param {string} date - 日期字符串（如 "2025-10-21"）
+ * @param {string} userKey - 用户密钥
+ * @returns {Promise<any>} 返回当天课程列表
  */
 export async function getDayCourseList(
     date: string,
     userKey: string
 ): Promise<any> {
-    return apiCall("RollCall_SourceListDay", {date}, userKey);
+    return apiCall("RollCall_SourceListDay", {
+        date,
+        userKey
+    });
 }
 
 /**
  * 获取当天签到记录
- * @param date - 日期字符串，格式为YYYY-MM-DD
- * @param userKey - 用户认证密钥
- * @returns 返回当天签到记录数据
- * @throws 请求失败时抛出错误
+ *
+ * @async
+ * @function getDaySignList
+ * @param {string} date - 日期字符串
+ * @param {string} userKey - 用户密钥
+ * @returns {Promise<any>} 返回签到记录数据
  */
 export async function getDaySignList(
     date: string,
     userKey: string
 ): Promise<any> {
-    return apiCall("RollCall_SourceSignList", {date}, userKey);
+    return apiCall("RollCall_SourceSignList", {
+        date,
+        userKey
+    });
 }
 
 /**
- * 课程签到接口
- * @param params - 签到参数对象
- * @param userKey - 用户认证密钥
- * @returns 返回签到结果
- * @throws 签到失败时抛出错误
+ * 课程签到参数接口定义
+ * @property {string} pk_anlaxy_syllabus_user - 课程用户主键
+ * @property {number} sign_in_type - 签到类型（0=正常，1=迟到等）
+ * @property {string} u_begin_time - 签到时间
+ * @property {number} late_time_length - 迟到时长（分钟）
+ * @property {number} late_num - 迟到次数
+ * @property {number} ask_leave_num - 请假次数
+ * @property {number} in_longitude - 签到经度
+ * @property {number} in_latitude - 签到纬度
+ * @property {string} phone_code - 手机识别码
  */
 export interface SignInParams {
     pk_anlaxy_syllabus_user: string;
@@ -183,19 +243,39 @@ export interface SignInParams {
     phone_code: string;
 }
 
+/**
+ * 课程签到接口
+ *
+ * @async
+ * @function signIn
+ * @param {SignInParams} params - 签到参数对象
+ * @param {string} userKey - 用户密钥
+ * @returns {Promise<any>} 返回签到结果
+ */
 export async function signIn(
     params: SignInParams,
     userKey: string
 ): Promise<any> {
-    return apiCall("RollCall_SignInSource", params, userKey);
+    return apiCall("RollCall_SignInSource", {
+        param: params,
+        userKey
+    });
 }
 
 /**
- * 课程签退接口
- * @param params - 签退参数对象
- * @param userKey - 用户认证密钥
- * @returns 返回签退结果
- * @throws 签退失败时抛出错误
+ * 课程签退参数接口定义
+ *
+ * @property {string} pk_anlaxy_syllabus_user - 课程用户主键
+ * @property {string} phone_code - 手机识别码
+ * @property {number} sign_out_type - 签退类型（0=正常，1=早退等）
+ * @property {string} u_end_time - 签退时间
+ * @property {string} lesson_change_list - 课程调整列表
+ * @property {string} lesson_change_type - 调整类型
+ * @property {number} ask_leave_num - 请假次数
+ * @property {number} out_longitude - 签退经度
+ * @property {number} out_latitude - 签退纬度
+ * @property {string} reviewscore - 评分
+ * @property {string} reviewcontent - 评价内容
  */
 export interface SignOutParams {
     pk_anlaxy_syllabus_user: string;
@@ -211,62 +291,75 @@ export interface SignOutParams {
     reviewcontent: string;
 }
 
+/**
+ * 课程签退接口
+ *
+ * @async
+ * @function signOut
+ * @param {SignOutParams} params - 签退参数对象
+ * @param {string} userKey - 用户密钥
+ * @returns {Promise<any>} 返回签退结果
+ */
 export async function signOut(
     params: SignOutParams,
     userKey: string
 ): Promise<any> {
-    return apiCall("RollCall_SignOutSource", params, userKey);
+    return apiCall("RollCall_SignOutSource", {
+        param: params,
+        userKey
+    });
 }
 
 /**
  * 获取课程结束时间
- * @param lessonId - 课程ID
- * @param userKey - 用户认证密钥
- * @returns 返回课程结束时间信息
- * @throws 请求失败时抛出错误
+ *
+ * @async
+ * @function getEndTime
+ * @param {string} lessonId - 课程ID
+ * @param {string} userKey - 用户密钥
+ * @returns {Promise<any>} 返回课程结束时间数据
  */
 export async function getEndTime(
     lessonId: string,
     userKey: string
 ): Promise<any> {
-    return apiCall(
-        "RollCall_Get_Change_EndTime",
-        {lesson_change_list: lessonId},
+    return apiCall("RollCall_Get_Change_EndTime", {
+        param: {lesson_change_list: lessonId},
         userKey
-    );
+    });
 }
 
-/*
-* 获取用户班级
-* @param userKey - 用户认证密钥
-* @returns 返回用户班级信息
-* */
+/**
+ * 获取用户班级列表
+ *
+ * @async
+ * @function getUserClass
+ * @param {string} userKey - 用户密钥
+ * @returns {Promise<any>} 返回班级列表数据
+ */
 export async function getUserClass(
     userKey: string
 ): Promise<any> {
-    return apiRollCall(
-        "Member_Get_Class",
-        {
-            userKey
-        }
-    );
+    return apiRollCall("Member_Get_Class", {
+        userKey
+    });
 }
 
-/*
-* 获取班级学生
-* @param userKey - 用户认证密钥
-* @param group_id - 班级ID
-* @returns 返回班级学生信息
-* */
+/**
+ * 获取班级学生列表
+ *
+ * @async
+ * @function getClassStudent
+ * @param {string} userKey - 用户密钥
+ * @param {string} group_id - 班级ID
+ * @returns {Promise<any>} 返回学生列表数据
+ */
 export async function getClassStudent(
     userKey: string,
     group_id: string
 ): Promise<any> {
-    return apiRollCall(
-        "Member_Get_Group",
-        {
-            userKey,
-            group_id
-        }
-    );
+    return apiRollCall("Member_Get_Group", {
+        userKey,
+        group_id
+    });
 }
