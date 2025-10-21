@@ -70,6 +70,12 @@ export async function apiCall(
         client_local_id?: string | null;
         userKey?: string | null;
         group_id?: string | null;
+        pk_user?: string | null;
+        pk_class?: string | null;
+        pk_lesson?: string | null;
+        type?: string | null;
+        startDate?: string | null;
+        endDate?: string | null;
     } = {}
 ): Promise<any> {
     const {
@@ -80,7 +86,14 @@ export async function apiCall(
         deviceId = null,
         client_local_id = null,
         userKey = null,
-        group_id = null
+        group_id = null,
+        pk_user = null,
+        pk_class = null,
+        pk_lesson = null,
+        type = null,
+        startDate = null,
+        endDate = null
+
     } = options;
 
     const payload: Record<string, any> = {
@@ -95,7 +108,13 @@ export async function apiCall(
             ...(deviceId ? {deviceId} : {}),
             ...(client_local_id ? {client_local_id} : {}),
             ...(userKey ? {userKey} : {}),
-            ...(group_id ? {group_id} : {})
+            ...(group_id ? {group_id} : {}),
+            ...(pk_user ? {pk_user} : {}),
+            ...(pk_class ? {pk_class} : {}),
+            ...(pk_lesson ? {pk_lesson} : {}),
+            ...(type ? {type} : {}),
+            ...(startDate ? {startDate} : {}),
+            ...(endDate ? {endDate} : {}),
         }
     };
 
@@ -128,12 +147,36 @@ export async function apiRollCall(
         param?: Record<string, any> | null;
         userKey?: string | null;
         group_id?: string | null;
+        date?: string | null;
+        userid?: string | null;
+        userpwd?: string | null;
+        deviceId?: string | null;
+        client_local_id?: string | null;
+        pk_user?: string | null;
+        pk_class?: string | null;
+        pk_lesson?: string | null;
+        type?: string | null;
+        startDate?: string | null;
+        endDate?: string | null;
+
     } = {}
 ): Promise<any> {
     const {
         param = {},
         userKey = null,
-        group_id = null
+        group_id = null,
+        date = null,
+        userid = null,
+        userpwd = null,
+        deviceId = null,
+        client_local_id = null,
+        pk_user = null,
+        pk_class = null,
+        pk_lesson = null,
+        type = null,
+        startDate = null,
+        endDate = null
+
     } = options;
 
     const payload: Record<string, any> = {
@@ -143,7 +186,18 @@ export async function apiRollCall(
             ...param,
             Source_PlatForm: 2,
             ...(userKey ? {userKey} : {}),
-            ...(group_id ? {group_id} : {})
+            ...(group_id ? {group_id} : {}),
+            ...(date ? {date} : {}),
+            ...(userid ? {userid} : {}),
+            ...(userpwd ? {userpwd} : {}),
+            ...(deviceId ? {deviceId} : {}),
+            ...(client_local_id ? {client_local_id} : {}),
+            ...(pk_user ? {pk_user} : {}),
+            ...(pk_class ? {pk_class} : {}),
+            ...(pk_lesson ? {pk_lesson} : {}),
+            ...(type ? {type} : {}),
+            ...(startDate ? {startDate} : {}),
+            ...(endDate ? {endDate} : {}),
         }
     };
 
@@ -363,3 +417,47 @@ export async function getClassStudent(
         group_id
     });
 }
+
+/**
+ * 获取课程状态
+ */
+export async function getCourseStatus(
+    userKey: string,
+    pk_user: string,
+    pk_class: string,
+    type: string,
+    startDate: string,
+    endDate: string
+): Promise<any> {
+    return apiRollCall("Supplement_Class_Anomaly", {
+        userKey,
+        pk_user,
+        pk_class,
+        "pk_lesson": "",
+        type,
+        startDate,
+        endDate
+    });
+}
+
+// 获取对应状态次数
+export async function getStatusCount(
+    userKey: string,
+    pk_class: string,
+    pk_lesson: string,
+    pk_user: string,
+    type: string,
+    startDate: string,
+    endDate: string
+): Promise<any> {
+    return apiRollCall("Supplement_Lesson_User", {
+        userKey,
+        pk_user,
+        pk_class,
+        pk_lesson,
+        type,
+        startDate,
+        endDate
+    });
+}
+
