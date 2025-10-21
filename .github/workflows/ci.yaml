@@ -27,7 +27,7 @@ jobs:
       - name: 获取提交信息
         id: commit_info
         run: |
-          COMMIT_MESSAGE=$(git log -1 --pretty=%B)
+          COMMIT_MESSAGE=$(git log -1 --pretty=%B | tr '\n' ' ' | sed 's/%/%25/g; s/\r/%0D/g; s/\n/%0A/g')
           echo "commit_message=$COMMIT_MESSAGE" >> $GITHUB_OUTPUT
           COMMIT_HASH=$(git log -1 --pretty=%H)
           echo "commit_hash=${COMMIT_HASH:0:7}" >> $GITHUB_OUTPUT
