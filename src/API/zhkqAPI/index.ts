@@ -76,6 +76,11 @@ export async function apiCall(
         type?: string | null;
         startDate?: string | null;
         endDate?: string | null;
+        classpk?: string | null;
+        source_code?: string | null;
+        user_code?: string | null;
+        start?: string | null;
+        end?: string | null;
     } = {}
 ): Promise<any> {
     const {
@@ -92,7 +97,11 @@ export async function apiCall(
         pk_lesson = null,
         type = null,
         startDate = null,
-        endDate = null
+        endDate = null,
+        source_code = null,
+        user_code = null,
+        start = null,
+        end = null,
 
     } = options;
 
@@ -115,6 +124,10 @@ export async function apiCall(
             ...(type ? {type} : {}),
             ...(startDate ? {startDate} : {}),
             ...(endDate ? {endDate} : {}),
+            ...(source_code ? {source_code} : {}),
+            ...(user_code ? {user_code} : {}),
+            ...(start ? {start} : {}),
+            ...(end ? {end} : {})
         }
     };
 
@@ -158,7 +171,11 @@ export async function apiRollCall(
         type?: string | null;
         startDate?: string | null;
         endDate?: string | null;
-
+        classpk?: string | null;
+        start?: string | null;
+        end?: string | null;
+        source_code?: string | null;
+        user_code?: string
     } = {}
 ): Promise<any> {
     const {
@@ -175,8 +192,12 @@ export async function apiRollCall(
         pk_lesson = null,
         type = null,
         startDate = null,
-        endDate = null
-
+        endDate = null,
+        classpk = null,
+        start = null,
+        end = null,
+        source_code = null,
+        user_code = null
     } = options;
 
     const payload: Record<string, any> = {
@@ -198,6 +219,11 @@ export async function apiRollCall(
             ...(type ? {type} : {}),
             ...(startDate ? {startDate} : {}),
             ...(endDate ? {endDate} : {}),
+            ...(classpk ? {classpk} : {}),
+            ...(start ? {start} : {}),
+            ...(end ? {end} : {}),
+            ...(source_code ? {source_code} : {}),
+            ...(user_code ? {user_code} : {}),
         }
     };
 
@@ -459,5 +485,28 @@ export async function getStatusCount(
         startDate,
         endDate
     });
+}
+
+/**
+ * 考勤状态日期查询
+ */
+export async function getAttendanceDates(
+    userKey: string,
+    classpk: string,
+    source_code: string,
+    user_code: string,
+    type: string,
+    start: string,
+    end: string
+): Promise<any> {
+    return apiCall("Supplement_LessonSignDetail", {
+        userKey,
+        classpk,
+        source_code,
+        user_code,
+        type,
+        start,
+        end
+    })
 }
 
