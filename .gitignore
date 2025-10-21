@@ -105,3 +105,6 @@ npm-shrinkwrap.json
 /.env.development
 .env.development
 /src/API/reqable/
+
+# remove bun for wzp ~_~ meow~
+bun.lock
