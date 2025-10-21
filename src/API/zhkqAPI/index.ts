@@ -74,41 +74,35 @@ export async function apiCall(
 }
 
 /**
- * 次要API - 2调用方法
- * @param func - 接口功能名称
- * @param param - 接口参数对象
- * @param userKey - 用户认证密钥，可选
- * @param group_id - 班级ID，可选
- * @returns 返回接口响应数据
- * @throws 当请求失败时抛出错误
+ * 通用 RollCall API 调用器
  */
 export async function apiRollCall(
     func: string,
-    param: Record<string, any> | null = null,
-    userKey: string | null = null,
-    group_id: string | null = null
+    options: {
+        param?: Record<string, any> | null;
+        userKey?: string | null;
+        group_id?: string | null;
+    } = {}
 ): Promise<any> {
-    // 构造请求负载
+    const {
+        param = {},
+        userKey = null,
+        group_id = null
+    } = options;
+
+    // 构造请求负担
     const payload: Record<string, any> = {
-        CommType: "function",   // 固定为"function"
-        Comm: func,             // 接口功能名称
+        CommType: "function",
+        Comm: func,
         Param: {
-            ...param,           // 展开传入的参数
-            Source_PlatForm: 2, // 固定为2，表示平台类型
-            group_id: group_id  // 班级ID
+            ...param,
+            Source_PlatForm: 2,
+            ...(userKey ? {userKey} : {}),
+            ...(group_id ? {group_id} : {})
         }
     };
 
-    // 如果提供了userKey，添加到参数中
-    if (userKey) {
-        payload.Param.userKey = userKey;
-    }
-
-    if (group_id) {
-        payload.Param.group_id = group_id;
-    }
-
-    // 生成双重Base64编码的表单数据
+    // 生成双重Base64编码
     const formData = generateInterfaceParams(payload);
 
     try {
@@ -252,25 +246,27 @@ export async function getUserClass(
 ): Promise<any> {
     return apiRollCall(
         "Member_Get_Class",
-        {},
-        userKey
+        {
+            userKey
+        }
     );
 }
 
 /*
 * 获取班级学生
 * @param userKey - 用户认证密钥
-* @param classId - 班级ID
+* @param group_id - 班级ID
 * @returns 返回班级学生信息
 * */
 export async function getClassStudent(
     userKey: string,
-    classId: string
+    group_id: string
 ): Promise<any> {
     return apiRollCall(
         "Member_Get_Group",
-        {},
-        userKey,
-        classId
+        {
+            userKey,
+            group_id
+        }
     );
 }
