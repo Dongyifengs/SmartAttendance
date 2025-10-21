@@ -4,6 +4,7 @@ import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import IconsResolver from 'unplugin-icons/resolver'
 import {ElementPlusResolver} from 'unplugin-vue-components/resolvers'
+import {resolve} from "path";
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -35,4 +36,9 @@ export default defineConfig({
         }
     },
     base: './',
+    resolve: {
+        alias: {
+            "@": resolve(__dirname, './src'),
+        }
+    }
 })
