@@ -1,0 +1,66 @@
+name: 构建并部署静态站点
+
+on:
+  push:
+    branches:
+      - master  # 当 master 分支有推送时触发
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 步骤 1: 检出代码
+      - name: 检出 master 分支
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # 获取完整的 git 历史记录
+
+      # 步骤 2: 设置 Node.js 22 环境
+      - name: 设置 Node.js 22
+        uses: actions/setup-node@v3
+        with:
+          node-version: 22
+
+      # 步骤 3: 获取最新的提交信息
+      - name: 获取提交信息
+        id: commit_info
+        run: |
+          COMMIT_MESSAGE=$(git log -1 --pretty=%B)
+          echo "commit_message=$COMMIT_MESSAGE" >> $GITHUB_OUTPUT
+          COMMIT_HASH=$(git log -1 --pretty=%H)
+          echo "commit_hash=${COMMIT_HASH:0:7}" >> $GITHUB_OUTPUT
+
+      # 步骤 4: 安装依赖并构建项目
+      - name: 安装依赖并构建
+        run: |
+          npm install
+          npm run build
+
+      # 步骤 5: 切换到 static 分支
+      - name: 切换到 static 分支
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          if git show-ref --verify --quiet refs/heads/static; then
+            git checkout static
+          else
+            git checkout --orphan static
+          fi
+
+      # 步骤 6: 准备静态内容
+      - name: 准备静态内容
+        run: |
+          git rm -rf .
+          cp -r dist/* .
+          rm -rf node_modules
+          rm -rf dist
+          rm -rf *.d.ts
+          git add .
+          git commit -m "🚀 部署: ${{ steps.commit_info.outputs.commit_message }} (基于 ${{ steps.commit_info.outputs.commit_hash }})"
+
+      # 步骤 7: 推送到 static 分支
+      - name: 推送到 static 分支
+        run: git push origin static --force
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

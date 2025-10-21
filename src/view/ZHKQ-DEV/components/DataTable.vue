@@ -146,7 +146,7 @@ function formatValue(label: string, val: any): string {
 
 /* ✅ 高亮样式（两边同步） */
 .highlight {
-  background-color: #fff7d6;
+  background-color: #ffe451;
   transition: background 0.2s;
 }
 </style>

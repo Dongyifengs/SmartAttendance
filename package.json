@@ -19,7 +19,7 @@
     "axios": "^1.11.0",
     "buffer": "^6.0.3",
     "dayjs": "^1.11.18",
-    "element-plus": "^2.11.1",
+    "element-plus": "2.11.3",
     "jsencrypt": "^3.5.4",
     "unplugin-icons": "^22.2.0",
     "vue": "^3.5.18",
