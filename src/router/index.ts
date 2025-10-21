@@ -1,16 +1,10 @@
 import {createRouter, createWebHashHistory} from "vue-router";
 
-import Login from "../view/Login/Login.vue";
-import Home from "../view/Home/Home.vue"
-import ClassListDev from "../view/ZHKQ-DEV/ClassListDev.vue"
-import AttendanceDev from "../view/ZHKQ-DEV/AttendanceDev.vue";
-import LeaveDev from "../view/ZHKQ-DEV/LeaveDev.vue"
-
 // 路由配置
 export const routes = [
     {
         path: '/',
-        component: Login,
+        component: import("../view/Login/Login.vue"),
         meta: {
             requiresAuth: true,
             title: "登录"
@@ -18,7 +12,7 @@ export const routes = [
     },
     {
         path: '/home',
-        component: Home,
+        component: import("../view/Home/Home.vue"),
         meta: {
             requiresAuth: true,
             title: "主页"
@@ -26,7 +20,7 @@ export const routes = [
     },
     {
         path: '/classListDev',
-        component: ClassListDev,
+        component: import("../view/ZHKQ-DEV/ClassListDev.vue"),
         meta: {
             requiresAuth: true,
             title: "开发者课程详细列表"
@@ -34,7 +28,7 @@ export const routes = [
     },
     {
         path: '/AttendanceDev',
-        component: AttendanceDev,
+        component: import("../view/ZHKQ-DEV/AttendanceDev.vue"),
         meta: {
             requiresAuth: true,
             title: "开发者考勤列表"
@@ -42,7 +36,7 @@ export const routes = [
     },
     {
         path: '/LeaveDev',
-        component: LeaveDev,
+        component: () => import("../view/ZHKQ-DEV/LeaveDev.vue"),
         meta: {
             requiresAuth: true,
             title: "开发者请假列表"
