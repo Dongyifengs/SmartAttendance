@@ -4,7 +4,7 @@ import {createRouter, createWebHashHistory} from "vue-router";
 export const routes = [
     {
         path: '/',
-        component: import("@/view/Login/Login.vue"),
+        component: () => import("@/view/Login/Login.vue"),
         meta: {
             requiresAuth: true,
             title: "登录"
@@ -12,7 +12,7 @@ export const routes = [
     },
     {
         path: '/home',
-        component: import("@/view/Home/Home.vue"),
+        component: () => import("@/view/Home/Home.vue"),
         meta: {
             requiresAuth: true,
             title: "主页"
@@ -20,7 +20,7 @@ export const routes = [
     },
     {
         path: '/classListDev',
-        component: import("@/view/ZHKQ-DEV/ClassListDev.vue"),
+        component: () => import("@/view/ZHKQ-DEV/ClassListDev.vue"),
         meta: {
             requiresAuth: true,
             title: "开发者课程详细列表"
@@ -28,7 +28,7 @@ export const routes = [
     },
     {
         path: '/AttendanceDev',
-        component: import("@/view/ZHKQ-DEV/AttendanceDev.vue"),
+        component: () => import("@/view/ZHKQ-DEV/AttendanceDev.vue"),
         meta: {
             requiresAuth: true,
             title: "开发者考勤列表"
