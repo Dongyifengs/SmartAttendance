@@ -3,7 +3,7 @@ import dayjs from "dayjs";
 import type {ClassInfo} from "@/components/ClassCard.vue";
 import {onMounted, ref} from "vue";
 import ClassContainer from "@/components/ClassContainer.vue";
-import {useUserInfo, getDayCourseList, getDaySignList} from "@/API/zhkqAPI/index.ts";
+import {getDayCourseList, getDaySignList, useUserInfo} from "@/API/zhkqAPI/index.ts";
 
 const userInfo = useUserInfo();
 const data = ref<ClassInfo[]>([]);
@@ -41,7 +41,7 @@ onMounted(async () => {
 </script>
 
 <template>
-<class-container v-model="data"></class-container>
+  <class-container v-model="data"></class-container>
 </template>
 
 <style scoped>

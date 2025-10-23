@@ -50,11 +50,11 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
-import { ElMessage } from 'element-plus'
-import { User, Lock, Cellphone } from "@element-plus/icons-vue";
-import { OC_LOGIN } from "../../API/ocAPI";
-import { ZHKQ_LOGIN } from '../../API/zhkqAPI';
+import {onMounted, ref} from 'vue'
+import {ElMessage} from 'element-plus'
+import {Cellphone, Lock, User} from "@element-plus/icons-vue";
+import {OC_LOGIN} from "../../API/ocAPI";
+import {ZHKQ_LOGIN} from '../../API/zhkqAPI';
 import router from "../../router";
 
 // 开发环境
@@ -85,7 +85,8 @@ function fillFormFromStorage() {
       zhkqForm.value.username = account.username || ''
       zhkqForm.value.password = account.password || ''
       zhkqForm.value.deviceId = account.deviceId || ''
-    } catch {}
+    } catch {
+    }
   } else {
     zhkqForm.value.username = import.meta.env.VITE_ZHKQAPI_USERNAME || ''
     zhkqForm.value.password = import.meta.env.VITE_ZHKQAPI_PASSWORD || ''
@@ -98,7 +99,8 @@ function fillFormFromStorage() {
       const account = JSON.parse(ocAccount)
       ocForm.value.username = account.username || ''
       ocForm.value.password = account.password || ''
-    } catch {}
+    } catch {
+    }
   } else {
     ocForm.value.username = import.meta.env.VITE_OC_USERNAME || ''
     ocForm.value.password = import.meta.env.VITE_OC_PASSWORD || ''
