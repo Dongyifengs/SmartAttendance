@@ -1,6 +1,3 @@
-// 布尔字符串类型定义
-export type BoolString = "0" | "1";
-
 // ************* [ 登录返回类型 - ZHKQ_LOGIN ] ************* //
 /**
  * 智慧考勤登录接口响应体返回类型定义
@@ -77,6 +74,7 @@ export interface OrgInfo {
 
 // ************* [ 登录返回类型 - ZHKQ_LOGIN ] ************* //
 
+
 // ************* [ 获取课程表返回类型 - getDayCourseList ] ************* //
 /**
  * 智慧考勤课程信息接口返回类型定义
@@ -135,3 +133,92 @@ export interface CourseList {
 }
 
 // ************* [ 获取课程表返回类型 - getDayCourseList ] ************* //
+
+
+// ************* [ 获取当天签到记录 - getDaySignList ] ************* //
+// 布尔字符串类型定义
+export type BoolString = "0" | "1";
+
+/**
+ * 智慧考勤签到记录接口返回类型定义
+ * 包含单个用户的课程签到信息、上课时间、请假/迟到/缺勤状态及教师信息等
+ * @interface SignRecord
+ * @property { number } lesson_type - 课程类型，例如 `0` 表示必修，`1` 表示选修
+ * @property { string } pk_anlaxy_syllabus_user - 课程用户表主键ID，例如 `"3A****4A6"`
+ * @property { string } lesson_date - 上课日期，例如 `"2020-01-01"`
+ * @property { string } user_id - 用户ID，例如 `"2****6"`
+ * @property { string } user_name - 用户姓名，例如 `"李****"`
+ * @property { string } before_class_time - 课前时间，例如 `"07:50"`
+ * @property { string } begin_time - 课程开始时间，例如 `"08:00"`
+ * @property { string } after_class_time - 课后时间，例如 `"08:00"`
+ * @property { string } u_begin_time - 用户实际开始上课时间，例如 `""`（未签到）
+ * @property { string } before_class_over_time - 课程结束前时间，例如 `"09:40"`
+ * @property { string } end_time - 课程结束时间，例如 `"09:40"`
+ * @property { string } after_class_over_time - 课程结束后时间，例如 `"09:50"`
+ * @property { string } u_end_time - 用户实际下课时间，例如 `""`（未签到）
+ * @property { number } late_time_length - 迟到时长（分钟），例如 `0`
+ * @property { number } leave_ago_time_length - 早退时长（分钟），例如 `0`
+ * @property { BoolString } absent_num - 是否缺勤，例如 `1` 表示缺勤，`0` 表示正常
+ * @property { BoolString } late_num - 是否迟到，例如 `0` 表示未迟到
+ * @property { BoolString } leave_num - 是否早退，例如 `0` 表示未早退
+ * @property { BoolString } ask_leave_num - 是否请假，例如 `0` 表示未请假
+ * @property { number } ok_num - 正常出勤数量，例如 `0`
+ * @property { number } get_num - 实到人数，例如 `0`
+ * @property { number } user_num - 用户总数，例如 `1`
+ * @property { number } section_num - 节次编号，例如 `10`
+ * @property { number } syllabus_status - 教学大纲状态，例如 `0`
+ * @property { string } uuid - 唯一标识符，例如 `"FD****25"`
+ * @property { string } srv_data - 服务器相关数据，例如 `"C3:****:CE"`
+ * @property { string } mac - 设备 MAC 地址，例如 `"c3:****:ce"`
+ * @property { number } reviewscore - 教师评分，例如 `0`
+ * @property { string } reviewcontent - 教师评价内容，例如 `""`
+ * @property { string } pk_user - 用户主键ID，例如 `"3B****A3"`
+ * @property { string } pk_class - 班级主键ID，例如 `"05****0A"`
+ * @property { string } pk_lesson - 课程主键ID，例如 `"F0****B6"`
+ * @property { string } pk_teacher - 教师主键ID，例如 `"01****65"`
+ * @property { string } pk_class_room - 教室主键ID，例如 `"AA****B0"`
+ * @property { string } campus - 校区ID，例如 `"C0****AF"`
+ * @property { string } pk_anlaxy_syllabus - 教学大纲主键ID，例如 `"FE****A0"`
+ * @property { string } teacher_pic - 教师头像URL，例如 `""`
+ */
+export interface SignRecord {
+    lesson_type: number;
+    pk_anlaxy_syllabus_user: string;
+    lesson_date: string;
+    user_id: string;
+    user_name: string;
+    before_class_time: string;
+    begin_time: string;
+    after_class_time: string;
+    u_begin_time: string;
+    before_class_over_time: string;
+    end_time: string;
+    after_class_over_time: string;
+    u_end_time: string;
+    late_time_length: number;
+    leave_ago_time_length: number;
+    absent_num: BoolString;
+    late_num: BoolString;
+    leave_num: BoolString;
+    ask_leave_num: BoolString;
+    ok_num: number;
+    get_num: number;
+    user_num: number;
+    section_num: number;
+    syllabus_status: number;
+    uuid: string;
+    srv_data: string;
+    mac: string;
+    reviewscore: number;
+    reviewcontent: string;
+    pk_user: string;
+    pk_class: string;
+    pk_lesson: string;
+    pk_teacher: string;
+    pk_class_room: string;
+    campus: string;
+    pk_anlaxy_syllabus: string;
+    teacher_pic: string;
+}
+
+// ************* [ 获取当天签到记录 - getDaySignList ] ************* //

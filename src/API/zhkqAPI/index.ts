@@ -3,7 +3,7 @@ import {encrypt} from './crypto';
 import {Buffer} from 'buffer';
 import {computed, type Ref} from "vue";
 import {useLocalStorage} from "@vueuse/core";
-import type {BoolString, CourseList, UserInfo} from './type';
+import type {CourseList, SignRecord, UserInfo} from './type';
 
 // RollCallAPI, 封装主接口请求
 const RollCallAPI = axios.create({
@@ -269,54 +269,13 @@ export async function getDayCourseList(date: string, userKey: string): Promise<{
     });
 }
 
-export interface SignRecord {
-    lesson_type: number;
-    pk_anlaxy_syllabus_user: string;
-    lesson_date: string;
-    user_id: string;
-    user_name: string;
-    before_class_time: string;
-    begin_time: string;
-    after_class_time: string;
-    u_begin_time: string;
-    before_class_over_time: string;
-    end_time: string;
-    after_class_over_time: string;
-    u_end_time: string;
-    late_time_length: number;
-    leave_ago_time_length: number;
-    absent_num: BoolString;
-    late_num: BoolString;
-    leave_num: BoolString;
-    ask_leave_num: BoolString;
-    ok_num: number;
-    get_num: number;
-    user_num: number;
-    section_num: number;
-    syllabus_status: number;
-    uuid: string;
-    srv_data: string;
-    mac: string;
-    reviewscore: number;
-    reviewcontent: string;
-    pk_user: string;
-    pk_class: string;
-    pk_lesson: string;
-    pk_teacher: string;
-    pk_class_room: string;
-    campus: string;
-    pk_anlaxy_syllabus: string;
-    teacher_pic: string;
-}
-
 
 /**
  * 获取当天签到记录
- * @async
  * @function getDaySignList
- * @param {string} date - 日期字符串
- * @param {string} userKey - 用户密钥
- * @returns {Promise<SignRecord>} 返回签到记录数据
+ * @param { string } date - 日期字符串: `YYYY-MM-DD`
+ * @param { string } userKey - 用户密钥: `用户Token`
+ * @returns { Promise<SignRecord> } 返回签到记录数据
  */
 export async function getDaySignList(date: string, userKey: string): Promise<{
     state: string,
