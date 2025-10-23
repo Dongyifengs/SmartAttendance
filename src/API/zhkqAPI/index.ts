@@ -3,17 +3,9 @@ import {encrypt} from './crypto';
 import {Buffer} from 'buffer';
 import {computed, type Ref} from "vue";
 import {useLocalStorage} from "@vueuse/core";
+import type {BoolString, UserInfo} from './type';
 
-/**
- * @file RollCall API 模块
- * @description 封装点名系统相关接口的通用调用方法，包括登录、签到、签退、课程信息等。
- * @module RollCallAPI
- */
-
-/**
- * 核心 Axios 实例 - RollCallAPI
- * 用于访问 rollcall.anlaxy.com.cn 主接口
- */
+// RollCallAPI, 封装主接口请求
 const RollCallAPI = axios.create({
     baseURL: 'https://rollcall.anlaxy.com.cn/SerApi/v02',
     headers: {
@@ -21,10 +13,7 @@ const RollCallAPI = axios.create({
     }
 });
 
-/**
- * 次级 Axios 实例 - PairAPI
- * 用于访问 PairAPI 接口（本地代理）
- */
+// PairAPI, 封装次级接口请求
 const PairAPI = axios.create({
     baseURL: '/PairAPI',
     headers: {
@@ -33,51 +22,15 @@ const PairAPI = axios.create({
 });
 
 /**
- * 生成接口参数（双重 Base64 编码）
- * @param {object} data - 需要进行编码的数据对象
- * @returns {string} 返回双重 Base64 编码后的参数字符串，例如：`interface=xxxxx`
+ * 生成接口参数(使用Base64编码进行2次加密)
+ * @function generateInterfaceParams
+ * @param { object } data - 需要进行加密的原参数对象
+ * @returns { string } 返回2次加密的参数字符串, 例如: `interface=xxxxx`
  */
 function generateInterfaceParams(data: object): string {
     const jsonStr = JSON.stringify(data);
     const firstEncode = Buffer.from(jsonStr).toString('base64');
     return `interface=${Buffer.from(firstEncode).toString('base64')}`;
-}
-
-type BoolString = "0" | "1";
-
-export interface UserInfo {
-    state: string;
-    birthday: string;
-    pk_group: string;
-    user_name: string;
-    orgList: OrgInfo[];
-    pk_user: string;
-    client_id: string;
-    pk_org: string;
-    user_role: number;
-    user_type: string;
-    group_easid: string;
-    user_code: string;
-    user_phone: string;
-    face_id: string;
-    pk_teacher: string;
-    group_name: string;
-    sex: string;
-    user_auth: number;
-    org_type: string;
-    curryDate: string;
-    token: string;
-    user_singlekey: string;
-    super_root: string;
-    user_pic: string;
-    org_lev: string;
-    new_join: number;
-    initUser: number;
-}
-
-export interface OrgInfo {
-    orgName: string;
-    orgPk: string;
 }
 
 export const useUserInfo = (): Ref<UserInfo | null> => {
@@ -103,7 +56,7 @@ export const useUserInfo = (): Ref<UserInfo | null> => {
  * @returns {Promise<any>} 返回后端响应数据
  * @throws {Error} 当请求失败时抛出异常
  */
-export async function apiCall(
+export async function apiCall<T = any>(
     func: string,
     options: {
         param?: Record<string, any> | null;
@@ -179,7 +132,7 @@ export async function apiCall(
 
     try {
         const response = await RollCallAPI.post('', formData);
-        return response.data;
+        return response.data as T;
     } catch (error) {
         console.error('API 调用失败:', error);
         throw error;
@@ -198,7 +151,7 @@ export async function apiCall(
  * @param {string|null} [options.group_id=null] - 班级/分组 ID
  * @returns {Promise<any>} 返回后端响应数据
  */
-export async function apiRollCall(
+export async function apiRollCall<T = any>(
     func: string,
     options: {
         param?: Record<string, any> | null;
@@ -275,7 +228,7 @@ export async function apiRollCall(
 
     try {
         const response = await PairAPI.post('', formData);
-        return response.data;
+        return response.data as T;
     } catch (error) {
         console.error('API 调用失败:', error);
         throw error;
@@ -284,20 +237,18 @@ export async function apiRollCall(
 
 /**
  * 用户登录接口
- *
  * @async
  * @function ZHKQ_LOGIN
- * @param {string} username - 用户名/账号
- * @param {string} password - 明文密码（将在函数内加密）
- * @param {string} deviceId - 设备唯一标识
- * @returns {Promise<any>} 返回登录结果数据
+ * @param {string} username - 学号: `20*******0`
+ * @param {string} password - 明文密码: `Password`
+ * @param {string} deviceId - 设备ID: `UUID`
+ * @returns {Promise<UserInfo>} 返回登录结果数据
  */
-export async function ZHKQ_LOGIN(username: string, password: string, deviceId: string): Promise<any> {
-    const encryptedPwd = encrypt(password);
-    return apiCall("Member_Login", {
-        userid: username,
-        userpwd: encryptedPwd,
-        client_local_id: deviceId
+export async function ZHKQ_LOGIN(username: string, password: string, deviceId: string): Promise<UserInfo> {
+    return apiCall<UserInfo>("Member_Login", {
+        userid: username,           // 学号
+        userpwd: encrypt(password), // 加密后的密码
+        client_local_id: deviceId   // 设备ID
     });
 }
 
