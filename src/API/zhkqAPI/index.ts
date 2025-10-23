@@ -3,7 +3,7 @@ import {encrypt} from './crypto';
 import {Buffer} from 'buffer';
 import {computed, type Ref} from "vue";
 import {useLocalStorage} from "@vueuse/core";
-import type {BoolString, UserInfo} from './type';
+import type {BoolString, CourseList, UserInfo} from './type';
 
 // RollCallAPI, 封装主接口请求
 const RollCallAPI = axios.create({
@@ -239,10 +239,10 @@ export async function apiRollCall<T = any>(
  * 用户登录接口
  * @async
  * @function ZHKQ_LOGIN
- * @param {string} username - 学号: `20*******0`
- * @param {string} password - 明文密码: `Password`
- * @param {string} deviceId - 设备ID: `UUID`
- * @returns {Promise<UserInfo>} 返回登录结果数据
+ * @param { string } username - 学号: `2****0`
+ * @param { string } password - 明文密码: `Password`
+ * @param { string } deviceId - 设备ID: `UUID`
+ * @returns { Promise<UserInfo> } 返回登录结果数据
  */
 export async function ZHKQ_LOGIN(username: string, password: string, deviceId: string): Promise<UserInfo> {
     return apiCall<UserInfo>("Member_Login", {
@@ -252,45 +252,16 @@ export async function ZHKQ_LOGIN(username: string, password: string, deviceId: s
     });
 }
 
-export interface Course {
-    lesson_type: number;
-    lesson_date: string;
-    selective: number;
-    week_num: number;
-    week_item: number;
-    week_name: string;
-    begin_time: string;
-    end_time: string;
-    section_num: number;
-    pk_anlaxy_semester: string;
-    pk_anlaxy_organize: string;
-    pk_group: string;
-    pk_anlaxy_timezone: string;
-    campus: string;
-    lesson_name: string;
-    pk_anlaxy_lesson: string;
-    teacher_id: string;
-    teacher_name: string;
-    pk_teacher: string;
-    class_room_name: string;
-    pk_anlaxy_classroom: string;
-    pk_anlaxy_syllabus: string;
-    max_count: number;
-    cur_count: string;
-}
-
 /**
  * 获取当天课程列表
- *
- * @async
  * @function getDayCourseList
- * @param {string} date - 日期字符串（如 "2025-10-21"）
- * @param {string} userKey - 用户密钥
- * @returns {Promise<any>} 返回当天课程列表
+ * @param { string } date - 日期字符串: `YYYY-MM-DD`
+ * @param { string } userKey - 用户密钥: `用户Token`
+ * @returns { Promise<state,CourseList >} 返回当天课程列表
  */
 export async function getDayCourseList(date: string, userKey: string): Promise<{
-    status: string,
-    sourcelist: Course[]
+    state: string,
+    sourcelist: CourseList[]
 }> {
     return apiCall("RollCall_SourceListDay", {
         date,
@@ -341,12 +312,11 @@ export interface SignRecord {
 
 /**
  * 获取当天签到记录
- *
  * @async
  * @function getDaySignList
  * @param {string} date - 日期字符串
  * @param {string} userKey - 用户密钥
- * @returns {Promise<any>} 返回签到记录数据
+ * @returns {Promise<SignRecord>} 返回签到记录数据
  */
 export async function getDaySignList(date: string, userKey: string): Promise<{
     state: string,

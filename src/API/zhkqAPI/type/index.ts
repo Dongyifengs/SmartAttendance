@@ -1,7 +1,7 @@
 // 布尔字符串类型定义
 export type BoolString = "0" | "1";
 
-// ************************* //
+// ************* [ 登录返回类型 - ZHKQ_LOGIN ] ************* //
 /**
  * 智慧考勤登录接口响应体返回类型定义
  * 包含用户基础信息、组织信息、权限信息及登录令牌等内容。
@@ -75,4 +75,63 @@ export interface OrgInfo {
     orgPk: string;
 }
 
-// ************************* //
+// ************* [ 登录返回类型 - ZHKQ_LOGIN ] ************* //
+
+// ************* [ 获取课程表返回类型 - getDayCourseList ] ************* //
+/**
+ * 智慧考勤课程信息接口返回类型定义
+ * 包含课程基本信息、教师信息、上课时间及教室等内容
+ * @interface CourseList
+ * @property { number } lesson_type - 课程类型，例如 `0` 表示必修，`1` 表示选修
+ * @property { string } lesson_date - 上课日期，例如 `"2020-01-01"`
+ * @property { number } selective - 是否选修，例如 `0` 表示否，`1` 表示是
+ * @property { number } week_num - 学期周数，例如 `8`
+ * @property { number } week_item - 一周中的第几天，例如 `4` 表示周四
+ * @property { string } week_name - 星期名称，例如 `"周四"`
+ * @property { string } begin_time - 课程开始时间，例如 `"08:00"`
+ * @property { string } end_time - 课程结束时间，例如 `"09:40"`
+ * @property { number } section_num - 节次编号，例如 `10`
+ * @property { string } pk_anlaxy_semester - 学期主键ID，例如 `"92****D6"`
+ * @property { string } pk_anlaxy_organize - 组织主键ID，例如 `"C0****AF"`
+ * @property { string } pk_group - 班级/分组主键ID，例如 `"F7****58"`
+ * @property { string } pk_anlaxy_timezone - 时区主键ID，例如 `"57****22"`
+ * @property { string } campus - 校区ID，例如 `"C0****AF"`
+ * @property { string } lesson_name - 课程名称，例如 `"高等数学"`
+ * @property { string } pk_anlaxy_lesson - 课程主键ID，例如 `"F0****B6"`
+ * @property { string } teacher_id - 教师工号，例如 `"2****0"`
+ * @property { string } teacher_name - 教师姓名，例如 `"李**"`
+ * @property { string } pk_teacher - 教师主键ID，例如 `"01****65"`
+ * @property { string } class_room_name - 教室名称，例如 `"提瓦特"`
+ * @property { string } pk_anlaxy_classroom - 教室主键ID，例如 `"AA****B0"`
+ * @property { string } pk_anlaxy_syllabus - 教学大纲主键ID，例如 `"FE****A0"`
+ * @property { number } max_count - 最大上课人数，例如 `0` 表示不限
+ * @property { string } cur_count - 当前已选人数，例如 `"0"`
+ */
+export interface CourseList {
+    lesson_type: number;
+    lesson_date: string;
+    selective: number;
+    week_num: number;
+    week_item: number;
+    week_name: string;
+    begin_time: string;
+    end_time: string;
+    section_num: number;
+    pk_anlaxy_semester: string;
+    pk_anlaxy_organize: string;
+    pk_group: string;
+    pk_anlaxy_timezone: string;
+    campus: string;
+    lesson_name: string;
+    pk_anlaxy_lesson: string;
+    teacher_id: string;
+    teacher_name: string;
+    pk_teacher: string;
+    class_room_name: string;
+    pk_anlaxy_classroom: string;
+    pk_anlaxy_syllabus: string;
+    max_count: number;
+    cur_count: string;
+}
+
+// ************* [ 获取课程表返回类型 - getDayCourseList ] ************* //
