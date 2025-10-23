@@ -43,18 +43,18 @@ export const useUserInfo = (): Ref<UserInfo | null> => {
  *
  * @async
  * @function apiCall
- * @param {string} func - 要调用的后端接口函数名（如 "Member_Login"）
- * @param {object} [options={}] - 可选参数配置
- * @param {Record<string, any>} [options.param=null] - 自定义参数对象
- * @param {string|null} [options.date=null] - 日期字符串
- * @param {string|null} [options.userid=null] - 用户ID
- * @param {string|null} [options.userpwd=null] - 用户加密密码
- * @param {string|null} [options.deviceId=null] - 设备唯一标识
- * @param {string|null} [options.client_local_id=null] - 客户端本地ID
- * @param {string|null} [options.userKey=null] - 用户会话密钥
- * @param {string|null} [options.group_id=null] - 班级/分组ID
- * @returns {Promise<any>} 返回后端响应数据
- * @throws {Error} 当请求失败时抛出异常
+ * @param { string } func - 要调用的后端接口函数名（如 "Member_Login"）
+ * @param { object } [options={}] - 可选参数配置
+ * @param { Record<string, any> } [options.param=null] - 自定义参数对象
+ * @param { string|null } [options.date=null] - 日期字符串
+ * @param { string|null } [options.userid=null] - 用户ID
+ * @param { string|null } [options.userpwd=null] - 用户加密密码
+ * @param { string|null } [options.deviceId=null] - 设备唯一标识
+ * @param { string|null } [options.client_local_id=null] - 客户端本地ID
+ * @param { string|null } [options.userKey=null] - 用户会话密钥
+ * @param { string|null } [options.group_id=null] - 班级/分组ID
+ * @returns { Promise<any> } 返回后端响应数据
+ * @throws { Error} 当请求失败时抛出异常
  */
 export async function apiCall<T = any>(
     func: string,
@@ -144,12 +144,12 @@ export async function apiCall<T = any>(
  *
  * @async
  * @function apiRollCall
- * @param {string} func - 要调用的后端函数名
- * @param {object} [options={}] - 参数对象
- * @param {Record<string, any>} [options.param=null] - 自定义参数对象
- * @param {string|null} [options.userKey=null] - 用户密钥
- * @param {string|null} [options.group_id=null] - 班级/分组 ID
- * @returns {Promise<any>} 返回后端响应数据
+ * @param { string } func - 要调用的后端函数名
+ * @param { object } [options={}] - 参数对象
+ * @param { Record<string, any> } [options.param=null] - 自定义参数对象
+ * @param { string|null } [options.userKey=null] - 用户密钥
+ * @param { string|null } [options.group_id=null] - 班级/分组 ID
+ * @returns { Promise<any> } 返回后端响应数据
  */
 export async function apiRollCall<T = any>(
     func: string,
@@ -289,15 +289,15 @@ export async function getDaySignList(date: string, userKey: string): Promise<{
 
 /**
  * 课程签到参数接口定义
- * @property {string} pk_anlaxy_syllabus_user - 课程用户主键
- * @property {number} sign_in_type - 签到类型（0=正常，1=迟到等）
- * @property {string} u_begin_time - 签到时间
- * @property {number} late_time_length - 迟到时长（分钟）
- * @property {number} late_num - 迟到次数
- * @property {number} ask_leave_num - 请假次数
- * @property {number} in_longitude - 签到经度
- * @property {number} in_latitude - 签到纬度
- * @property {string} phone_code - 手机识别码
+ * @property { string } pk_anlaxy_syllabus_user - 课程用户主键
+ * @property { number } sign_in_type - 签到类型（0=正常，1=迟到等）
+ * @property { string } u_begin_time - 签到时间
+ * @property { number } late_time_length - 迟到时长（分钟）
+ * @property { number } late_num - 迟到次数
+ * @property { number } ask_leave_num - 请假次数
+ * @property { number } in_longitude - 签到经度
+ * @property { number } in_latitude - 签到纬度
+ * @property { string } phone_code - 手机识别码
  */
 export interface SignInParams {
     pk_anlaxy_syllabus_user: string;
@@ -316,9 +316,9 @@ export interface SignInParams {
  *
  * @async
  * @function signIn
- * @param {SignInParams} params - 签到参数对象
- * @param {string} userKey - 用户密钥
- * @returns {Promise<any>} 返回签到结果
+ * @param { SignInParams } params - 签到参数对象
+ * @param { string } userKey - 用户密钥
+ * @returns { Promise<any> } 返回签到结果
  */
 export async function signIn(params: SignInParams, userKey: string): Promise<any> {
     return apiCall("RollCall_SignInSource", {
@@ -330,17 +330,17 @@ export async function signIn(params: SignInParams, userKey: string): Promise<any
 /**
  * 课程签退参数接口定义
  *
- * @property {string} pk_anlaxy_syllabus_user - 课程用户主键
- * @property {string} phone_code - 手机识别码
- * @property {number} sign_out_type - 签退类型（0=正常，1=早退等）
- * @property {string} u_end_time - 签退时间
- * @property {string} lesson_change_list - 课程调整列表
- * @property {string} lesson_change_type - 调整类型
- * @property {number} ask_leave_num - 请假次数
- * @property {number} out_longitude - 签退经度
- * @property {number} out_latitude - 签退纬度
- * @property {string} reviewscore - 评分
- * @property {string} reviewcontent - 评价内容
+ * @property { string } pk_anlaxy_syllabus_user - 课程用户主键
+ * @property { string } phone_code - 手机识别码
+ * @property { number } sign_out_type - 签退类型（0=正常，1=早退等）
+ * @property { string } u_end_time - 签退时间
+ * @property { string } lesson_change_list - 课程调整列表
+ * @property { string } lesson_change_type - 调整类型
+ * @property { number } ask_leave_num - 请假次数
+ * @property { number } out_longitude - 签退经度
+ * @property { number } out_latitude - 签退纬度
+ * @property { string } reviewscore - 评分
+ * @property { string } reviewcontent - 评价内容
  */
 export interface SignOutParams {
     pk_anlaxy_syllabus_user: string;
@@ -361,9 +361,9 @@ export interface SignOutParams {
  *
  * @async
  * @function signOut
- * @param {SignOutParams} params - 签退参数对象
- * @param {string} userKey - 用户密钥
- * @returns {Promise<any>} 返回签退结果
+ * @param { SignOutParams } params - 签退参数对象
+ * @param { string } userKey - 用户密钥
+ * @returns { Promise<any> } 返回签退结果
  */
 export async function signOut(params: SignOutParams, userKey: string): Promise<any> {
     return apiCall("RollCall_SignOutSource", {
@@ -374,12 +374,11 @@ export async function signOut(params: SignOutParams, userKey: string): Promise<a
 
 /**
  * 获取课程结束时间
- *
  * @async
  * @function getEndTime
- * @param {string} lessonId - 课程ID
- * @param {string} userKey - 用户密钥
- * @returns {Promise<any>} 返回课程结束时间数据
+ * @param { string } lessonId - 课程ID
+ * @param { string } userKey - 用户密钥
+ * @returns { Promise<any> } 返回课程结束时间数据
  */
 export async function getEndTime(lessonId: string, userKey: string): Promise<any> {
     return apiCall("RollCall_Get_Change_EndTime", {
@@ -393,8 +392,8 @@ export async function getEndTime(lessonId: string, userKey: string): Promise<any
  *
  * @async
  * @function getUserClass
- * @param {string} userKey - 用户密钥
- * @returns {Promise<any>} 返回班级列表数据
+ * @param { string } userKey - 用户密钥
+ * @returns { Promise<any> } 返回班级列表数据
  */
 export async function getUserClass(userKey: string): Promise<any> {
     return apiRollCall("Member_Get_Class", {
@@ -407,9 +406,9 @@ export async function getUserClass(userKey: string): Promise<any> {
  *
  * @async
  * @function getClassStudent
- * @param {string} userKey - 用户密钥
- * @param {string} group_id - 班级ID
- * @returns {Promise<any>} 返回学生列表数据
+ * @param { string } userKey - 用户密钥
+ * @param { string } group_id - 班级ID
+ * @returns { Promise<any> } 返回学生列表数据
  */
 export async function getClassStudent(userKey: string, group_id: string): Promise<any> {
     return apiRollCall("Member_Get_Group", {
