@@ -292,11 +292,7 @@ export async function apiRollCall(
  * @param {string} deviceId - 设备唯一标识
  * @returns {Promise<any>} 返回登录结果数据
  */
-export async function ZHKQ_LOGIN(
-    username: string,
-    password: string,
-    deviceId: string
-): Promise<any> {
+export async function ZHKQ_LOGIN(username: string, password: string, deviceId: string): Promise<any> {
     const encryptedPwd = encrypt(password);
     return apiCall("Member_Login", {
         userid: username,
@@ -341,10 +337,10 @@ export interface Course {
  * @param {string} userKey - 用户密钥
  * @returns {Promise<any>} 返回当天课程列表
  */
-export async function getDayCourseList(
-    date: string,
-    userKey: string
-): Promise<{status: string, sourcelist: Course[]}> {
+export async function getDayCourseList(date: string, userKey: string): Promise<{
+    status: string,
+    sourcelist: Course[]
+}> {
     return apiCall("RollCall_SourceListDay", {
         date,
         userKey
@@ -401,10 +397,10 @@ export interface SignRecord {
  * @param {string} userKey - 用户密钥
  * @returns {Promise<any>} 返回签到记录数据
  */
-export async function getDaySignList(
-    date: string,
-    userKey: string
-): Promise<{state: string, sign_record_list: SignRecord[]}> {
+export async function getDaySignList(date: string, userKey: string): Promise<{
+    state: string,
+    sign_record_list: SignRecord[]
+}> {
     return apiCall("RollCall_SourceSignList", {
         date,
         userKey
@@ -444,10 +440,7 @@ export interface SignInParams {
  * @param {string} userKey - 用户密钥
  * @returns {Promise<any>} 返回签到结果
  */
-export async function signIn(
-    params: SignInParams,
-    userKey: string
-): Promise<any> {
+export async function signIn(params: SignInParams, userKey: string): Promise<any> {
     return apiCall("RollCall_SignInSource", {
         param: params,
         userKey
@@ -492,10 +485,7 @@ export interface SignOutParams {
  * @param {string} userKey - 用户密钥
  * @returns {Promise<any>} 返回签退结果
  */
-export async function signOut(
-    params: SignOutParams,
-    userKey: string
-): Promise<any> {
+export async function signOut(params: SignOutParams, userKey: string): Promise<any> {
     return apiCall("RollCall_SignOutSource", {
         param: params,
         userKey
@@ -511,10 +501,7 @@ export async function signOut(
  * @param {string} userKey - 用户密钥
  * @returns {Promise<any>} 返回课程结束时间数据
  */
-export async function getEndTime(
-    lessonId: string,
-    userKey: string
-): Promise<any> {
+export async function getEndTime(lessonId: string, userKey: string): Promise<any> {
     return apiCall("RollCall_Get_Change_EndTime", {
         param: {lesson_change_list: lessonId},
         userKey
@@ -529,9 +516,7 @@ export async function getEndTime(
  * @param {string} userKey - 用户密钥
  * @returns {Promise<any>} 返回班级列表数据
  */
-export async function getUserClass(
-    userKey: string
-): Promise<any> {
+export async function getUserClass(userKey: string): Promise<any> {
     return apiRollCall("Member_Get_Class", {
         userKey
     });
@@ -546,10 +531,7 @@ export async function getUserClass(
  * @param {string} group_id - 班级ID
  * @returns {Promise<any>} 返回学生列表数据
  */
-export async function getClassStudent(
-    userKey: string,
-    group_id: string
-): Promise<any> {
+export async function getClassStudent(userKey: string, group_id: string): Promise<any> {
     return apiRollCall("Member_Get_Group", {
         userKey,
         group_id
@@ -559,14 +541,7 @@ export async function getClassStudent(
 /**
  * 获取课程状态
  */
-export async function getCourseStatus(
-    userKey: string,
-    pk_user: string,
-    pk_class: string,
-    type: string,
-    startDate: string,
-    endDate: string
-): Promise<any> {
+export async function getCourseStatus(userKey: string, pk_user: string, pk_class: string, type: string, startDate: string, endDate: string): Promise<any> {
     return apiRollCall("Supplement_Class_Anomaly", {
         userKey,
         pk_user,
@@ -579,15 +554,7 @@ export async function getCourseStatus(
 }
 
 // 获取对应状态次数
-export async function getStatusCount(
-    userKey: string,
-    pk_class: string,
-    pk_lesson: string,
-    pk_user: string,
-    type: string,
-    startDate: string,
-    endDate: string
-): Promise<any> {
+export async function getStatusCount(userKey: string, pk_class: string, pk_lesson: string, pk_user: string, type: string, startDate: string, endDate: string): Promise<any> {
     return apiRollCall("Supplement_Lesson_User", {
         userKey,
         pk_user,
@@ -602,15 +569,7 @@ export async function getStatusCount(
 /**
  * 考勤状态日期查询
  */
-export async function getAttendanceDates(
-    userKey: string,
-    classpk: string,
-    source_code: string,
-    user_code: string,
-    type: string,
-    start: string,
-    end: string
-): Promise<any> {
+export async function getAttendanceDates(userKey: string, classpk: string, source_code: string, user_code: string, type: string, start: string, end: string): Promise<any> {
     return apiCall("Supplement_LessonSignDetail", {
         userKey,
         classpk,
