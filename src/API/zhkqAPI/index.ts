@@ -3,7 +3,7 @@ import {encrypt} from './crypto';
 import {Buffer} from 'buffer';
 import {computed, type Ref} from "vue";
 import {useLocalStorage} from "@vueuse/core";
-import type {CourseList, SignRecord, UserInfo} from './type';
+import type {CourseList, SignInParams, SignInRespondingBody, SignRecord, UserInfo} from './type';
 
 // RollCallAPI, 封装主接口请求
 const RollCallAPI = axios.create({
@@ -287,43 +287,17 @@ export async function getDaySignList(date: string, userKey: string): Promise<{
     });
 }
 
-/**
- * 课程签到参数接口定义
- * @property { string } pk_anlaxy_syllabus_user - 课程用户主键
- * @property { number } sign_in_type - 签到类型（0=正常，1=迟到等）
- * @property { string } u_begin_time - 签到时间
- * @property { number } late_time_length - 迟到时长（分钟）
- * @property { number } late_num - 迟到次数
- * @property { number } ask_leave_num - 请假次数
- * @property { number } in_longitude - 签到经度
- * @property { number } in_latitude - 签到纬度
- * @property { string } phone_code - 手机识别码
- */
-export interface SignInParams {
-    pk_anlaxy_syllabus_user: string;
-    sign_in_type: number;
-    u_begin_time: string;
-    late_time_length: number;
-    late_num: number;
-    ask_leave_num: number;
-    in_longitude: number;
-    in_latitude: number;
-    phone_code: string;
-}
+
 
 /**
  * 课程签到接口
- *
- * @async
  * @function signIn
  * @param { SignInParams } params - 签到参数对象
- * @param { string } userKey - 用户密钥
- * @returns { Promise<any> } 返回签到结果
+ * @returns { Promise<SignInRespondingBody> } 返回签到结果
  */
-export async function signIn(params: SignInParams, userKey: string): Promise<any> {
+export async function signIn(params: SignInParams,): Promise<SignInRespondingBody> {
     return apiCall("RollCall_SignInSource", {
-        param: params,
-        userKey
+        param: params
     });
 }
 
