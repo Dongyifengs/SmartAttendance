@@ -8,18 +8,25 @@ import {resolve} from "path"
 import {execSync} from 'child_process'
 
 // 获取 Git 提交哈希值
+let cachedGitHash: string | null = null
 function getGitHash(): string {
+    if (cachedGitHash !== null) {
+        return cachedGitHash
+    }
     try {
         const hash = execSync('git rev-parse --short HEAD').toString().trim()
         // 验证哈希值格式（至少4个十六进制字符）
         if (hash && /^[0-9a-f]{4,}$/.test(hash)) {
+            cachedGitHash = hash
             return hash
         }
         console.warn('Git 哈希值格式无效，使用默认值')
-        return 'unknown'
+        cachedGitHash = 'unknown'
+        return cachedGitHash
     } catch (error) {
         console.warn('无法获取 Git 提交哈希值，使用默认值')
-        return 'unknown'
+        cachedGitHash = 'unknown'
+        return cachedGitHash
     }
 }
 
