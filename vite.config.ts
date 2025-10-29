@@ -22,12 +22,11 @@ function getGitHash(): string {
         }
         console.warn('Git 哈希值格式无效，使用默认值')
         cachedGitHash = 'unknown'
-        return cachedGitHash
     } catch (error) {
         console.warn('无法获取 Git 提交哈希值，使用默认值')
         cachedGitHash = 'unknown'
-        return cachedGitHash
     }
+    return 'unknown'
 }
 
 // https://vite.dev/config/
