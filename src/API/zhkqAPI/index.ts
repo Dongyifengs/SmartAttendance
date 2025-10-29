@@ -288,7 +288,6 @@ export async function getDaySignList(date: string, userKey: string): Promise<{
 }
 
 
-
 /**
  * 课程签到接口
  * @function signIn
