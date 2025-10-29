@@ -7,7 +7,11 @@
               :style="{ animationDelay: (i * 0.08) + 's' }">
           {{ char }}
         </span>
-        <el-tag type="danger">{{ isDev }}</el-tag>
+        <el-tag v-if="buildInfo" type="danger" class="build-info-tag">
+          <span>在{{ buildInfo.date }}编译</span>
+          <a :href="buildInfo.commitUrl" target="_blank" class="commit-hash-link">({{ buildInfo.hash }})</a>
+        </el-tag>
+        <el-tag v-else type="danger">{{ isDev }}</el-tag>
       </div>
 
       <el-tabs v-model="activeTab" type="card" class="loginTabs" :class="activeTab === 'ocLogin' ? 'dy_item' : ''">
@@ -50,7 +54,7 @@
 </template>
 
 <script setup lang="ts">
-import {onMounted, ref} from 'vue'
+import {onMounted, ref, computed} from 'vue'
 import {ElMessage} from 'element-plus'
 import {Cellphone, Lock, User} from "@element-plus/icons-vue";
 import {OC_LOGIN} from "../../API/ocAPI";
@@ -59,6 +63,24 @@ import router from "../../router";
 
 // 开发环境
 const isDev = import.meta.env.VITE_TEXT
+
+// 构建信息（生产环境）
+const buildInfo = computed(() => {
+  const buildDate = import.meta.env.VITE_BUILD_DATE
+  const gitHash = import.meta.env.VITE_GIT_HASH
+  const gitFullHash = import.meta.env.VITE_GIT_FULL_HASH
+  const githubRepo = import.meta.env.VITE_GITHUB_REPO
+  
+  if (buildDate && gitHash && gitFullHash && githubRepo) {
+    return {
+      date: buildDate,
+      hash: gitHash,
+      commitUrl: `${githubRepo}/commit/${gitFullHash}`
+    }
+  }
+  return null
+})
+
 const activeTab = ref('zhkqLogin')
 const zhkqForm = ref({
   username: '',
