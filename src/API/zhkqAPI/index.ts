@@ -1,8 +1,19 @@
-import {encrypt} from './crypto/crypto.ts';
 import {generateInterfaceParams} from './Function/Function'
 import {PairAPI, RollCallAPI} from './APIStarter/APIStarter';
-import type {ZHKQ_CourseList, ZHKQ_SignInRespondingBody, ZHKQ_SignRecord, ZHKQ_UserInfo} from './type/RespondingBody'
-import type {ZHKQ_SignInParams} from "@/API/zhkqAPI/type/RequestingBody.ts";
+import type {
+    ZHKQ_RespondingBodyCourseList,
+    ZHKQ_RespondingBodyUserInfo,
+    ZHKQ_SignInRespondingBody,
+    ZHKQ_SignOutRespondingBody,
+    ZHKQ_SignRecord
+} from './type/RespondingBody'
+// 请求体
+import type {
+    ZHKQ_RequestingBody_GetDayCourseList,
+    ZHKQ_RequestingBody_Login,
+    ZHKQ_SignInParams,
+    ZHKQ_SignOutParams
+} from "@/API/zhkqAPI/type/RequestingBody.ts";
 
 
 /**
@@ -204,35 +215,33 @@ export async function apiRollCall<T = any>(
 
 /**
  * 用户登录接口
- * @async
- * @function ZHKQ_LOGIN
- * @param { string } username - 学号: `2****0`
- * @param { string } password - 明文密码: `Password`
- * @param { string } deviceId - 设备ID: `UUID`
- * @returns { Promise<ZHKQ_UserInfo> } 返回登录结果数据
+ * @function ZHKQ_Login
+ * @param { ZHKQ_RequestingBody_Login } param - 登录参数对象
+ * @param { string } param.userid - 用户名：`学号`
+ * @param { string } param.userpwd - 用户密码：`<PASSWORD>`
+ * @param { string } param.client_local_id - 客户端本地ID: `uuid_****`
+ * @returns { Promise<ZHKQ_RespondingBodyUserInfo> } 返回登录结果数据
  */
-export async function ZHKQ_LOGIN(username: string, password: string, deviceId: string): Promise<ZHKQ_UserInfo> {
-    return apiCall<ZHKQ_UserInfo>("Member_Login", {
-        userid: username,           // 学号
-        userpwd: encrypt(password), // 加密后的密码
-        client_local_id: deviceId   // 设备ID
+export async function ZHKQ_Login(param: ZHKQ_RequestingBody_Login): Promise<ZHKQ_RespondingBodyUserInfo> {
+    return apiCall("Member_Login", {
+        param
     });
 }
 
 /**
  * 获取当天课程列表
  * @function ZHKQ_GetDayCourseList
- * @param { string } date - 日期字符串: `YYYY-MM-DD`
- * @param { string } userKey - 用户密钥: `用户Token`
- * @returns { Promise<state,ZHKQ_CourseList >} 返回当天课程列表
+ * @param { ZHKQ_RequestingBody_GetDayCourseList } param - 请求参数对象
+ * @param { string } param.userKey - 用户密钥： `用户Token`
+ * @param { string } param.date - 日期字符串：`YYYY-MM-DD`
+ * @returns { Promise<state,ZHKQ_RespondingBodyCourseList >} 返回当天课程列表
  */
-export async function ZHKQ_GetDayCourseList(date: string, userKey: string): Promise<{
+export async function ZHKQ_GetDayCourseList(param: ZHKQ_RequestingBody_GetDayCourseList): Promise<{
     state: string,
-    sourcelist: ZHKQ_CourseList[]
+    sourcelist: ZHKQ_RespondingBodyCourseList[]
 }> {
     return apiCall("RollCall_SourceListDay", {
-        date,
-        userKey
+        param
     });
 }
 
@@ -267,45 +276,15 @@ export async function ZHKQ_SignIn(params: ZHKQ_SignInParams,): Promise<ZHKQ_Sign
     });
 }
 
-/**
- * 课程签退参数接口定义
- *
- * @property { string } pk_anlaxy_syllabus_user - 课程用户主键
- * @property { string } phone_code - 手机识别码
- * @property { number } sign_out_type - 签退类型（0=正常，1=早退等）
- * @property { string } u_end_time - 签退时间
- * @property { string } lesson_change_list - 课程调整列表
- * @property { string } lesson_change_type - 调整类型
- * @property { number } ask_leave_num - 请假次数
- * @property { number } out_longitude - 签退经度
- * @property { number } out_latitude - 签退纬度
- * @property { string } reviewscore - 评分
- * @property { string } reviewcontent - 评价内容
- */
-export interface SignOutParams {
-    pk_anlaxy_syllabus_user: string;
-    phone_code: string;
-    sign_out_type: number;
-    u_end_time: string;
-    lesson_change_list: string;
-    lesson_change_type: string;
-    ask_leave_num: number;
-    out_longitude: number;
-    out_latitude: number;
-    reviewscore: string;
-    reviewcontent: string;
-}
 
 /**
  * 课程签退接口
- *
- * @async
- * @function signOut
- * @param { SignOutParams } params - 签退参数对象
+ * @function ZHKQ_SignOut
+ * @param { ZHKQ_SignOutParams } params - 签退参数对象
  * @param { string } userKey - 用户密钥
- * @returns { Promise<any> } 返回签退结果
+ * @returns { Promise<ZHKQ_SignOutRespondingBody> } 返回签退结果
  */
-export async function signOut(params: SignOutParams, userKey: string): Promise<any> {
+export async function ZHKQ_SignOut(params: ZHKQ_SignOutParams, userKey: string): Promise<ZHKQ_SignOutRespondingBody> {
     return apiCall("RollCall_SignOutSource", {
         param: params,
         userKey

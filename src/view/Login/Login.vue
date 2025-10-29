@@ -54,11 +54,11 @@
 </template>
 
 <script setup lang="ts">
-import {onMounted, ref, computed} from 'vue'
+import {computed, onMounted, ref} from 'vue'
 import {ElMessage} from 'element-plus'
 import {Cellphone, Lock, User} from "@element-plus/icons-vue";
 import {OC_LOGIN} from "../../API/ocAPI";
-import {ZHKQ_LOGIN} from '../../API/zhkqAPI';
+import {ZHKQ_Login} from '../../API/zhkqAPI';
 import router from "../../router";
 
 // 开发环境
@@ -70,7 +70,7 @@ const buildInfo = computed(() => {
   const gitHash = import.meta.env.VITE_GIT_HASH
   const gitFullHash = import.meta.env.VITE_GIT_FULL_HASH
   const githubRepo = import.meta.env.VITE_GITHUB_REPO
-  
+
   if (buildDate && gitHash && gitFullHash && githubRepo) {
     return {
       date: buildDate,
@@ -158,7 +158,11 @@ function onLogin(type: 1 | 2) {
       ElMessage.warning("请填写完整信息！")
       return
     } else {
-      ZHKQ_LOGIN(zhkqForm.value.username, zhkqForm.value.password, zhkqForm.value.deviceId).then(async res => {
+      ZHKQ_Login({
+        userid: zhkqForm.value.username,
+        userpwd: zhkqForm.value.password,
+        client_local_id: zhkqForm.value.deviceId
+      }).then(async res => {
         if (res.state === "1") {
           ElMessage.success("智慧考勤登录成功！")
           localStorage.setItem("SA-ZHKQ-USERINFO", JSON.stringify(res))
@@ -178,6 +182,7 @@ function onLogin(type: 1 | 2) {
           ElMessage.error("智慧考勤登录失败：" + res.info)
         }
       })
+      ZHKQ_Login({us})
     }
   } else if (type == 2) {
     if (!ocForm.value.username || !ocForm.value.password) {

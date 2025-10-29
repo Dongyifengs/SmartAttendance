@@ -72,7 +72,16 @@ const getUserToken = () => {
 async function fetchList(name: string, api: Function, date: string, target: any, loadingFlag: any, keyName: string) {
   loadingFlag.value = true
   try {
-    const res = await api(date, getUserToken())
+    // 修改这里：根据不同的API函数使用不同的参数格式
+    let res;
+    if (api === ZHKQ_GetDayCourseList) {
+      // 使用对象参数格式
+      res = await api({date: date, userKey: getUserToken()})
+    } else {
+      // 保持原来的参数格式
+      res = await api(date, getUserToken())
+    }
+
     const list = res[keyName]
     if (res.state === '1' && Array.isArray(list)) {
       target.value = list

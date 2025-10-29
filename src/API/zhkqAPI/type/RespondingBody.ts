@@ -1,19 +1,13 @@
-// *************** [ 登录API返回 - ZHKQ_LOGIN ] *************** //
-/**
- * 组织信息
- * @interface OrgInfo
- * @property { string } orgName - 组织名称，例如 `"摸鱼学院"`
- * @property { string } orgPk - 组织主键 ID，例如 `"68****F9"`
- */
-export interface OrgInfo {
-    orgName: string;
-    orgPk: string;
-}
+// ******************** //
+//  响应体参数接口定义文件  //
+// ******************** //
 
+
+// *************** [ 用户登录接口API响应体 - ZHKQ_LOGIN ] *************** //
 /**
  * 智慧考勤登录接口响应体返回类型定义
  * 包含用户基础信息、组织信息、权限信息及登录令牌等内容。
- * @interface ZHKQ_UserInfo
+ * @interface ZHKQ_RespondingBodyUserInfo
  * @property { string } state - 状态码，例如 `"1"` 表示成功
  * @property { string } info - 错误信息，例如 `服务端错误`
  * @property { string } birthday - 出生日期，例如 `"2000-01-01"`
@@ -43,7 +37,7 @@ export interface OrgInfo {
  * @property { number } new_join - 是否新加入用户，`0` 表示否
  * @property { number } initUser - 是否初始化用户，`0` 表示否
  */
-export interface ZHKQ_UserInfo {
+export interface ZHKQ_RespondingBodyUserInfo {
     state: string;
     info?: string;
     birthday: string;
@@ -74,14 +68,25 @@ export interface ZHKQ_UserInfo {
     initUser: number;
 }
 
-// *************** [ 登录API返回 - ZHKQ_LOGIN ] *************** //
+/**
+ * 组织信息
+ * @interface OrgInfo
+ * @property { string } orgName - 组织名称，例如 `"摸鱼学院"`
+ * @property { string } orgPk - 组织主键 ID，例如 `"68****F9"`
+ */
+export interface OrgInfo {
+    orgName: string;
+    orgPk: string;
+}
+
+// *************** [ 用户登录接口API响应体 - ZHKQ_LOGIN ] *************** //
 
 
-// *************** [ 获取课程列表API返回 - ZHKQ_GetDayCourseList ] *************** //
+// *************** [ 课程列表API响应体 - ZHKQ_GetDayCourseList ] *************** //
 /**
  * 智慧考勤课程信息接口返回类型定义
  * 包含课程基本信息、教师信息、上课时间及教室等内容
- * @interface ZHKQ_CourseList
+ * @interface ZHKQ_RespondingBodyCourseList
  * @property { number } lesson_type - 课程类型，例如 `0` 表示必修，`1` 表示选修
  * @property { string } lesson_date - 上课日期，例如 `"2020-01-01"`
  * @property { number } selective - 是否选修，例如 `0` 表示否，`1` 表示是
@@ -107,7 +112,7 @@ export interface ZHKQ_UserInfo {
  * @property { number } max_count - 最大上课人数，例如 `0` 表示不限
  * @property { string } cur_count - 当前已选人数，例如 `"0"`
  */
-export interface ZHKQ_CourseList {
+export interface ZHKQ_RespondingBodyCourseList {
     lesson_type: number;
     lesson_date: string;
     selective: number;
@@ -133,6 +138,16 @@ export interface ZHKQ_CourseList {
     max_count: number;
     cur_count: string;
 }
+
+
+// *************** [ 课程列表API响应体 - ZHKQ_GetDayCourseList ] *************** //
+
+
+//////////////////////////////////////////////////////////////////////////////////////
+
+
+// *************** [ 获取课程列表API返回 - ZHKQ_GetDayCourseList ] *************** //
+
 
 // *************** [ 获取课程列表API返回 - ZHKQ_GetDayCourseList ] *************** //
 
@@ -228,6 +243,7 @@ export interface ZHKQ_SignRecord {
 // *************** [ 获取签到操作API返回 - ZHKQ_SignIn ] *************** //
 /**
  * 课程签到响应体返回
+ * @interface ZHKQ_SignInRespondingBody
  * @property { string } state - 状态码，例如`"1"`
  * @property { number } sign_coin - 签名码，例如`0`
  * @property { number } sing_result - 签到结果，例如`0`
@@ -242,3 +258,23 @@ export interface ZHKQ_SignInRespondingBody {
 }
 
 // *************** [ 获取签到操作API返回 - ZHKQ_SignIn ] *************** //
+
+
+// *************** [ 课程签退接口API返回 - ZHKQ_SignOut ] *************** //
+/**
+ * 课程签退接口API返回
+ * @interface ZHKQ_SignOutRespondingBody
+ * @property { string } state - 状态码，例如`"1"`
+ * @property { number } sign_coin - 签名码，例如`0`
+ * @property { number } sing_result - 签到结果，例如`0`
+ * @property { string } source_code - 课程主键，例如`"56****AD"`
+ */
+
+export interface ZHKQ_SignOutRespondingBody {
+    state: string;
+    sign_coin: number;
+    sing_result: number;
+    source_code: string;
+}
+
+// *************** [ 课程签退接口API返回 - ZHKQ_SignOut ] *************** //

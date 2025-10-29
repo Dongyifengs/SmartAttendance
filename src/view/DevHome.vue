@@ -12,7 +12,7 @@ const todayString = dayjs().format("YYYY-MM-DD")
 onMounted(async () => {
   if (userInfo) {
     const signInfo = (await getDaySignList(todayString, userInfo.value!.token)).sign_record_list
-    const courseList = (await ZHKQ_GetDayCourseList(todayString, userInfo.value!.token)).sourcelist;
+    const courseList = (await ZHKQ_GetDayCourseList({date: todayString, userKey: userInfo.value!.token})).sourcelist;
     const signMap = new Map(signInfo.map(e => [e.pk_lesson, e]));
     data.value = courseList.map((e, index): ClassInfo | null => {
       const signData = signMap.get(e.pk_anlaxy_lesson);
