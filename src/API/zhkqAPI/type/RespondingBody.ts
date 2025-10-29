@@ -1,8 +1,19 @@
-// ************* [ 登录返回类型 - ZHKQ_LOGIN ] ************* //
+// *************** [ 登录API返回 - ZHKQ_LOGIN ] *************** //
+/**
+ * 组织信息
+ * @interface OrgInfo
+ * @property { string } orgName - 组织名称，例如 `"摸鱼学院"`
+ * @property { string } orgPk - 组织主键 ID，例如 `"68****F9"`
+ */
+export interface OrgInfo {
+    orgName: string;
+    orgPk: string;
+}
+
 /**
  * 智慧考勤登录接口响应体返回类型定义
  * 包含用户基础信息、组织信息、权限信息及登录令牌等内容。
- * @interface UserInfo
+ * @interface ZHKQ_UserInfo
  * @property { string } state - 状态码，例如 `"1"` 表示成功
  * @property { string } info - 错误信息，例如 `服务端错误`
  * @property { string } birthday - 出生日期，例如 `"2000-01-01"`
@@ -32,7 +43,7 @@
  * @property { number } new_join - 是否新加入用户，`0` 表示否
  * @property { number } initUser - 是否初始化用户，`0` 表示否
  */
-export interface UserInfo {
+export interface ZHKQ_UserInfo {
     state: string;
     info?: string;
     birthday: string;
@@ -63,25 +74,14 @@ export interface UserInfo {
     initUser: number;
 }
 
-/**
- * 组织信息
- * @interface OrgInfo
- * @property { string } orgName - 组织名称，例如 `"摸鱼学院"`
- * @property { string } orgPk - 组织主键 ID，例如 `"68****F9"`
- */
-export interface OrgInfo {
-    orgName: string;
-    orgPk: string;
-}
-
-// ************* [ 登录返回类型 - ZHKQ_LOGIN ] ************* //
+// *************** [ 登录API返回 - ZHKQ_LOGIN ] *************** //
 
 
-// ************* [ 获取课程表返回类型 - getDayCourseList ] ************* //
+// *************** [ 获取课程列表API返回 - ZHKQ_GetDayCourseList ] *************** //
 /**
  * 智慧考勤课程信息接口返回类型定义
  * 包含课程基本信息、教师信息、上课时间及教室等内容
- * @interface CourseList
+ * @interface ZHKQ_CourseList
  * @property { number } lesson_type - 课程类型，例如 `0` 表示必修，`1` 表示选修
  * @property { string } lesson_date - 上课日期，例如 `"2020-01-01"`
  * @property { number } selective - 是否选修，例如 `0` 表示否，`1` 表示是
@@ -107,7 +107,7 @@ export interface OrgInfo {
  * @property { number } max_count - 最大上课人数，例如 `0` 表示不限
  * @property { string } cur_count - 当前已选人数，例如 `"0"`
  */
-export interface CourseList {
+export interface ZHKQ_CourseList {
     lesson_type: number;
     lesson_date: string;
     selective: number;
@@ -134,17 +134,16 @@ export interface CourseList {
     cur_count: string;
 }
 
-// ************* [ 获取课程表返回类型 - getDayCourseList ] ************* //
+// *************** [ 获取课程列表API返回 - ZHKQ_GetDayCourseList ] *************** //
 
 
-// ************* [ 获取当天签到记录 - getDaySignList ] ************* //
-// 布尔字符串类型定义
+// *************** [ 获取签到记录API返回 - ZHKQ_GetDaySignList ] *************** //
 export type BoolString = "0" | "1";
 
 /**
  * 智慧考勤签到记录接口返回类型定义
  * 包含单个用户的课程签到信息、上课时间、请假/迟到/缺勤状态及教师信息等
- * @interface SignRecord
+ * @interface ZHKQ_SignRecord
  * @property { number } lesson_type - 课程类型，例如 `0` 表示必修，`1` 表示选修
  * @property { string } pk_anlaxy_syllabus_user - 课程用户表主键ID，例如 `"3A****4A6"`
  * @property { string } lesson_date - 上课日期，例如 `"2020-01-01"`
@@ -183,7 +182,7 @@ export type BoolString = "0" | "1";
  * @property { string } pk_anlaxy_syllabus - 教学大纲主键ID，例如 `"FE****A0"`
  * @property { string } teacher_pic - 教师头像URL，例如 `""`
  */
-export interface SignRecord {
+export interface ZHKQ_SignRecord {
     lesson_type: number;
     pk_anlaxy_syllabus_user: string;
     lesson_date: string;
@@ -223,40 +222,10 @@ export interface SignRecord {
     teacher_pic: string;
 }
 
-// ************* [ 获取当天签到记录 - getDaySignList ] ************* //
+// *************** [ 获取签到记录API返回 - ZHKQ_GetDaySignList ] *************** //
 
 
-// ************* [ 课程签到请求体接口 - signIn ] ************* //
-/**
- * 课程签到请求体参数接口定义
- * @property { string } userKey - 用户密钥，例如 `"V0****0="`
- * @property { string } pk_anlaxy_syllabus_user - 课程用户主键，例如 `"56****AD"`
- * @property { number } sign_in_type - 签到类型，例如 `1迟到 | 2正常`
- * @property { string } u_begin_time - 签到时间，例如 `"YYYY-MM-dd HH:mm:ss"`
- * @property { number } late_time_length - 迟到时长，例如 `0`
- * @property { number } late_num - 迟到次数，例如 `0`
- * @property { number } ask_leave_num - 请假次数，例如 `0`
- * @property { number } in_longitude - 签到经度，例如 `0`
- * @property { number } in_latitude - 签到纬度，例如 `0`
- * @property { string } phone_code - 手机识别码，例如 `uuid_****,uuid_****`
- */
-export interface SignInParams {
-    userKey: string;
-    pk_anlaxy_syllabus_user: string;
-    sign_in_type: number;
-    u_begin_time: string;
-    late_time_length: number;
-    late_num: number;
-    ask_leave_num: number;
-    in_longitude: number;
-    in_latitude: number;
-    phone_code: string;
-}
-
-// ************* [ 课程签到请求体接口 - signIn ] ************* //
-
-
-// ************* [ 课程签到响应体返回 - signIn ] ************* //
+// *************** [ 获取签到操作API返回 - ZHKQ_SignIn ] *************** //
 /**
  * 课程签到响应体返回
  * @property { string } state - 状态码，例如`"1"`
@@ -265,11 +234,11 @@ export interface SignInParams {
  * @property { string } source_code - 课程主键，例如`"56****AD"`
  */
 
-export interface SignInRespondingBody {
+export interface ZHKQ_SignInRespondingBody {
     state: string;
     sign_coin: number;
     sing_result: number;
     source_code: string;
 }
 
-// ************* [ 课程签到响应体返回 - signIn ] ************* //
+// *************** [ 获取签到操作API返回 - ZHKQ_SignIn ] *************** //

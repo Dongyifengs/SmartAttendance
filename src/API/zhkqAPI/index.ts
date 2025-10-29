@@ -1,42 +1,9 @@
-import axios from 'axios';
-import {encrypt} from './crypto';
-import {Buffer} from 'buffer';
-import {computed, type Ref} from "vue";
-import {useLocalStorage} from "@vueuse/core";
-import type {CourseList, SignInParams, SignInRespondingBody, SignRecord, UserInfo} from './type';
+import {encrypt} from './crypto/crypto.ts';
+import {generateInterfaceParams} from './Function/Function'
+import {PairAPI, RollCallAPI} from './APIStarter/APIStarter';
+import type {ZHKQ_CourseList, ZHKQ_SignInRespondingBody, ZHKQ_SignRecord, ZHKQ_UserInfo} from './type/RespondingBody'
+import type {ZHKQ_SignInParams} from "@/API/zhkqAPI/type/RequestingBody.ts";
 
-// RollCallAPI, 封装主接口请求
-const RollCallAPI = axios.create({
-    baseURL: 'https://rollcall.anlaxy.com.cn/SerApi/v02',
-    headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
-    }
-});
-
-// PairAPI, 封装次级接口请求
-const PairAPI = axios.create({
-    baseURL: '/PairAPI',
-    headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
-    }
-});
-
-/**
- * 生成接口参数(使用Base64编码进行2次加密)
- * @function generateInterfaceParams
- * @param { object } data - 需要进行加密的原参数对象
- * @returns { string } 返回2次加密的参数字符串, 例如: `interface=xxxxx`
- */
-function generateInterfaceParams(data: object): string {
-    const jsonStr = JSON.stringify(data);
-    const firstEncode = Buffer.from(jsonStr).toString('base64');
-    return `interface=${Buffer.from(firstEncode).toString('base64')}`;
-}
-
-export const useUserInfo = (): Ref<UserInfo | null> => {
-    const storage = useLocalStorage("SA-ZHKQ-USERINFO", null);
-    return computed(() => storage.value ? JSON.parse(storage.value) as UserInfo : null)
-}
 
 /**
  * 通用 API 调用方法（增强版）
@@ -242,10 +209,10 @@ export async function apiRollCall<T = any>(
  * @param { string } username - 学号: `2****0`
  * @param { string } password - 明文密码: `Password`
  * @param { string } deviceId - 设备ID: `UUID`
- * @returns { Promise<UserInfo> } 返回登录结果数据
+ * @returns { Promise<ZHKQ_UserInfo> } 返回登录结果数据
  */
-export async function ZHKQ_LOGIN(username: string, password: string, deviceId: string): Promise<UserInfo> {
-    return apiCall<UserInfo>("Member_Login", {
+export async function ZHKQ_LOGIN(username: string, password: string, deviceId: string): Promise<ZHKQ_UserInfo> {
+    return apiCall<ZHKQ_UserInfo>("Member_Login", {
         userid: username,           // 学号
         userpwd: encrypt(password), // 加密后的密码
         client_local_id: deviceId   // 设备ID
@@ -254,14 +221,14 @@ export async function ZHKQ_LOGIN(username: string, password: string, deviceId: s
 
 /**
  * 获取当天课程列表
- * @function getDayCourseList
+ * @function ZHKQ_GetDayCourseList
  * @param { string } date - 日期字符串: `YYYY-MM-DD`
  * @param { string } userKey - 用户密钥: `用户Token`
- * @returns { Promise<state,CourseList >} 返回当天课程列表
+ * @returns { Promise<state,ZHKQ_CourseList >} 返回当天课程列表
  */
-export async function getDayCourseList(date: string, userKey: string): Promise<{
+export async function ZHKQ_GetDayCourseList(date: string, userKey: string): Promise<{
     state: string,
-    sourcelist: CourseList[]
+    sourcelist: ZHKQ_CourseList[]
 }> {
     return apiCall("RollCall_SourceListDay", {
         date,
@@ -275,11 +242,11 @@ export async function getDayCourseList(date: string, userKey: string): Promise<{
  * @function getDaySignList
  * @param { string } date - 日期字符串: `YYYY-MM-DD`
  * @param { string } userKey - 用户密钥: `用户Token`
- * @returns { Promise<SignRecord> } 返回签到记录数据
+ * @returns { Promise<ZHKQ_SignRecord> } 返回签到记录数据
  */
 export async function getDaySignList(date: string, userKey: string): Promise<{
     state: string,
-    sign_record_list: SignRecord[]
+    sign_record_list: ZHKQ_SignRecord[]
 }> {
     return apiCall("RollCall_SourceSignList", {
         date,
@@ -290,11 +257,11 @@ export async function getDaySignList(date: string, userKey: string): Promise<{
 
 /**
  * 课程签到接口
- * @function signIn
- * @param { SignInParams } params - 签到参数对象
- * @returns { Promise<SignInRespondingBody> } 返回签到结果
+ * @function ZHKQ_SignIn
+ * @param { ZHKQ_SignInParams } params - 签到参数对象
+ * @returns { Promise<ZHKQ_SignInRespondingBody> } 返回签到结果
  */
-export async function signIn(params: SignInParams,): Promise<SignInRespondingBody> {
+export async function ZHKQ_SignIn(params: ZHKQ_SignInParams,): Promise<ZHKQ_SignInRespondingBody> {
     return apiCall("RollCall_SignInSource", {
         param: params
     });

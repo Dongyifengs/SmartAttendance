@@ -43,7 +43,7 @@
 import {onMounted, ref} from 'vue'
 import {ElMessage} from 'element-plus'
 import dayjs from 'dayjs'
-import {getDayCourseList, getDaySignList} from '../../API/zhkqAPI'
+import {getDaySignList, ZHKQ_GetDayCourseList} from '../../API/zhkqAPI'
 import {checkInFields, courseFields} from './Type/dataFields'
 import DataTable from './components/DataTable.vue'
 
@@ -90,7 +90,7 @@ async function fetchList(name: string, api: Function, date: string, target: any,
 }
 
 // 获取课程与签到
-const fetchTodayCourses = (date: string) => fetchList('课程', getDayCourseList, date, todayCourseList, loadingCourses, 'sourcelist')
+const fetchTodayCourses = (date: string) => fetchList('课程', ZHKQ_GetDayCourseList, date, todayCourseList, loadingCourses, 'sourcelist')
 const fetchCheckInRecords = (date: string) => fetchList('签到', getDaySignList, date, checkInRecords, loadingCheckIns, 'sign_record_list')
 
 const fetchAllData = () => {
