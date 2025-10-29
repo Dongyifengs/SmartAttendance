@@ -182,7 +182,6 @@ function onLogin(type: 1 | 2) {
           ElMessage.error("智慧考勤登录失败：" + res.info)
         }
       })
-      ZHKQ_Login({us})
     }
   } else if (type == 2) {
     if (!ocForm.value.username || !ocForm.value.password) {
