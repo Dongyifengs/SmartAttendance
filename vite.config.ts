@@ -10,7 +10,13 @@ import {execSync} from 'child_process'
 // 获取 Git 提交哈希值
 function getGitHash(): string {
     try {
-        return execSync('git rev-parse --short HEAD').toString().trim()
+        const hash = execSync('git rev-parse --short HEAD').toString().trim()
+        // 验证哈希值格式（7个十六进制字符）
+        if (hash && /^[0-9a-f]{7}$/.test(hash)) {
+            return hash
+        }
+        console.warn('Git 哈希值格式无效，使用默认值')
+        return 'unknown'
     } catch (error) {
         console.warn('无法获取 Git 提交哈希值，使用默认值')
         return 'unknown'
@@ -19,8 +25,8 @@ function getGitHash(): string {
 
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
-    // 获取当前的 Git 哈希值
-    const gitHash = getGitHash()
+    // 仅在生产环境下获取 Git 哈希值以优化开发构建性能
+    const gitHash = mode === 'production' ? getGitHash() : ''
     
     return {
         plugins: [
