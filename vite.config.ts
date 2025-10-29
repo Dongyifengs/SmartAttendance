@@ -7,16 +7,17 @@ import {ElementPlusResolver} from 'unplugin-vue-components/resolvers'
 import {resolve} from "path"
 import {execSync} from 'child_process'
 
-// 获取 Git 提交哈希值
+// 获取 Git 提交哈希值（8位）
 let cachedGitHash: string | null = null
 function getGitHash(): string {
     if (cachedGitHash !== null) {
         return cachedGitHash
     }
     try {
-        const hash = execSync('git rev-parse --short HEAD').toString().trim()
-        // 验证哈希值格式（至少4个十六进制字符）
-        if (hash && /^[0-9a-f]{4,}$/.test(hash)) {
+        // 使用 --short=8 获取8位哈希值
+        const hash = execSync('git rev-parse --short=8 HEAD').toString().trim()
+        // 验证哈希值格式（8个十六进制字符）
+        if (hash && /^[0-9a-f]{8}$/.test(hash)) {
             cachedGitHash = hash
             return hash
         }
@@ -27,6 +28,37 @@ function getGitHash(): string {
         cachedGitHash = 'unknown'
     }
     return 'unknown'
+}
+
+// 获取完整的 Git 提交哈希值（用于GitHub链接）
+let cachedFullGitHash: string | null = null
+function getFullGitHash(): string {
+    if (cachedFullGitHash !== null) {
+        return cachedFullGitHash
+    }
+    try {
+        const hash = execSync('git rev-parse HEAD').toString().trim()
+        // 验证完整哈希值格式（40个十六进制字符）
+        if (hash && /^[0-9a-f]{40}$/.test(hash)) {
+            cachedFullGitHash = hash
+            return hash
+        }
+        console.warn('完整 Git 哈希值格式无效，使用默认值')
+        cachedFullGitHash = 'unknown'
+    } catch (error) {
+        console.warn('无法获取完整 Git 提交哈希值，使用默认值')
+        cachedFullGitHash = 'unknown'
+    }
+    return 'unknown'
+}
+
+// 获取编译日期
+function getBuildDate(): string {
+    const now = new Date()
+    const year = now.getFullYear()
+    const month = String(now.getMonth() + 1).padStart(2, '0')
+    const day = String(now.getDate()).padStart(2, '0')
+    return `${year}-${month}-${day}`
 }
 
 // https://vite.dev/config/
@@ -48,9 +80,20 @@ export default defineConfig(({ mode }) => {
             }),
         ],
         define: {
-            // 在生产环境下，将 Git 哈希值注入到 VITE_TEXT 中
+            // 在生产环境下，将编译信息注入到环境变量中
+            'import.meta.env.VITE_BUILD_DATE': mode === 'production' 
+                ? JSON.stringify(getBuildDate())
+                : JSON.stringify(''),
+            'import.meta.env.VITE_GIT_HASH': mode === 'production' 
+                ? JSON.stringify(getGitHash())
+                : JSON.stringify(''),
+            'import.meta.env.VITE_GIT_FULL_HASH': mode === 'production' 
+                ? JSON.stringify(getFullGitHash())
+                : JSON.stringify(''),
+            'import.meta.env.VITE_GITHUB_REPO': JSON.stringify('https://github.com/Dongyifengs/SmartAttendance'),
+            // 保留 VITE_TEXT 用于开发环境
             'import.meta.env.VITE_TEXT': mode === 'production' 
-                ? JSON.stringify(`生产环境 (${getGitHash()})`)
+                ? JSON.stringify('')
                 : JSON.stringify(process.env.VITE_TEXT || '开发环境')
         },
         server: {
