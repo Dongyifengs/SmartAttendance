@@ -24,7 +24,7 @@ import type {
  * @function apiCall
  * @param { string } func - 要调用的后端接口函数名（如 "Member_Login"）
  * @param { Record<string, any> } [params={}] - 请求参数对象，会被放入 Param 字段
- * @returns { Promise<T> } 返回后端响应数据
+ * @returns { Promise } 返回后端响应数据
  * @throws { Error } 当请求失败时抛出异常
  */
 export async function apiCall<T = any>(
@@ -58,7 +58,7 @@ export async function apiCall<T = any>(
  * @function apiRollCall
  * @param { string } func - 要调用的后端函数名
  * @param { Record<string, any> } [params={}] - 请求参数对象，会被放入 Param 字段
- * @returns { Promise<T> } 返回后端响应数据
+ * @returns { Promise } 返回后端响应数据
  * @throws { Error } 当请求失败时抛出异常
  */
 export async function apiRollCall<T = any>(
