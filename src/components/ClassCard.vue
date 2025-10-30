@@ -42,6 +42,16 @@ const shouldShowSignOutSelector = computed(() => {
   return (info.value.situation === "早退" || displayStatus.value === "早退") && !info.value.signOutTime;
 });
 
+// Compute tag type based on status
+const tagType = computed(() => {
+  if (info.value.situation === '缺勤') return 'danger';
+  if (info.value.situation === '迟到' || info.value.situation === '早退') return 'warning';
+  if (info.value.situation === '请假') return 'info';
+  if (displayStatus.value === '已签退') return 'success';
+  if (displayStatus.value === '已签到') return 'primary';
+  return 'info';
+});
+
 </script>
 <template>
   <div class="class-card-wrapper">
@@ -53,7 +63,7 @@ const shouldShowSignOutSelector = computed(() => {
         </div>
         <div class="status-tag">
           <el-tag 
-            :type="info.situation === '缺勤' ? 'danger' : info.situation === '迟到' ? 'warning' : info.situation === '早退' ? 'warning' : info.situation === '请假' ? 'info' : displayStatus === '已签退' ? 'success' : displayStatus === '已签到' ? 'primary' : 'info'"
+            :type="tagType"
             effect="dark"
             round
           >
