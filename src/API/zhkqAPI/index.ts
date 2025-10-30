@@ -1,15 +1,17 @@
 import {generateInterfaceParams} from './Function/Function'
 import {PairAPI, RollCallAPI} from './APIStarter/APIStarter';
+// 响应体
 import type {
     ZHKQ_RespondingBodyCourseList,
+    ZHKQ_RespondingBodyGetDaySignList,
     ZHKQ_RespondingBodyUserInfo,
     ZHKQ_SignInRespondingBody,
     ZHKQ_SignOutRespondingBody,
-    ZHKQ_SignRecord
 } from './type/RespondingBody'
 // 请求体
 import type {
     ZHKQ_RequestingBody_GetDayCourseList,
+    ZHKQ_RequestingBody_GetDaySignList,
     ZHKQ_RequestingBody_Login,
     ZHKQ_SignInParams,
     ZHKQ_SignOutParams
@@ -248,18 +250,18 @@ export async function ZHKQ_GetDayCourseList(param: ZHKQ_RequestingBody_GetDayCou
 
 /**
  * 获取当天签到记录
- * @function getDaySignList
- * @param { string } date - 日期字符串: `YYYY-MM-DD`
- * @param { string } userKey - 用户密钥: `用户Token`
- * @returns { Promise<ZHKQ_SignRecord> } 返回签到记录数据
+ * @function ZHKQ_GetDaySignList
+ * @param { ZHKQ_RequestingBody_GetDaySignList } param - 请求参数对象
+ * @param { string } param.date - 日期字符串：`YYYY-MM-DD`
+ * @param { string } param.userKey - 用户密钥： `用户Token`
+ * @returns { Promise<ZHKQ_RespondingBodyGetDaySignList> } 返回签到记录数据
  */
-export async function getDaySignList(date: string, userKey: string): Promise<{
+export async function ZHKQ_GetDaySignList(param: ZHKQ_RequestingBody_GetDaySignList): Promise<{
     state: string,
-    sign_record_list: ZHKQ_SignRecord[]
+    sign_record_list: ZHKQ_RespondingBodyGetDaySignList[]
 }> {
     return apiCall("RollCall_SourceSignList", {
-        date,
-        userKey
+        param
     });
 }
 

@@ -143,22 +143,13 @@ export interface ZHKQ_RespondingBodyCourseList {
 // *************** [ 课程列表API响应体 - ZHKQ_GetDayCourseList ] *************** //
 
 
-//////////////////////////////////////////////////////////////////////////////////////
-
-
-// *************** [ 获取课程列表API返回 - ZHKQ_GetDayCourseList ] *************** //
-
-
-// *************** [ 获取课程列表API返回 - ZHKQ_GetDayCourseList ] *************** //
-
-
-// *************** [ 获取签到记录API返回 - ZHKQ_GetDaySignList ] *************** //
+// *************** [ 获取签到记录API响应 - ZHKQ_GetDaySignList ] *************** //
 export type BoolString = "0" | "1";
 
 /**
  * 智慧考勤签到记录接口返回类型定义
  * 包含单个用户的课程签到信息、上课时间、请假/迟到/缺勤状态及教师信息等
- * @interface ZHKQ_SignRecord
+ * @interface ZHKQ_RespondingBodyGetDaySignList
  * @property { number } lesson_type - 课程类型，例如 `0` 表示必修，`1` 表示选修
  * @property { string } pk_anlaxy_syllabus_user - 课程用户表主键ID，例如 `"3A****4A6"`
  * @property { string } lesson_date - 上课日期，例如 `"2020-01-01"`
@@ -197,7 +188,8 @@ export type BoolString = "0" | "1";
  * @property { string } pk_anlaxy_syllabus - 教学大纲主键ID，例如 `"FE****A0"`
  * @property { string } teacher_pic - 教师头像URL，例如 `""`
  */
-export interface ZHKQ_SignRecord {
+export interface ZHKQ_RespondingBodyGetDaySignList {
+
     lesson_type: number;
     pk_anlaxy_syllabus_user: string;
     lesson_date: string;
@@ -237,7 +229,10 @@ export interface ZHKQ_SignRecord {
     teacher_pic: string;
 }
 
-// *************** [ 获取签到记录API返回 - ZHKQ_GetDaySignList ] *************** //
+// *************** [ 获取签到记录API响应 - ZHKQ_GetDaySignList ] *************** //
+
+
+//////////////////////////////////////////////////////////////////////////////////////
 
 
 // *************** [ 获取签到操作API返回 - ZHKQ_SignIn ] *************** //

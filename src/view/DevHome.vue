@@ -3,7 +3,7 @@ import dayjs from "dayjs";
 import type {ClassInfo} from "@/components/ClassCard.vue";
 import {onMounted, ref} from "vue";
 import ClassContainer from "@/components/ClassContainer.vue";
-import {getDaySignList, ZHKQ_GetDayCourseList} from "@/API/zhkqAPI/index.ts";
+import {ZHKQ_GetDayCourseList, ZHKQ_GetDaySignList} from "@/API/zhkqAPI/index.ts";
 import {getZHKQUserInfo} from '../API/zhkqAPI/Function/Function'
 
 const userInfo = getZHKQUserInfo();
@@ -11,7 +11,7 @@ const data = ref<ClassInfo[]>([]);
 const todayString = dayjs().format("YYYY-MM-DD")
 onMounted(async () => {
   if (userInfo) {
-    const signInfo = (await getDaySignList(todayString, userInfo.value!.token)).sign_record_list
+    const signInfo = (await ZHKQ_GetDaySignList(todayString, userInfo.value!.token)).sign_record_list
     const courseList = (await ZHKQ_GetDayCourseList({date: todayString, userKey: userInfo.value!.token})).sourcelist;
     const signMap = new Map(signInfo.map(e => [e.pk_lesson, e]));
     data.value = courseList.map((e, index): ClassInfo | null => {

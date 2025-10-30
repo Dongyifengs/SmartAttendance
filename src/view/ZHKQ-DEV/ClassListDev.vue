@@ -43,7 +43,7 @@
 import {onMounted, ref} from 'vue'
 import {ElMessage} from 'element-plus'
 import dayjs from 'dayjs'
-import {getDaySignList, ZHKQ_GetDayCourseList} from '../../API/zhkqAPI'
+import {ZHKQ_GetDayCourseList, ZHKQ_GetDaySignList} from '../../API/zhkqAPI'
 import {checkInFields, courseFields} from './Type/dataFields'
 import DataTable from './components/DataTable.vue'
 
@@ -100,7 +100,7 @@ async function fetchList(name: string, api: Function, date: string, target: any,
 
 // 获取课程与签到
 const fetchTodayCourses = (date: string) => fetchList('课程', ZHKQ_GetDayCourseList, date, todayCourseList, loadingCourses, 'sourcelist')
-const fetchCheckInRecords = (date: string) => fetchList('签到', getDaySignList, date, checkInRecords, loadingCheckIns, 'sign_record_list')
+const fetchCheckInRecords = (date: string) => fetchList('签到', ZHKQ_GetDaySignList, date, checkInRecords, loadingCheckIns, 'sign_record_list')
 
 const fetchAllData = () => {
   const date = selectedDate.value ? dayjs(selectedDate.value).format('YYYY-MM-DD') : getCurrentDate()

@@ -35,6 +35,21 @@ export interface ZHKQ_RequestingBody_GetDayCourseList {
 // *************** [ 获取当天课程列表API请求体 - ZHKQ_GetDayCourseList ] *************** //
 
 
+// *************** [ 获取签到记录API请求体 - ZHKQ_GetDaySignList ] *************** //
+/**
+ * 智慧考勤 | 签到记录API请求体参数接口定义
+ * @interface ZHKQ_RequestingBody_GetDaySignList
+ * @property { string } userKey - 用户密钥，例如 `"V0****0="`
+ * @property { string } date - 日期，例如 `"YYYY-MM-DD"`
+ */
+export interface ZHKQ_RequestingBody_GetDaySignList {
+    userKey: string;
+    date: string;
+}
+
+// *************** [ 获取签到记录API请求体 - ZHKQ_GetDaySignList ] *************** //
+
+
 //////////////////////////////////////////////////////////////////////////////////////
 
 
