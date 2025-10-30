@@ -22,8 +22,8 @@ const cleanDeviceId = computed(() => {
 
 // Calculate course status based on current time
 const calculateStatus = (course: any, signData: any): "已签退" | "已签到" | "未签到" | "迟到" | "早退" | null => {
-  const startTime = dayjs(course.begin_time);
-  const endTime = dayjs(course.end_time);
+  const startTime = dayjs(`${course.lesson_date} ${course.begin_time}`);
+  const endTime = dayjs(`${course.lesson_date} ${course.end_time}`);
   
   const hasSignedIn = signData.u_begin_time && signData.u_begin_time !== "";
   const hasSignedOut = signData.u_end_time && signData.u_end_time !== "";
@@ -78,12 +78,12 @@ onMounted(async () => {
         return {
           classIndex: index + 1,
           className: e.lesson_name,
-          startTime: dayjs(e.begin_time),
-          endTime: dayjs(e.end_time),
+          startTime: dayjs(`${e.lesson_date} ${e.begin_time}`),
+          endTime: dayjs(`${e.lesson_date} ${e.end_time}`),
           signInTime: signData.u_begin_time ? dayjs(signData.u_begin_time) : null,
           signOutTime: signData.u_end_time ? dayjs(signData.u_end_time) : null,
-          shouldSignInTime: dayjs(signData.before_class_time),
-          shouldSignOutTime: dayjs(signData.after_class_time),
+          shouldSignInTime: dayjs(`${signData.lesson_date} ${signData.before_class_time}`),
+          shouldSignOutTime: dayjs(`${signData.lesson_date} ${signData.after_class_over_time}`),
           classRoom: e.class_room_name,
           teacher: {
             name: e.teacher_name,
