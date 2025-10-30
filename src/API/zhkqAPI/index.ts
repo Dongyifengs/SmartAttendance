@@ -4,8 +4,8 @@ import {PairAPI, RollCallAPI} from './APIStarter/APIStarter';
 import type {
     ZHKQ_RespondingBodyCourseList,
     ZHKQ_RespondingBodyGetDaySignList,
+    ZHKQ_RespondingBodySignIn,
     ZHKQ_RespondingBodyUserInfo,
-    ZHKQ_SignInRespondingBody,
     ZHKQ_SignOutRespondingBody,
 } from './type/RespondingBody'
 // 请求体
@@ -13,7 +13,7 @@ import type {
     ZHKQ_RequestingBody_GetDayCourseList,
     ZHKQ_RequestingBody_GetDaySignList,
     ZHKQ_RequestingBody_Login,
-    ZHKQ_SignInParams,
+    ZHKQ_RequestingBody_SignInParams,
     ZHKQ_SignOutParams
 } from "@/API/zhkqAPI/type/RequestingBody.ts";
 
@@ -269,10 +269,20 @@ export async function ZHKQ_GetDaySignList(param: ZHKQ_RequestingBody_GetDaySignL
 /**
  * 课程签到接口
  * @function ZHKQ_SignIn
- * @param { ZHKQ_SignInParams } params - 签到参数对象
- * @returns { Promise<ZHKQ_SignInRespondingBody> } 返回签到结果
+ * @param { ZHKQ_RequestingBody_SignInParams } params - 签到参数对象
+ * @param { string } params.userKey - 用户密钥，例如 `"V0****0="`
+ * @param { string } params.pk_anlaxy_syllabus_user - 课程用户主键，例如 `"56****AD"`
+ * @param { string } params.sign_in_type - 签到类型，例如 `1迟到 | 2正常`
+ * @param { string } params.u_begin_time - 签到时间，例如 `"YYYY-MM-dd HH:mm:ss"`
+ * @param { string } params.late_time_length - 迟到时长，默认 `0`
+ * @param { string } params.late_num - 迟到次数，默认 `0`
+ * @param { string } params.ask_leave_num - 请假次数，默认 `0`
+ * @param { string } params.in_longitude - 签到经度，默认 `0`
+ * @param { string } params.in_latitude - 签到纬度，默认 `0`
+ * @param { string } params.phone_code - 手机识别码，例如 `uuid_****,uuid_****`
+ * @returns { Promise<ZHKQ_RespondingBodySignIn> } 返回签到结果
  */
-export async function ZHKQ_SignIn(params: ZHKQ_SignInParams,): Promise<ZHKQ_SignInRespondingBody> {
+export async function ZHKQ_SignIn(params: ZHKQ_RequestingBody_SignInParams,): Promise<ZHKQ_RespondingBodySignIn> {
     return apiCall("RollCall_SignInSource", {
         param: params
     });
