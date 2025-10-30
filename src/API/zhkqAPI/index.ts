@@ -1,5 +1,6 @@
 import {generateInterfaceParams} from './Function/Function'
 import {PairAPI, RollCallAPI} from './APIStarter/APIStarter';
+import type {AxiosInstance} from 'axios';
 // 响应体
 import type {
     ZHKQ_RespondingBody_CourseList,
@@ -17,6 +18,82 @@ import type {
     ZHKQ_RequestingBody_SignOutParams
 } from "@/API/zhkqAPI/type/RequestingBody.ts";
 
+/**
+ * API 参数类型定义
+ */
+type ApiOptions = {
+    param?: Record<string, any> | null;
+    date?: string | null;
+    userid?: string | null;
+    userpwd?: string | null;
+    deviceId?: string | null;
+    client_local_id?: string | null;
+    userKey?: string | null;
+    group_id?: string | null;
+    pk_user?: string | null;
+    pk_class?: string | null;
+    pk_lesson?: string | null;
+    type?: string | null;
+    startDate?: string | null;
+    endDate?: string | null;
+    classpk?: string | null;
+    source_code?: string | null;
+    user_code?: string | null;
+    start?: string | null;
+    end?: string | null;
+};
+
+/**
+ * 过滤掉 null 和 undefined 的辅助函数
+ * @param obj - 要过滤的对象
+ * @returns 过滤后的对象
+ */
+function filterNullish<T extends Record<string, any>>(obj: T): Record<string, any> {
+    return Object.entries(obj).reduce((acc, [key, value]) => {
+        if (value != null) {
+            acc[key] = value;
+        }
+        return acc;
+    }, {} as Record<string, any>);
+}
+
+/**
+ * 通用 API 调用核心方法
+ * @param apiInstance - Axios 实例
+ * @param func - 要调用的后端接口函数名
+ * @param options - 可选参数配置
+ * @returns 返回后端响应数据
+ */
+async function baseApiCall<T = any>(
+    apiInstance: AxiosInstance,
+    func: string,
+    options: ApiOptions = {}
+): Promise<T> {
+    const { param = {}, ...restOptions } = options;
+
+    // 构建 Param 对象，只包含非空值
+    const filteredParams = filterNullish(restOptions);
+
+    const payload: Record<string, any> = {
+        CommType: "function",
+        Comm: func,
+        Param: {
+            ...param,
+            Source_PlatForm: 2,
+            ...filteredParams
+        }
+    };
+
+    const formData = generateInterfaceParams(payload);
+
+    try {
+        const response = await apiInstance.post('', formData);
+        return response.data as T;
+    } catch (error) {
+        console.error('API 调用失败:', error);
+        throw error;
+    }
+}
 
 /**
  * 通用 API 调用方法（增强版）
@@ -24,7 +101,7 @@ import type {
  * @async
  * @function apiCall
  * @param { string } func - 要调用的后端接口函数名（如 "Member_Login"）
- * @param { object } [options={}] - 可选参数配置
+ * @param { ApiOptions } [options={}] - 可选参数配置
  * @param { Record<string, any> } [options.param=null] - 自定义参数对象
  * @param { string|null } [options.date=null] - 日期字符串
  * @param { string|null } [options.userid=null] - 用户ID
@@ -38,85 +115,9 @@ import type {
  */
 export async function apiCall<T = any>(
     func: string,
-    options: {
-        param?: Record<string, any> | null;
-        date?: string | null;
-        userid?: string | null;
-        userpwd?: string | null;
-        deviceId?: string | null;
-        client_local_id?: string | null;
-        userKey?: string | null;
-        group_id?: string | null;
-        pk_user?: string | null;
-        pk_class?: string | null;
-        pk_lesson?: string | null;
-        type?: string | null;
-        startDate?: string | null;
-        endDate?: string | null;
-        classpk?: string | null;
-        source_code?: string | null;
-        user_code?: string | null;
-        start?: string | null;
-        end?: string | null;
-    } = {}
-): Promise<any> {
-    const {
-        param = {},
-        date = null,
-        userid = null,
-        userpwd = null,
-        deviceId = null,
-        client_local_id = null,
-        userKey = null,
-        group_id = null,
-        pk_user = null,
-        pk_class = null,
-        pk_lesson = null,
-        type = null,
-        startDate = null,
-        endDate = null,
-        source_code = null,
-        user_code = null,
-        start = null,
-        end = null,
-
-    } = options;
-
-    const payload: Record<string, any> = {
-        CommType: "function",
-        Comm: func,
-        Param: {
-            ...param,
-            Source_PlatForm: 2,
-            ...(date ? {date} : {}),
-            ...(userid ? {userid} : {}),
-            ...(userpwd ? {userpwd} : {}),
-            ...(deviceId ? {deviceId} : {}),
-            ...(client_local_id ? {client_local_id} : {}),
-            ...(userKey ? {userKey} : {}),
-            ...(group_id ? {group_id} : {}),
-            ...(pk_user ? {pk_user} : {}),
-            ...(pk_class ? {pk_class} : {}),
-            ...(pk_lesson ? {pk_lesson} : {}),
-            ...(type ? {type} : {}),
-            ...(startDate ? {startDate} : {}),
-            ...(endDate ? {endDate} : {}),
-            ...(source_code ? {source_code} : {}),
-            ...(user_code ? {user_code} : {}),
-            ...(start ? {start} : {}),
-            ...(end ? {end} : {})
-        }
-    };
-
-    const formData = generateInterfaceParams(payload);
-
-    try {
-        const response = await RollCallAPI.post('', formData);
-        return response.data as T;
-    } catch (error) {
-        console.error('API 调用失败:', error);
-        throw error;
-    }
+    options: ApiOptions = {}
+): Promise<T> {
+    return baseApiCall<T>(RollCallAPI, func, options);
 }
 
 /**
@@ -125,7 +126,7 @@ export async function apiCall<T = any>(
  * @async
  * @function apiRollCall
  * @param { string } func - 要调用的后端函数名
- * @param { object } [options={}] - 参数对象
+ * @param { ApiOptions } [options={}] - 参数对象
  * @param { Record<string, any> } [options.param=null] - 自定义参数对象
  * @param { string|null } [options.userKey=null] - 用户密钥
  * @param { string|null } [options.group_id=null] - 班级/分组 ID
@@ -133,86 +134,9 @@ export async function apiCall<T = any>(
  */
 export async function apiRollCall<T = any>(
     func: string,
-    options: {
-        param?: Record<string, any> | null;
-        userKey?: string | null;
-        group_id?: string | null;
-        date?: string | null;
-        userid?: string | null;
-        userpwd?: string | null;
-        deviceId?: string | null;
-        client_local_id?: string | null;
-        pk_user?: string | null;
-        pk_class?: string | null;
-        pk_lesson?: string | null;
-        type?: string | null;
-        startDate?: string | null;
-        endDate?: string | null;
-        classpk?: string | null;
-        start?: string | null;
-        end?: string | null;
-        source_code?: string | null;
-        user_code?: string
-    } = {}
-): Promise<any> {
-    const {
-        param = {},
-        userKey = null,
-        group_id = null,
-        date = null,
-        userid = null,
-        userpwd = null,
-        deviceId = null,
-        client_local_id = null,
-        pk_user = null,
-        pk_class = null,
-        pk_lesson = null,
-        type = null,
-        startDate = null,
-        endDate = null,
-        classpk = null,
-        start = null,
-        end = null,
-        source_code = null,
-        user_code = null
-    } = options;
-
-    const payload: Record<string, any> = {
-        CommType: "function",
-        Comm: func,
-        Param: {
-            ...param,
-            Source_PlatForm: 2,
-            ...(userKey ? {userKey} : {}),
-            ...(group_id ? {group_id} : {}),
-            ...(date ? {date} : {}),
-            ...(userid ? {userid} : {}),
-            ...(userpwd ? {userpwd} : {}),
-            ...(deviceId ? {deviceId} : {}),
-            ...(client_local_id ? {client_local_id} : {}),
-            ...(pk_user ? {pk_user} : {}),
-            ...(pk_class ? {pk_class} : {}),
-            ...(pk_lesson ? {pk_lesson} : {}),
-            ...(type ? {type} : {}),
-            ...(startDate ? {startDate} : {}),
-            ...(endDate ? {endDate} : {}),
-            ...(classpk ? {classpk} : {}),
-            ...(start ? {start} : {}),
-            ...(end ? {end} : {}),
-            ...(source_code ? {source_code} : {}),
-            ...(user_code ? {user_code} : {}),
-        }
-    };
-
-    const formData = generateInterfaceParams(payload);
-
-    try {
-        const response = await PairAPI.post('', formData);
-        return response.data as T;
-    } catch (error) {
-        console.error('API 调用失败:', error);
-        throw error;
-    }
+    options: ApiOptions = {}
+): Promise<T> {
+    return baseApiCall<T>(PairAPI, func, options);
 }
 
 /**
