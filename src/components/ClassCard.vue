@@ -17,57 +17,326 @@ export interface ClassInfo {
   shouldSignInTime: Dayjs
   shouldSignOutTime: Dayjs,
   situation: "早退" | "迟到" | "缺勤" | "请假" | null
+  computedStatus?: "已签退" | "已签到" | "未签到" | "迟到" | "早退" | null
 }
 </script>
 <script setup lang="ts">
 import {Clock, Location, User, CircleClose, CircleCheck} from "@element-plus/icons-vue";
-import IconifyText from "@/components/IconifyText.vue";
-import {ref} from "vue";
+import {ref, computed} from "vue";
 
 const info = defineModel<ClassInfo>({required: true});
 const selectedSignInTime = ref<string>("");
 const selectedSignOutTime = ref<string>("");
+
+// Determine the status to display
+const displayStatus = computed(() => {
+  return info.value.computedStatus || (info.value.situation ? null : "未签到");
+});
+
+// Check if we should show time selectors (for 迟到 or 早退)
+const shouldShowSignInSelector = computed(() => {
+  return (info.value.situation === "迟到" || displayStatus.value === "迟到") && !info.value.signInTime;
+});
+
+const shouldShowSignOutSelector = computed(() => {
+  return (info.value.situation === "早退" || displayStatus.value === "早退") && !info.value.signOutTime;
+});
+
 </script>
 <template>
-  <el-card class="class-container">
-    <template #header>
-      <div class="class-header-container">
-        <div>第{{info.classIndex}}节课 | {{info.className}}</div>
-        <div>
-          <el-tag type="danger" v-if="info.situation">{{info.situation}}</el-tag>
-          <el-tag type="success" v-else-if="info.signInTime && info.signOutTime">签退成功</el-tag>
-          <el-tag type="primary" v-else-if="info.signInTime">签到成功</el-tag>
-          <el-tag type="info" v-else>暂未签到</el-tag>
+  <div class="class-card-wrapper">
+    <div class="class-container">
+      <div class="class-header">
+        <div class="class-title">
+          <span class="class-index">第{{info.classIndex}}节</span>
+          <span class="class-name">{{info.className}}</span>
+        </div>
+        <div class="status-tag">
+          <el-tag 
+            :type="info.situation === '缺勤' ? 'danger' : info.situation === '迟到' ? 'warning' : info.situation === '早退' ? 'warning' : info.situation === '请假' ? 'info' : displayStatus === '已签退' ? 'success' : displayStatus === '已签到' ? 'primary' : 'info'"
+            effect="dark"
+            round
+          >
+            {{ info.situation || displayStatus }}
+          </el-tag>
         </div>
       </div>
-    </template>
-    <div class="content">
-      <iconify-text :icon="Clock">课程时间：{{info.startTime.format("HH:mm")}} ~ {{info.endTime.format("HH:mm")}}</iconify-text>
-      <iconify-text :icon="Location">教室位置：{{info.classRoom}}</iconify-text>
-      <iconify-text :icon="User">教师：{{info.teacher.name}}（{{info.teacher.id}}）</iconify-text>
-      <iconify-text :icon="CircleCheck" color="green" v-if="info.signInTime">签到时间：{{info.signInTime.format("HH:mm:ss")}}</iconify-text>
-      <iconify-text :icon="CircleClose" color="red" v-else>签到时间：<el-time-select size="small" v-model="selectedSignInTime" :start="info.shouldSignInTime.format('HH:mm')" step="00:01" :end="info.startTime.format('HH:mm')" placeholder="请选择时间以签到" class="small-input"/></iconify-text>
-      <iconify-text :icon="CircleCheck" color="green" v-if="info.signInTime && info.signOutTime">签退时间：{{info.signOutTime.format("HH:mm:ss")}}</iconify-text>
-      <iconify-text :icon="CircleClose" color="red" v-else-if="info.signInTime">签退时间：<el-time-select size="small" v-model="selectedSignOutTime" :start="info.endTime.format('HH:mm')" step="00:01" :end="info.shouldSignOutTime.format('HH:mm')" placeholder="请选择时间以签退" class="small-input"/></iconify-text>
+      
+      <div class="class-content">
+        <div class="info-item">
+          <el-icon class="info-icon" :color="'#667eea'"><Clock /></el-icon>
+          <span class="info-text">{{info.startTime.format("HH:mm")}} - {{info.endTime.format("HH:mm")}}</span>
+        </div>
+        
+        <div class="info-item">
+          <el-icon class="info-icon" :color="'#f093fb'"><Location /></el-icon>
+          <span class="info-text">{{info.classRoom}}</span>
+        </div>
+        
+        <div class="info-item">
+          <el-icon class="info-icon" :color="'#4facfe'"><User /></el-icon>
+          <span class="info-text">{{info.teacher.name}}</span>
+        </div>
+        
+        <div class="divider"></div>
+        
+        <!-- Sign In Section -->
+        <div class="sign-section">
+          <div class="sign-item" v-if="info.signInTime">
+            <el-icon class="sign-icon" :color="'#00d2ff'"><CircleCheck /></el-icon>
+            <span class="sign-label">签到时间：</span>
+            <span class="sign-value success">{{info.signInTime.format("HH:mm:ss")}}</span>
+          </div>
+          <div class="sign-item" v-else-if="shouldShowSignInSelector">
+            <el-icon class="sign-icon" :color="'#f093fb'"><CircleClose /></el-icon>
+            <span class="sign-label">签到时间：</span>
+            <el-time-select 
+              size="small" 
+              v-model="selectedSignInTime" 
+              :start="info.shouldSignInTime.format('HH:mm')" 
+              step="00:01" 
+              :end="info.startTime.format('HH:mm')" 
+              placeholder="选择签到时间" 
+              class="time-selector"
+            />
+          </div>
+          <div class="sign-item" v-else>
+            <el-icon class="sign-icon" :color="'#fa709a'"><CircleClose /></el-icon>
+            <span class="sign-label">签到时间：</span>
+            <span class="sign-value pending">未签到</span>
+          </div>
+        </div>
+        
+        <!-- Sign Out Section -->
+        <div class="sign-section" v-if="info.signInTime">
+          <div class="sign-item" v-if="info.signOutTime">
+            <el-icon class="sign-icon" :color="'#00d2ff'"><CircleCheck /></el-icon>
+            <span class="sign-label">签退时间：</span>
+            <span class="sign-value success">{{info.signOutTime.format("HH:mm:ss")}}</span>
+          </div>
+          <div class="sign-item" v-else-if="shouldShowSignOutSelector">
+            <el-icon class="sign-icon" :color="'#f093fb'"><CircleClose /></el-icon>
+            <span class="sign-label">签退时间：</span>
+            <el-time-select 
+              size="small" 
+              v-model="selectedSignOutTime" 
+              :start="info.endTime.format('HH:mm')" 
+              step="00:01" 
+              :end="info.shouldSignOutTime.format('HH:mm')" 
+              placeholder="选择签退时间" 
+              class="time-selector"
+            />
+          </div>
+          <div class="sign-item" v-else>
+            <el-icon class="sign-icon" :color="'#fa709a'"><CircleClose /></el-icon>
+            <span class="sign-label">签退时间：</span>
+            <span class="sign-value pending">待签退</span>
+          </div>
+        </div>
+      </div>
     </div>
-  </el-card>
+  </div>
 </template>
 
 <style scoped>
-.small-input {
-  width: 170px;
+.class-card-wrapper {
+  animation: cardFadeIn 0.5s ease-out;
 }
-.content {
+
+@keyframes cardFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.class-container {
+  background: white;
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  flex: 1;
+  min-width: 320px;
+  max-width: 100%;
+}
+
+.class-container:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.class-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid #f5f5f7;
+}
+
+.class-title {
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
-.class-container {
-  flex: 1;
-  min-width: 370px
+
+.class-index {
+  font-size: 12px;
+  color: #86868b;
+  font-weight: 500;
+  letter-spacing: 0.5px;
 }
-.class-header-container {
+
+.class-name {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1d1d1f;
+  letter-spacing: 0.3px;
+}
+
+.status-tag {
+  animation: tagPulse 0.6s ease-out;
+}
+
+@keyframes tagPulse {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.class-content {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  background: #f5f5f7;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+.info-item:hover {
+  background: #e8e8ed;
+  transform: translateX(4px);
+}
+
+.info-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.info-text {
+  font-size: 14px;
+  color: #1d1d1f;
+  font-weight: 500;
+}
+
+.divider {
+  height: 1px;
+  background: linear-gradient(to right, transparent, #d2d2d7, transparent);
+  margin: 8px 0;
+}
+
+.sign-section {
+  margin-top: 4px;
+}
+
+.sign-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: linear-gradient(135deg, #f5f5f7 0%, #fafafa 100%);
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.sign-item:hover {
+  background: linear-gradient(135deg, #e8e8ed 0%, #f0f0f5 100%);
+}
+
+.sign-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.sign-label {
+  font-size: 14px;
+  color: #86868b;
+  font-weight: 500;
+  min-width: 80px;
+}
+
+.sign-value {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+.sign-value.success {
+  color: #00d2ff;
+}
+
+.sign-value.pending {
+  color: #fa709a;
+}
+
+.time-selector {
+  flex: 1;
+  max-width: 180px;
+}
+
+.time-selector :deep(.el-input__wrapper) {
+  border-radius: 10px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.time-selector :deep(.el-input__wrapper):hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 768px) {
+  .class-container {
+    min-width: 280px;
+    padding: 16px;
+    border-radius: 16px;
+  }
+  
+  .class-name {
+    font-size: 18px;
+  }
+  
+  .info-item {
+    padding: 8px 10px;
+  }
+  
+  .sign-item {
+    padding: 10px;
+    flex-wrap: wrap;
+  }
+  
+  .time-selector {
+    max-width: 100%;
+    width: 100%;
+  }
 }
 </style>

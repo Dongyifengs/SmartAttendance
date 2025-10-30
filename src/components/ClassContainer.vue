@@ -12,10 +12,26 @@ const data = defineModel<ClassInfo[]>({required: true});
 
 <style scoped>
 .class-list-container {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 20px;
-  flex-wrap: wrap;
-  padding: 10px;
-  justify-content: center;
+  padding: 0;
+  animation: containerFadeIn 0.6s ease-out;
+}
+
+@keyframes containerFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .class-list-container {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
 }
 </style>
