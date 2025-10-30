@@ -9,8 +9,8 @@
 
 一个智能化的校园签到签退解决方案，让考勤变得简单高效
 
-[适用学校（不完整）](http://anlaxy.com/business.html) | 
-[阿拉校园官网](http://anlaxy.com/index.html) | 
+[适用学校（不完整）](http://anlaxy.com/business.html) |
+[阿拉校园官网](http://anlaxy.com/index.html) |
 [阿拉校园后台](https://anlaxy.com.cn/admin)
 
 </div>
@@ -398,7 +398,7 @@ SmartAttendance/
 
 ### Q4: 如何获取设备 ID？
 **A**: 
-- **Android**: 拨号盘输入 `*#06#`，使用 IMEI1
+- **Android**: 拨号盘输入 `*#06#`，使用 IMEI 1
 - **iOS**: 设置 > 通用 > 关于本机 > IMEI
 
 ### Q5: 是否支持多设备登录？
