@@ -65,6 +65,7 @@ const tagType = computed(() => {
           <el-tag 
             :type="tagType"
             effect="dark"
+            size="small"
             round
           >
             {{ info.situation || displayStatus }}
@@ -73,74 +74,71 @@ const tagType = computed(() => {
       </div>
       
       <div class="class-content">
-        <div class="info-item">
-          <el-icon class="info-icon" :color="'#667eea'"><Clock /></el-icon>
-          <span class="info-text">{{info.startTime.format("HH:mm")}} - {{info.endTime.format("HH:mm")}}</span>
-        </div>
-        
-        <div class="info-item">
-          <el-icon class="info-icon" :color="'#f093fb'"><Location /></el-icon>
-          <span class="info-text">{{info.classRoom}}</span>
-        </div>
-        
-        <div class="info-item">
-          <el-icon class="info-icon" :color="'#4facfe'"><User /></el-icon>
-          <span class="info-text">{{info.teacher.name}}</span>
+        <div class="info-row-compact">
+          <span class="info-item-inline">
+            <el-icon class="info-icon" :color="'#667eea'"><Clock /></el-icon>
+            {{info.startTime.format("HH:mm")}} - {{info.endTime.format("HH:mm")}}
+          </span>
+          <span class="divider-inline">|</span>
+          <span class="info-item-inline">
+            <el-icon class="info-icon" :color="'#f093fb'"><Location /></el-icon>
+            {{info.classRoom}}
+          </span>
+          <span class="divider-inline">|</span>
+          <span class="info-item-inline">
+            <el-icon class="info-icon" :color="'#4facfe'"><User /></el-icon>
+            {{info.teacher.name}}
+          </span>
         </div>
         
         <div class="divider"></div>
         
-        <!-- Sign In Section -->
-        <div class="sign-section">
-          <div class="sign-item" v-if="info.signInTime">
+        <!-- Sign In/Out Section - More Compact -->
+        <div class="sign-info">
+          <div class="sign-row" v-if="info.signInTime">
             <el-icon class="sign-icon" :color="'#00d2ff'"><CircleCheck /></el-icon>
-            <span class="sign-label">签到时间：</span>
-            <span class="sign-value success">{{info.signInTime.format("HH:mm:ss")}}</span>
+            <span class="sign-text">签到: {{info.signInTime.format("HH:mm:ss")}}</span>
           </div>
-          <div class="sign-item" v-else-if="shouldShowSignInSelector">
+          <div class="sign-row" v-else-if="shouldShowSignInSelector">
             <el-icon class="sign-icon" :color="'#f093fb'"><CircleClose /></el-icon>
-            <span class="sign-label">签到时间：</span>
+            <span class="sign-label">签到:</span>
             <el-time-select 
               size="small" 
               v-model="selectedSignInTime" 
               :start="info.shouldSignInTime.format('HH:mm')" 
               step="00:01" 
               :end="info.startTime.format('HH:mm')" 
-              placeholder="选择签到时间" 
+              placeholder="选择时间" 
               class="time-selector"
             />
           </div>
-          <div class="sign-item" v-else>
+          <div class="sign-row" v-else>
             <el-icon class="sign-icon" :color="'#fa709a'"><CircleClose /></el-icon>
-            <span class="sign-label">签到时间：</span>
-            <span class="sign-value pending">未签到</span>
+            <span class="sign-text pending">未签到</span>
           </div>
         </div>
         
-        <!-- Sign Out Section -->
-        <div class="sign-section" v-if="info.signInTime">
-          <div class="sign-item" v-if="info.signOutTime">
+        <div class="sign-info" v-if="info.signInTime">
+          <div class="sign-row" v-if="info.signOutTime">
             <el-icon class="sign-icon" :color="'#00d2ff'"><CircleCheck /></el-icon>
-            <span class="sign-label">签退时间：</span>
-            <span class="sign-value success">{{info.signOutTime.format("HH:mm:ss")}}</span>
+            <span class="sign-text">签退: {{info.signOutTime.format("HH:mm:ss")}}</span>
           </div>
-          <div class="sign-item" v-else-if="shouldShowSignOutSelector">
+          <div class="sign-row" v-else-if="shouldShowSignOutSelector">
             <el-icon class="sign-icon" :color="'#f093fb'"><CircleClose /></el-icon>
-            <span class="sign-label">签退时间：</span>
+            <span class="sign-label">签退:</span>
             <el-time-select 
               size="small" 
               v-model="selectedSignOutTime" 
               :start="info.endTime.format('HH:mm')" 
               step="00:01" 
               :end="info.shouldSignOutTime.format('HH:mm')" 
-              placeholder="选择签退时间" 
+              placeholder="选择时间" 
               class="time-selector"
             />
           </div>
-          <div class="sign-item" v-else>
+          <div class="sign-row" v-else>
             <el-icon class="sign-icon" :color="'#fa709a'"><CircleClose /></el-icon>
-            <span class="sign-label">签退时间：</span>
-            <span class="sign-value pending">待签退</span>
+            <span class="sign-text pending">待签退</span>
           </div>
         </div>
       </div>
@@ -150,13 +148,13 @@ const tagType = computed(() => {
 
 <style scoped>
 .class-card-wrapper {
-  animation: cardFadeIn 0.5s ease-out;
+  animation: cardFadeIn 0.4s ease-out;
 }
 
 @keyframes cardFadeIn {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(8px);
   }
   to {
     opacity: 1;
@@ -166,60 +164,58 @@ const tagType = computed(() => {
 
 .class-container {
   background: white;
-  border-radius: 20px;
-  padding: 20px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  padding: 14px 16px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   flex: 1;
-  min-width: 320px;
+  min-width: 300px;
   max-width: 100%;
 }
 
 .class-container:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 }
 
 .class-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
-  padding-bottom: 16px;
-  border-bottom: 2px solid #f5f5f7;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #f0f0f5;
 }
 
 .class-title {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
 }
 
 .class-index {
-  font-size: 12px;
+  font-size: 11px;
   color: #86868b;
   font-weight: 500;
-  letter-spacing: 0.5px;
 }
 
 .class-name {
-  font-size: 20px;
+  font-size: 16px;
   font-weight: 600;
   color: #1d1d1f;
-  letter-spacing: 0.3px;
 }
 
 .status-tag {
-  animation: tagPulse 0.6s ease-out;
+  animation: tagPulse 0.5s ease-out;
 }
 
 @keyframes tagPulse {
   0% {
-    transform: scale(0.8);
+    transform: scale(0.85);
     opacity: 0;
   }
   50% {
-    transform: scale(1.05);
+    transform: scale(1.03);
   }
   100% {
     transform: scale(1);
@@ -230,117 +226,113 @@ const tagType = computed(() => {
 .class-content {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
 }
 
-.info-item {
+.info-row-compact {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 10px 12px;
-  background: #f5f5f7;
-  border-radius: 12px;
-  transition: all 0.2s ease;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 13px;
+  color: #1d1d1f;
+  padding: 6px 0;
 }
 
-.info-item:hover {
-  background: #e8e8ed;
-  transform: translateX(4px);
+.info-item-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.divider-inline {
+  color: #d2d2d7;
+  font-weight: 300;
 }
 
 .info-icon {
-  font-size: 18px;
-  flex-shrink: 0;
-}
-
-.info-text {
   font-size: 14px;
-  color: #1d1d1f;
-  font-weight: 500;
+  flex-shrink: 0;
 }
 
 .divider {
   height: 1px;
-  background: linear-gradient(to right, transparent, #d2d2d7, transparent);
-  margin: 8px 0;
+  background: linear-gradient(to right, transparent, #e8e8ed, transparent);
+  margin: 4px 0;
 }
 
-.sign-section {
-  margin-top: 4px;
+.sign-info {
+  margin-top: 2px;
 }
 
-.sign-item {
+.sign-row {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px;
-  background: linear-gradient(135deg, #f5f5f7 0%, #fafafa 100%);
-  border-radius: 12px;
-  transition: all 0.3s ease;
+  gap: 8px;
+  padding: 6px 8px;
+  background: #f5f5f7;
+  border-radius: 10px;
+  transition: all 0.2s ease;
+  font-size: 13px;
 }
 
-.sign-item:hover {
-  background: linear-gradient(135deg, #e8e8ed 0%, #f0f0f5 100%);
+.sign-row:hover {
+  background: #e8e8ed;
 }
 
 .sign-icon {
-  font-size: 20px;
+  font-size: 16px;
   flex-shrink: 0;
 }
 
 .sign-label {
-  font-size: 14px;
-  color: #86868b;
   font-weight: 500;
-  min-width: 80px;
+  color: #86868b;
+  min-width: 50px;
 }
 
-.sign-value {
-  font-size: 14px;
-  font-weight: 600;
-  letter-spacing: 0.3px;
-}
-
-.sign-value.success {
+.sign-text {
+  font-weight: 500;
   color: #00d2ff;
 }
 
-.sign-value.pending {
+.sign-text.pending {
   color: #fa709a;
 }
 
 .time-selector {
   flex: 1;
-  max-width: 180px;
+  max-width: 140px;
 }
 
 .time-selector :deep(.el-input__wrapper) {
-  border-radius: 10px;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border-radius: 8px;
+  transition: all 0.2s ease;
 }
 
 .time-selector :deep(.el-input__wrapper):hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 @media (max-width: 768px) {
   .class-container {
-    min-width: 280px;
-    padding: 16px;
-    border-radius: 16px;
+    min-width: 260px;
+    padding: 12px 14px;
+    border-radius: 14px;
   }
   
   .class-name {
-    font-size: 18px;
+    font-size: 15px;
   }
   
-  .info-item {
-    padding: 8px 10px;
+  .info-row-compact {
+    font-size: 12px;
+    gap: 6px;
   }
   
-  .sign-item {
-    padding: 10px;
+  .sign-row {
+    padding: 5px 7px;
+    font-size: 12px;
     flex-wrap: wrap;
   }
   

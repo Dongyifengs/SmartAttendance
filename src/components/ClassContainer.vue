@@ -13,10 +13,10 @@ const data = defineModel<ClassInfo[]>({required: true});
 <style scoped>
 .class-list-container {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 14px;
   padding: 0;
-  animation: containerFadeIn 0.6s ease-out;
+  animation: containerFadeIn 0.5s ease-out;
 }
 
 @keyframes containerFadeIn {
@@ -31,7 +31,7 @@ const data = defineModel<ClassInfo[]>({required: true});
 @media (max-width: 768px) {
   .class-list-container {
     grid-template-columns: 1fr;
-    gap: 16px;
+    gap: 12px;
   }
 }
 </style>
