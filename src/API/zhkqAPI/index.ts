@@ -5,8 +5,8 @@ import type {
     ZHKQ_RespondingBodyCourseList,
     ZHKQ_RespondingBodyGetDaySignList,
     ZHKQ_RespondingBodySignIn,
+    ZHKQ_RespondingBodySignOut,
     ZHKQ_RespondingBodyUserInfo,
-    ZHKQ_SignOutRespondingBody,
 } from './type/RespondingBody'
 // 请求体
 import type {
@@ -14,7 +14,7 @@ import type {
     ZHKQ_RequestingBody_GetDaySignList,
     ZHKQ_RequestingBody_Login,
     ZHKQ_RequestingBody_SignInParams,
-    ZHKQ_SignOutParams
+    ZHKQ_RequestingBody_SignOutParams
 } from "@/API/zhkqAPI/type/RequestingBody.ts";
 
 
@@ -292,14 +292,32 @@ export async function ZHKQ_SignIn(params: ZHKQ_RequestingBody_SignInParams,): Pr
 /**
  * 课程签退接口
  * @function ZHKQ_SignOut
- * @param { ZHKQ_SignOutParams } params - 签退参数对象
- * @param { string } userKey - 用户密钥
- * @returns { Promise<ZHKQ_SignOutRespondingBody> } 返回签退结果
+ * @param { ZHKQ_RequestingBody_SignOutParams } params - 签退参数对象
+ * @param { string } params.userKey - 用户密钥，例如 `"V0****0="`
+ * @param { string } params.pk_anlaxy_syllabus_user - 课程用户主键，例如 `"56****AD"`
+ * @param { string } params.phone_code - 手机识别码，例如 `uuid_****,uuid_****`
+ * @param { string } params.sign_out_type - 签退类型，例如 `1迟到 | 2正常`
+ * @param { string } params.u_end_time - 签退时间，例如 `"HH:mm"`
+ * @param { string } params.lesson_change_list - 课程变更列表，默认 `"DA****AD"`
+ * @param { string } params.lesson_change_type - 课程变更类型，默认 `0`
+ * @param { string } params.ask_leave_num - 请假次数，默认 `0`
+ * @param { string } params.out_longitude - 签退经度，默认 `0`
+ * @param { string } params.out_latitude - 签退纬度，默认  `0`
+ * @param { string } params.in_longitude - 签到经度，默认 `""`
+ * @param { string } params.in_latitude - 签到纬度，默认 `""`
+ * @param { string } params.reviewscore - 课程评分，默认 `10`
+ * @param { string } params.reviewcontent - 课程评价内容，默认 `""`
+ * @param { string } params.sign_in_type - 签到类型，默认 `"2"`
+ * @param { Date } params.u_begin_time - 签到时间，例如 `"YYYY-MM-dd HH:mm:ss"`
+ * @param { string } params.before_class_over_time - 课前结束时间，例如 `"HH:mm"`
+ * @param { string } params.late_time_length - 迟到时长，默认 `0`
+ * @param { string } params.late_num - 迟到次数，默认 `0`
+ *
+ * @returns { Promise<ZHKQ_RespondingBodySignOut> } 返回签退结果
  */
-export async function ZHKQ_SignOut(params: ZHKQ_SignOutParams, userKey: string): Promise<ZHKQ_SignOutRespondingBody> {
+export async function ZHKQ_SignOut(params: ZHKQ_RequestingBody_SignOutParams): Promise<ZHKQ_RespondingBodySignOut> {
     return apiCall("RollCall_SignOutSource", {
-        param: params,
-        userKey
+        param: params
     });
 }
 

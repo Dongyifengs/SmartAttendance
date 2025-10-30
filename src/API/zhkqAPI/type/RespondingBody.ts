@@ -251,27 +251,20 @@ export interface ZHKQ_RespondingBodySignIn {
 // *************** [ 获取签到操作API响应 - ZHKQ_SignIn ] *************** //
 
 
-//////////////////////////////////////////////////////////////////////////////////////
-
-
-
-
-
-// *************** [ 课程签退接口API返回 - ZHKQ_SignOut ] *************** //
+// *************** [ 课程签退接口API响应 - ZHKQ_SignOut ] *************** //
 /**
  * 课程签退接口API返回
- * @interface ZHKQ_SignOutRespondingBody
+ * @interface ZHKQ_RespondingBodySignOut
  * @property { string } state - 状态码，例如`"1"`
  * @property { number } sign_coin - 签名码，例如`0`
  * @property { number } sing_result - 签到结果，例如`0`
  * @property { string } source_code - 课程主键，例如`"56****AD"`
  */
-
-export interface ZHKQ_SignOutRespondingBody {
+export interface ZHKQ_RespondingBodySignOut {
     state: string;
     sign_coin: number;
     sing_result: number;
     source_code: string;
 }
 
-// *************** [ 课程签退接口API返回 - ZHKQ_SignOut ] *************** //
+// *************** [ 课程签退接口API响应 - ZHKQ_SignOut ] *************** //
