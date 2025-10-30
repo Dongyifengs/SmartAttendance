@@ -11,7 +11,7 @@ const data = ref<ClassInfo[]>([]);
 const todayString = dayjs().format("YYYY-MM-DD")
 onMounted(async () => {
   if (userInfo) {
-    const signInfo = (await ZHKQ_GetDaySignList(todayString, userInfo.value!.token)).sign_record_list
+    const signInfo = (await ZHKQ_GetDaySignList({date: todayString, userKey: userInfo.value!.token})).sign_record_list
     const courseList = (await ZHKQ_GetDayCourseList({date: todayString, userKey: userInfo.value!.token})).sourcelist;
     const signMap = new Map(signInfo.map(e => [e.pk_lesson, e]));
     data.value = courseList.map((e, index): ClassInfo | null => {
