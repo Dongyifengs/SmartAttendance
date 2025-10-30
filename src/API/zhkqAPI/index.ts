@@ -17,94 +17,26 @@ import type {
     ZHKQ_RequestingBody_SignOutParams
 } from "@/API/zhkqAPI/type/RequestingBody.ts";
 
-
 /**
- * 通用 API 调用方法（增强版）
+ * 通用 API 调用方法
  *
  * @async
  * @function apiCall
  * @param { string } func - 要调用的后端接口函数名（如 "Member_Login"）
- * @param { object } [options={}] - 可选参数配置
- * @param { Record<string, any> } [options.param=null] - 自定义参数对象
- * @param { string|null } [options.date=null] - 日期字符串
- * @param { string|null } [options.userid=null] - 用户ID
- * @param { string|null } [options.userpwd=null] - 用户加密密码
- * @param { string|null } [options.deviceId=null] - 设备唯一标识
- * @param { string|null } [options.client_local_id=null] - 客户端本地ID
- * @param { string|null } [options.userKey=null] - 用户会话密钥
- * @param { string|null } [options.group_id=null] - 班级/分组ID
- * @returns { Promise<any> } 返回后端响应数据
- * @throws { Error} 当请求失败时抛出异常
+ * @param { Record<string, any> } [params={}] - 请求参数对象，会被放入 Param 字段
+ * @returns { Promise<T> } 返回后端响应数据
+ * @throws { Error } 当请求失败时抛出异常
  */
 export async function apiCall<T = any>(
     func: string,
-    options: {
-        param?: Record<string, any> | null;
-        date?: string | null;
-        userid?: string | null;
-        userpwd?: string | null;
-        deviceId?: string | null;
-        client_local_id?: string | null;
-        userKey?: string | null;
-        group_id?: string | null;
-        pk_user?: string | null;
-        pk_class?: string | null;
-        pk_lesson?: string | null;
-        type?: string | null;
-        startDate?: string | null;
-        endDate?: string | null;
-        classpk?: string | null;
-        source_code?: string | null;
-        user_code?: string | null;
-        start?: string | null;
-        end?: string | null;
-    } = {}
-): Promise<any> {
-    const {
-        param = {},
-        date = null,
-        userid = null,
-        userpwd = null,
-        deviceId = null,
-        client_local_id = null,
-        userKey = null,
-        group_id = null,
-        pk_user = null,
-        pk_class = null,
-        pk_lesson = null,
-        type = null,
-        startDate = null,
-        endDate = null,
-        source_code = null,
-        user_code = null,
-        start = null,
-        end = null,
-
-    } = options;
-
-    const payload: Record<string, any> = {
+    params: Record<string, any> = {}
+): Promise<T> {
+    const payload = {
         CommType: "function",
         Comm: func,
         Param: {
-            ...param,
             Source_PlatForm: 2,
-            ...(date ? {date} : {}),
-            ...(userid ? {userid} : {}),
-            ...(userpwd ? {userpwd} : {}),
-            ...(deviceId ? {deviceId} : {}),
-            ...(client_local_id ? {client_local_id} : {}),
-            ...(userKey ? {userKey} : {}),
-            ...(group_id ? {group_id} : {}),
-            ...(pk_user ? {pk_user} : {}),
-            ...(pk_class ? {pk_class} : {}),
-            ...(pk_lesson ? {pk_lesson} : {}),
-            ...(type ? {type} : {}),
-            ...(startDate ? {startDate} : {}),
-            ...(endDate ? {endDate} : {}),
-            ...(source_code ? {source_code} : {}),
-            ...(user_code ? {user_code} : {}),
-            ...(start ? {start} : {}),
-            ...(end ? {end} : {})
+            ...params
         }
     };
 
@@ -125,82 +57,20 @@ export async function apiCall<T = any>(
  * @async
  * @function apiRollCall
  * @param { string } func - 要调用的后端函数名
- * @param { object } [options={}] - 参数对象
- * @param { Record<string, any> } [options.param=null] - 自定义参数对象
- * @param { string|null } [options.userKey=null] - 用户密钥
- * @param { string|null } [options.group_id=null] - 班级/分组 ID
- * @returns { Promise<any> } 返回后端响应数据
+ * @param { Record<string, any> } [params={}] - 请求参数对象，会被放入 Param 字段
+ * @returns { Promise<T> } 返回后端响应数据
+ * @throws { Error } 当请求失败时抛出异常
  */
 export async function apiRollCall<T = any>(
     func: string,
-    options: {
-        param?: Record<string, any> | null;
-        userKey?: string | null;
-        group_id?: string | null;
-        date?: string | null;
-        userid?: string | null;
-        userpwd?: string | null;
-        deviceId?: string | null;
-        client_local_id?: string | null;
-        pk_user?: string | null;
-        pk_class?: string | null;
-        pk_lesson?: string | null;
-        type?: string | null;
-        startDate?: string | null;
-        endDate?: string | null;
-        classpk?: string | null;
-        start?: string | null;
-        end?: string | null;
-        source_code?: string | null;
-        user_code?: string
-    } = {}
-): Promise<any> {
-    const {
-        param = {},
-        userKey = null,
-        group_id = null,
-        date = null,
-        userid = null,
-        userpwd = null,
-        deviceId = null,
-        client_local_id = null,
-        pk_user = null,
-        pk_class = null,
-        pk_lesson = null,
-        type = null,
-        startDate = null,
-        endDate = null,
-        classpk = null,
-        start = null,
-        end = null,
-        source_code = null,
-        user_code = null
-    } = options;
-
-    const payload: Record<string, any> = {
+    params: Record<string, any> = {}
+): Promise<T> {
+    const payload = {
         CommType: "function",
         Comm: func,
         Param: {
-            ...param,
             Source_PlatForm: 2,
-            ...(userKey ? {userKey} : {}),
-            ...(group_id ? {group_id} : {}),
-            ...(date ? {date} : {}),
-            ...(userid ? {userid} : {}),
-            ...(userpwd ? {userpwd} : {}),
-            ...(deviceId ? {deviceId} : {}),
-            ...(client_local_id ? {client_local_id} : {}),
-            ...(pk_user ? {pk_user} : {}),
-            ...(pk_class ? {pk_class} : {}),
-            ...(pk_lesson ? {pk_lesson} : {}),
-            ...(type ? {type} : {}),
-            ...(startDate ? {startDate} : {}),
-            ...(endDate ? {endDate} : {}),
-            ...(classpk ? {classpk} : {}),
-            ...(start ? {start} : {}),
-            ...(end ? {end} : {}),
-            ...(source_code ? {source_code} : {}),
-            ...(user_code ? {user_code} : {}),
+            ...params
         }
     };
 
@@ -225,9 +95,7 @@ export async function apiRollCall<T = any>(
  * @returns { Promise<ZHKQ_RespondingBody_UserInfo> } 返回登录结果数据
  */
 export async function ZHKQ_Login(param: ZHKQ_RequestingBody_Login): Promise<ZHKQ_RespondingBody_UserInfo> {
-    return apiCall("Member_Login", {
-        param
-    });
+    return apiCall("Member_Login", param);
 }
 
 /**
@@ -242,9 +110,7 @@ export async function ZHKQ_GetDayCourseList(param: ZHKQ_RequestingBody_GetDayCou
     state: string,
     sourcelist: ZHKQ_RespondingBody_CourseList[]
 }> {
-    return apiCall("RollCall_SourceListDay", {
-        param
-    });
+    return apiCall("RollCall_SourceListDay", param);
 }
 
 
@@ -260,9 +126,7 @@ export async function ZHKQ_GetDaySignList(param: ZHKQ_RequestingBody_GetDaySignL
     state: string,
     sign_record_list: ZHKQ_RespondingBody_GetDaySignList[]
 }> {
-    return apiCall("RollCall_SourceSignList", {
-        param
-    });
+    return apiCall("RollCall_SourceSignList", param);
 }
 
 
@@ -283,9 +147,7 @@ export async function ZHKQ_GetDaySignList(param: ZHKQ_RequestingBody_GetDaySignL
  * @returns { Promise<ZHKQ_RespondingBody_SignIn> } 返回签到结果
  */
 export async function ZHKQ_SignIn(params: ZHKQ_RequestingBody_SignInParams,): Promise<ZHKQ_RespondingBody_SignIn> {
-    return apiCall("RollCall_SignInSource", {
-        param: params
-    });
+    return apiCall("RollCall_SignInSource", params);
 }
 
 
@@ -316,9 +178,7 @@ export async function ZHKQ_SignIn(params: ZHKQ_RequestingBody_SignInParams,): Pr
  * @returns { Promise<ZHKQ_RespondingBody_SignOut> } 返回签退结果
  */
 export async function ZHKQ_SignOut(params: ZHKQ_RequestingBody_SignOutParams): Promise<ZHKQ_RespondingBody_SignOut> {
-    return apiCall("RollCall_SignOutSource", {
-        param: params
-    });
+    return apiCall("RollCall_SignOutSource", params);
 }
 
 /**
@@ -331,7 +191,7 @@ export async function ZHKQ_SignOut(params: ZHKQ_RequestingBody_SignOutParams): P
  */
 export async function getEndTime(lessonId: string, userKey: string): Promise<any> {
     return apiCall("RollCall_Get_Change_EndTime", {
-        param: {lesson_change_list: lessonId},
+        lesson_change_list: lessonId,
         userKey
     });
 }

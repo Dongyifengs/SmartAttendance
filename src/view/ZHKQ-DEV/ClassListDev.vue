@@ -77,6 +77,8 @@ async function fetchList(name: string, api: Function, date: string, target: any,
     if (api === ZHKQ_GetDayCourseList) {
       // 使用对象参数格式
       res = await api({date: date, userKey: getUserToken()})
+    } else if (api === ZHKQ_GetDaySignList) {
+      res = await api({date: date, userKey: getUserToken()})
     } else {
       // 保持原来的参数格式
       res = await api(date, getUserToken())
