@@ -2,11 +2,11 @@ import {generateInterfaceParams} from './Function/Function'
 import {PairAPI, RollCallAPI} from './APIStarter/APIStarter';
 // 响应体
 import type {
-    ZHKQ_RespondingBodyCourseList,
-    ZHKQ_RespondingBodyGetDaySignList,
-    ZHKQ_RespondingBodySignIn,
-    ZHKQ_RespondingBodySignOut,
-    ZHKQ_RespondingBodyUserInfo,
+    ZHKQ_RespondingBody_CourseList,
+    ZHKQ_RespondingBody_GetDaySignList,
+    ZHKQ_RespondingBody_SignIn,
+    ZHKQ_RespondingBody_SignOut,
+    ZHKQ_RespondingBody_UserInfo,
 } from './type/RespondingBody'
 // 请求体
 import type {
@@ -222,9 +222,9 @@ export async function apiRollCall<T = any>(
  * @param { string } param.userid - 用户名：`学号`
  * @param { string } param.userpwd - 用户密码：`<PASSWORD>`
  * @param { string } param.client_local_id - 客户端本地ID: `uuid_****`
- * @returns { Promise<ZHKQ_RespondingBodyUserInfo> } 返回登录结果数据
+ * @returns { Promise<ZHKQ_RespondingBody_UserInfo> } 返回登录结果数据
  */
-export async function ZHKQ_Login(param: ZHKQ_RequestingBody_Login): Promise<ZHKQ_RespondingBodyUserInfo> {
+export async function ZHKQ_Login(param: ZHKQ_RequestingBody_Login): Promise<ZHKQ_RespondingBody_UserInfo> {
     return apiCall("Member_Login", {
         param
     });
@@ -236,11 +236,11 @@ export async function ZHKQ_Login(param: ZHKQ_RequestingBody_Login): Promise<ZHKQ
  * @param { ZHKQ_RequestingBody_GetDayCourseList } param - 请求参数对象
  * @param { string } param.userKey - 用户密钥： `用户Token`
  * @param { string } param.date - 日期字符串：`YYYY-MM-DD`
- * @returns { Promise<state,ZHKQ_RespondingBodyCourseList >} 返回当天课程列表
+ * @returns { Promise<state,ZHKQ_RespondingBody_CourseList >} 返回当天课程列表
  */
 export async function ZHKQ_GetDayCourseList(param: ZHKQ_RequestingBody_GetDayCourseList): Promise<{
     state: string,
-    sourcelist: ZHKQ_RespondingBodyCourseList[]
+    sourcelist: ZHKQ_RespondingBody_CourseList[]
 }> {
     return apiCall("RollCall_SourceListDay", {
         param
@@ -254,11 +254,11 @@ export async function ZHKQ_GetDayCourseList(param: ZHKQ_RequestingBody_GetDayCou
  * @param { ZHKQ_RequestingBody_GetDaySignList } param - 请求参数对象
  * @param { string } param.date - 日期字符串：`YYYY-MM-DD`
  * @param { string } param.userKey - 用户密钥： `用户Token`
- * @returns { Promise<ZHKQ_RespondingBodyGetDaySignList> } 返回签到记录数据
+ * @returns { Promise<ZHKQ_RespondingBody_GetDaySignList> } 返回签到记录数据
  */
 export async function ZHKQ_GetDaySignList(param: ZHKQ_RequestingBody_GetDaySignList): Promise<{
     state: string,
-    sign_record_list: ZHKQ_RespondingBodyGetDaySignList[]
+    sign_record_list: ZHKQ_RespondingBody_GetDaySignList[]
 }> {
     return apiCall("RollCall_SourceSignList", {
         param
@@ -280,9 +280,9 @@ export async function ZHKQ_GetDaySignList(param: ZHKQ_RequestingBody_GetDaySignL
  * @param { string } params.in_longitude - 签到经度，默认 `0`
  * @param { string } params.in_latitude - 签到纬度，默认 `0`
  * @param { string } params.phone_code - 手机识别码，例如 `uuid_****,uuid_****`
- * @returns { Promise<ZHKQ_RespondingBodySignIn> } 返回签到结果
+ * @returns { Promise<ZHKQ_RespondingBody_SignIn> } 返回签到结果
  */
-export async function ZHKQ_SignIn(params: ZHKQ_RequestingBody_SignInParams,): Promise<ZHKQ_RespondingBodySignIn> {
+export async function ZHKQ_SignIn(params: ZHKQ_RequestingBody_SignInParams,): Promise<ZHKQ_RespondingBody_SignIn> {
     return apiCall("RollCall_SignInSource", {
         param: params
     });
@@ -313,9 +313,9 @@ export async function ZHKQ_SignIn(params: ZHKQ_RequestingBody_SignInParams,): Pr
  * @param { string } params.late_time_length - 迟到时长，默认 `0`
  * @param { string } params.late_num - 迟到次数，默认 `0`
  *
- * @returns { Promise<ZHKQ_RespondingBodySignOut> } 返回签退结果
+ * @returns { Promise<ZHKQ_RespondingBody_SignOut> } 返回签退结果
  */
-export async function ZHKQ_SignOut(params: ZHKQ_RequestingBody_SignOutParams): Promise<ZHKQ_RespondingBodySignOut> {
+export async function ZHKQ_SignOut(params: ZHKQ_RequestingBody_SignOutParams): Promise<ZHKQ_RespondingBody_SignOut> {
     return apiCall("RollCall_SignOutSource", {
         param: params
     });

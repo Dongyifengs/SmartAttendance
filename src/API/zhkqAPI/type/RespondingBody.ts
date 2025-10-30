@@ -7,7 +7,7 @@
 /**
  * 智慧考勤登录接口响应体返回类型定义
  * 包含用户基础信息、组织信息、权限信息及登录令牌等内容。
- * @interface ZHKQ_RespondingBodyUserInfo
+ * @interface ZHKQ_RespondingBody_UserInfo
  * @property { string } state - 状态码，例如 `"1"` 表示成功
  * @property { string } info - 错误信息，例如 `服务端错误`
  * @property { string } birthday - 出生日期，例如 `"2000-01-01"`
@@ -37,7 +37,7 @@
  * @property { number } new_join - 是否新加入用户，`0` 表示否
  * @property { number } initUser - 是否初始化用户，`0` 表示否
  */
-export interface ZHKQ_RespondingBodyUserInfo {
+export interface ZHKQ_RespondingBody_UserInfo {
     state: string;
     info?: string;
     birthday: string;
@@ -86,7 +86,7 @@ export interface OrgInfo {
 /**
  * 智慧考勤课程信息接口返回类型定义
  * 包含课程基本信息、教师信息、上课时间及教室等内容
- * @interface ZHKQ_RespondingBodyCourseList
+ * @interface ZHKQ_RespondingBody_CourseList
  * @property { number } lesson_type - 课程类型，例如 `0` 表示必修，`1` 表示选修
  * @property { string } lesson_date - 上课日期，例如 `"2020-01-01"`
  * @property { number } selective - 是否选修，例如 `0` 表示否，`1` 表示是
@@ -112,7 +112,7 @@ export interface OrgInfo {
  * @property { number } max_count - 最大上课人数，例如 `0` 表示不限
  * @property { string } cur_count - 当前已选人数，例如 `"0"`
  */
-export interface ZHKQ_RespondingBodyCourseList {
+export interface ZHKQ_RespondingBody_CourseList {
     lesson_type: number;
     lesson_date: string;
     selective: number;
@@ -149,7 +149,7 @@ export type BoolString = "0" | "1";
 /**
  * 智慧考勤签到记录接口返回类型定义
  * 包含单个用户的课程签到信息、上课时间、请假/迟到/缺勤状态及教师信息等
- * @interface ZHKQ_RespondingBodyGetDaySignList
+ * @interface ZHKQ_RespondingBody_GetDaySignList
  * @property { number } lesson_type - 课程类型，例如 `0` 表示必修，`1` 表示选修
  * @property { string } pk_anlaxy_syllabus_user - 课程用户表主键ID，例如 `"3A****4A6"`
  * @property { string } lesson_date - 上课日期，例如 `"2020-01-01"`
@@ -188,7 +188,7 @@ export type BoolString = "0" | "1";
  * @property { string } pk_anlaxy_syllabus - 教学大纲主键ID，例如 `"FE****A0"`
  * @property { string } teacher_pic - 教师头像URL，例如 `""`
  */
-export interface ZHKQ_RespondingBodyGetDaySignList {
+export interface ZHKQ_RespondingBody_GetDaySignList {
 
     lesson_type: number;
     pk_anlaxy_syllabus_user: string;
@@ -235,13 +235,13 @@ export interface ZHKQ_RespondingBodyGetDaySignList {
 // *************** [ 获取签到操作API响应 - ZHKQ_SignIn ] *************** //
 /**
  * 课程签到响应体响应
- * @interface ZHKQ_RespondingBodySignIn
+ * @interface ZHKQ_RespondingBody_SignIn
  * @property { string } state - 状态码，例如`"1"`
  * @property { number } sign_coin - 签名码，例如`0`
  * @property { number } sing_result - 签到结果，例如`0`
  * @property { string } source_code - 课程主键，例如`"56****AD"`
  */
-export interface ZHKQ_RespondingBodySignIn {
+export interface ZHKQ_RespondingBody_SignIn {
     state: string;
     sign_coin: number;
     sing_result: number;
@@ -254,13 +254,13 @@ export interface ZHKQ_RespondingBodySignIn {
 // *************** [ 课程签退接口API响应 - ZHKQ_SignOut ] *************** //
 /**
  * 课程签退接口API返回
- * @interface ZHKQ_RespondingBodySignOut
+ * @interface ZHKQ_RespondingBody_SignOut
  * @property { string } state - 状态码，例如`"1"`
  * @property { number } sign_coin - 签名码，例如`0`
  * @property { number } sing_result - 签到结果，例如`0`
  * @property { string } source_code - 课程主键，例如`"56****AD"`
  */
-export interface ZHKQ_RespondingBodySignOut {
+export interface ZHKQ_RespondingBody_SignOut {
     state: string;
     sign_coin: number;
     sing_result: number;
