@@ -1,6 +1,5 @@
 import {generateInterfaceParams} from './Function/Function'
 import {PairAPI, RollCallAPI} from './APIStarter/APIStarter';
-import type {AxiosInstance} from 'axios';
 // 响应体
 import type {
     ZHKQ_RespondingBody_CourseList,
@@ -19,75 +18,32 @@ import type {
 } from "@/API/zhkqAPI/type/RequestingBody.ts";
 
 /**
- * API 参数类型定义
+ * 通用 API 调用方法
+ *
+ * @async
+ * @function apiCall
+ * @param { string } func - 要调用的后端接口函数名（如 "Member_Login"）
+ * @param { Record<string, any> } [params={}] - 请求参数对象，会被放入 Param 字段
+ * @returns { Promise<T> } 返回后端响应数据
+ * @throws { Error } 当请求失败时抛出异常
  */
-type ApiOptions = {
-    param?: Record<string, any> | null;
-    date?: string | null;
-    userid?: string | null;
-    userpwd?: string | null;
-    deviceId?: string | null;
-    client_local_id?: string | null;
-    userKey?: string | null;
-    group_id?: string | null;
-    pk_user?: string | null;
-    pk_class?: string | null;
-    pk_lesson?: string | null;
-    type?: string | null;
-    startDate?: string | null;
-    endDate?: string | null;
-    classpk?: string | null;
-    source_code?: string | null;
-    user_code?: string | null;
-    start?: string | null;
-    end?: string | null;
-};
-
-/**
- * 过滤掉 null 和 undefined 的辅助函数
- * @param obj - 要过滤的对象
- * @returns 过滤后的对象
- */
-function filterNullish<T extends Record<string, any>>(obj: T): Record<string, any> {
-    return Object.entries(obj).reduce((acc, [key, value]) => {
-        if (value != null) {
-            acc[key] = value;
-        }
-        return acc;
-    }, {} as Record<string, any>);
-}
-
-/**
- * 通用 API 调用核心方法
- * @param apiInstance - Axios 实例
- * @param func - 要调用的后端接口函数名
- * @param options - 可选参数配置
- * @returns 返回后端响应数据
- */
-async function baseApiCall<T = any>(
-    apiInstance: AxiosInstance,
+export async function apiCall<T = any>(
     func: string,
-    options: ApiOptions = {}
+    params: Record<string, any> = {}
 ): Promise<T> {
-    const { param = {}, ...restOptions } = options;
-
-    // 构建 Param 对象，只包含非空值
-    const filteredParams = filterNullish(restOptions);
-
-    const payload: Record<string, any> = {
+    const payload = {
         CommType: "function",
         Comm: func,
         Param: {
-            ...param,
             Source_PlatForm: 2,
-            ...filteredParams
+            ...params
         }
     };
 
     const formData = generateInterfaceParams(payload);
 
     try {
-        const response = await apiInstance.post('', formData);
+        const response = await RollCallAPI.post('', formData);
         return response.data as T;
     } catch (error) {
         console.error('API 调用失败:', error);
@@ -96,47 +52,37 @@ async function baseApiCall<T = any>(
 }
 
 /**
- * 通用 API 调用方法（增强版）
- *
- * @async
- * @function apiCall
- * @param { string } func - 要调用的后端接口函数名（如 "Member_Login"）
- * @param { ApiOptions } [options={}] - 可选参数配置
- * @param { Record<string, any> } [options.param=null] - 自定义参数对象
- * @param { string|null } [options.date=null] - 日期字符串
- * @param { string|null } [options.userid=null] - 用户ID
- * @param { string|null } [options.userpwd=null] - 用户加密密码
- * @param { string|null } [options.deviceId=null] - 设备唯一标识
- * @param { string|null } [options.client_local_id=null] - 客户端本地ID
- * @param { string|null } [options.userKey=null] - 用户会话密钥
- * @param { string|null } [options.group_id=null] - 班级/分组ID
- * @returns { Promise<any> } 返回后端响应数据
- * @throws { Error} 当请求失败时抛出异常
- */
-export async function apiCall<T = any>(
-    func: string,
-    options: ApiOptions = {}
-): Promise<T> {
-    return baseApiCall<T>(RollCallAPI, func, options);
-}
-
-/**
  * 通用 RollCall Pair API 调用器
  *
  * @async
  * @function apiRollCall
  * @param { string } func - 要调用的后端函数名
- * @param { ApiOptions } [options={}] - 参数对象
- * @param { Record<string, any> } [options.param=null] - 自定义参数对象
- * @param { string|null } [options.userKey=null] - 用户密钥
- * @param { string|null } [options.group_id=null] - 班级/分组 ID
- * @returns { Promise<any> } 返回后端响应数据
+ * @param { Record<string, any> } [params={}] - 请求参数对象，会被放入 Param 字段
+ * @returns { Promise<T> } 返回后端响应数据
+ * @throws { Error } 当请求失败时抛出异常
  */
 export async function apiRollCall<T = any>(
     func: string,
-    options: ApiOptions = {}
+    params: Record<string, any> = {}
 ): Promise<T> {
-    return baseApiCall<T>(PairAPI, func, options);
+    const payload = {
+        CommType: "function",
+        Comm: func,
+        Param: {
+            Source_PlatForm: 2,
+            ...params
+        }
+    };
+
+    const formData = generateInterfaceParams(payload);
+
+    try {
+        const response = await PairAPI.post('', formData);
+        return response.data as T;
+    } catch (error) {
+        console.error('API 调用失败:', error);
+        throw error;
+    }
 }
 
 /**
@@ -149,9 +95,7 @@ export async function apiRollCall<T = any>(
  * @returns { Promise<ZHKQ_RespondingBody_UserInfo> } 返回登录结果数据
  */
 export async function ZHKQ_Login(param: ZHKQ_RequestingBody_Login): Promise<ZHKQ_RespondingBody_UserInfo> {
-    return apiCall("Member_Login", {
-        param
-    });
+    return apiCall("Member_Login", param);
 }
 
 /**
@@ -166,9 +110,7 @@ export async function ZHKQ_GetDayCourseList(param: ZHKQ_RequestingBody_GetDayCou
     state: string,
     sourcelist: ZHKQ_RespondingBody_CourseList[]
 }> {
-    return apiCall("RollCall_SourceListDay", {
-        param
-    });
+    return apiCall("RollCall_SourceListDay", param);
 }
 
 
@@ -184,9 +126,7 @@ export async function ZHKQ_GetDaySignList(param: ZHKQ_RequestingBody_GetDaySignL
     state: string,
     sign_record_list: ZHKQ_RespondingBody_GetDaySignList[]
 }> {
-    return apiCall("RollCall_SourceSignList", {
-        param
-    });
+    return apiCall("RollCall_SourceSignList", param);
 }
 
 
@@ -207,9 +147,7 @@ export async function ZHKQ_GetDaySignList(param: ZHKQ_RequestingBody_GetDaySignL
  * @returns { Promise<ZHKQ_RespondingBody_SignIn> } 返回签到结果
  */
 export async function ZHKQ_SignIn(params: ZHKQ_RequestingBody_SignInParams,): Promise<ZHKQ_RespondingBody_SignIn> {
-    return apiCall("RollCall_SignInSource", {
-        param: params
-    });
+    return apiCall("RollCall_SignInSource", params);
 }
 
 
@@ -240,9 +178,7 @@ export async function ZHKQ_SignIn(params: ZHKQ_RequestingBody_SignInParams,): Pr
  * @returns { Promise<ZHKQ_RespondingBody_SignOut> } 返回签退结果
  */
 export async function ZHKQ_SignOut(params: ZHKQ_RequestingBody_SignOutParams): Promise<ZHKQ_RespondingBody_SignOut> {
-    return apiCall("RollCall_SignOutSource", {
-        param: params
-    });
+    return apiCall("RollCall_SignOutSource", params);
 }
 
 /**
@@ -255,7 +191,7 @@ export async function ZHKQ_SignOut(params: ZHKQ_RequestingBody_SignOutParams): P
  */
 export async function getEndTime(lessonId: string, userKey: string): Promise<any> {
     return apiCall("RollCall_Get_Change_EndTime", {
-        param: {lesson_change_list: lessonId},
+        lesson_change_list: lessonId,
         userKey
     });
 }
