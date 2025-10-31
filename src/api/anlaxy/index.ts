@@ -261,7 +261,7 @@ export async function getStatusCount(
   type: string,
   startDate: string,
   endDate: string
-): Promise<{ state: BoolString; list: StatusCountInfo }> {
+): Promise<{ state: BoolString; list: StatusCountInfo[] }> {
   return apiRollCall('Supplement_Lesson_User', {
     userKey,
     pk_user,
