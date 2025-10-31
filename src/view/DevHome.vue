@@ -22,6 +22,7 @@ const cleanDeviceId = computed(() => {
 
 // Calculate course status based on current time
 const calculateStatus = (course: any, signData: any): "已签退" | "已签到" | "未签到" | "迟到" | "早退" | null => {
+  const now = dayjs();
   const startTime = dayjs(`${course.lesson_date} ${course.begin_time}`);
   const endTime = dayjs(`${course.lesson_date} ${course.end_time}`);
   
@@ -54,6 +55,11 @@ const calculateStatus = (course: any, signData: any): "已签退" | "已签到" 
   // Normal flow
   if (hasSignedOut) return "已签退";
   if (hasSignedIn) return "已签到";
+  
+  // If not signed in yet and current time is after class start time, show as late
+  if (!hasSignedIn && now.isAfter(startTime)) {
+    return "迟到";
+  }
   
   return "未签到";
 };
