@@ -18,15 +18,21 @@ export interface ClassInfo {
   shouldSignOutTime: Dayjs,
   situation: "早退" | "迟到" | "已旷课" | "已请假" | null
   computedStatus?: "已签退" | "已签到" | "未签到" | "迟到" | "早退" | null
+  // 签到所需的额外字段
+  pk_anlaxy_syllabus_user?: string
+  lessonDate?: string
 }
 </script>
 <script setup lang="ts">
 import {Clock, Location, User, CircleClose, CircleCheck} from "@element-plus/icons-vue";
 import {ref, computed} from "vue";
+import dayjs from "dayjs";
+import {getZHKQUserInfo} from '@/API/zhkqAPI/Function/Function';
 
 const info = defineModel<ClassInfo>({required: true});
 const selectedSignInTime = ref<string>("");
 const selectedSignOutTime = ref<string>("");
+const userInfo = getZHKQUserInfo();
 
 // Determine the status to display
 const displayStatus = computed(() => {
@@ -51,6 +57,79 @@ const tagType = computed(() => {
   if (displayStatus.value === '已签到') return 'primary';
   return 'info';
 });
+
+// 模拟签到函数 - 只打印参数，不真正调用API
+const simulateSignIn = () => {
+  if (!userInfo.value || !info.value.pk_anlaxy_syllabus_user) {
+    console.error('❌ 缺少必要的签到信息');
+    return;
+  }
+
+  const now = dayjs();
+  const startTime = info.value.startTime;
+  
+  // 判断签到类型：1=迟到, 2=正常
+  const isLate = now.isAfter(startTime);
+  const signInType = isLate ? 1 : 2;
+  
+  // 获取签到时间
+  let signInTime: string;
+  if (isLate && selectedSignInTime.value) {
+    // 如果是迟到且用户选择了时间，使用选择的时间
+    signInTime = `${info.value.lessonDate} ${selectedSignInTime.value}:00`;
+  } else {
+    // 否则使用当前时间
+    signInTime = now.format('YYYY-MM-DD HH:mm:ss');
+  }
+  
+  // 计算迟到时长（分钟）
+  const lateTimeLength = isLate ? Math.max(0, dayjs(signInTime).diff(startTime, 'minute')) : 0;
+  
+  // 构建签到参数
+  const signInParams = {
+    userKey: userInfo.value.token,
+    pk_anlaxy_syllabus_user: info.value.pk_anlaxy_syllabus_user,
+    sign_in_type: signInType,
+    u_begin_time: signInTime,
+    late_time_length: lateTimeLength,
+    late_num: isLate ? 1 : 0,
+    ask_leave_num: 0,
+    in_longitude: 0,
+    in_latitude: 0,
+    phone_code: userInfo.value.client_id || ''
+  };
+
+  // 在控制台打印签到参数
+  console.log('============================================');
+  console.log('📋 模拟签到 - ZHKQ_SignIn 参数预览');
+  console.log('============================================');
+  console.log('课程信息:');
+  console.log(`  课程名称: ${info.value.className}`);
+  console.log(`  课程时间: ${info.value.startTime.format('YYYY-MM-DD HH:mm')} - ${info.value.endTime.format('HH:mm')}`);
+  console.log(`  教室: ${info.value.classRoom}`);
+  console.log(`  教师: ${info.value.teacher.name}`);
+  console.log('--------------------------------------------');
+  console.log('签到参数:');
+  console.log(`  userKey: ${signInParams.userKey}`);
+  console.log(`  pk_anlaxy_syllabus_user: ${signInParams.pk_anlaxy_syllabus_user}`);
+  console.log(`  sign_in_type: ${signInParams.sign_in_type} (${signInType === 1 ? '迟到' : '正常'})`);
+  console.log(`  u_begin_time: ${signInParams.u_begin_time}`);
+  console.log(`  late_time_length: ${signInParams.late_time_length} 分钟`);
+  console.log(`  late_num: ${signInParams.late_num}`);
+  console.log(`  ask_leave_num: ${signInParams.ask_leave_num}`);
+  console.log(`  in_longitude: ${signInParams.in_longitude}`);
+  console.log(`  in_latitude: ${signInParams.in_latitude}`);
+  console.log(`  phone_code: ${signInParams.phone_code}`);
+  console.log('--------------------------------------------');
+  console.log('完整参数对象:');
+  console.log(signInParams);
+  console.log('============================================');
+  console.log('ℹ️ 注意: 这是模拟调用，未真正执行签到操作');
+  console.log('============================================');
+  
+  // 可以添加一个提示
+  alert(`✅ 签到参数已在控制台打印\n\n课程: ${info.value.className}\n签到时间: ${signInTime}\n状态: ${signInType === 1 ? '迟到' : '正常签到'}`);
+};
 
 </script>
 <template>
@@ -111,10 +190,27 @@ const tagType = computed(() => {
               placeholder="选择时间" 
               class="time-selector"
             />
+            <el-button 
+              type="primary" 
+              size="small" 
+              @click="simulateSignIn"
+              class="sign-button"
+            >
+              模拟签到
+            </el-button>
           </div>
           <div class="sign-row" v-else>
             <el-icon class="sign-icon" :color="'#fa709a'"><CircleClose /></el-icon>
             <span class="sign-text pending">未签到</span>
+            <el-button 
+              type="primary" 
+              size="small" 
+              @click="simulateSignIn"
+              class="sign-button"
+              v-if="!info.signInTime && info.situation !== '已请假' && info.situation !== '已旷课'"
+            >
+              模拟签到
+            </el-button>
           </div>
         </div>
         
@@ -312,6 +408,13 @@ const tagType = computed(() => {
 
 .time-selector :deep(.el-input__wrapper):hover {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.sign-button {
+  margin-left: auto;
+  border-radius: 8px;
+  font-size: 12px;
+  padding: 6px 12px;
 }
 
 @media (max-width: 768px) {

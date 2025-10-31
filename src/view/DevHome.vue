@@ -96,7 +96,9 @@ onMounted(async () => {
             id: Number.parseInt(e.teacher_id)
           },
           situation: calculateSituation(signData, status),
-          computedStatus: status
+          computedStatus: status,
+          pk_anlaxy_syllabus_user: signData.pk_anlaxy_syllabus_user,
+          lessonDate: e.lesson_date
         }
       }
       return null;
