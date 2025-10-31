@@ -93,10 +93,10 @@ const simulateSignIn = () => {
     signInTime = now.format('YYYY-MM-DD HH:mm:ss');
   }
   
-  // 判断签到类型：根据实际签到时间判断，1=迟到, 2=正常
+  // 签到类型：始终为2（正常）
+  const signInType = 2;
   const actualSignInTime = dayjs(signInTime);
   const isLate = actualSignInTime.isAfter(startTime);
-  const signInType = isLate ? 1 : 2;
   
   // 计算迟到时长（分钟）
   const lateTimeLength = isLate ? Math.max(0, actualSignInTime.diff(startTime, 'minute')) : 0;
@@ -128,7 +128,7 @@ const simulateSignIn = () => {
   console.log('签到参数:');
   console.log(`  userKey: ${signInParams.userKey}`);
   console.log(`  pk_anlaxy_syllabus_user: ${signInParams.pk_anlaxy_syllabus_user}`);
-  console.log(`  sign_in_type: ${signInParams.sign_in_type} (${signInType === 1 ? '迟到' : '正常'})`);
+  console.log(`  sign_in_type: ${signInParams.sign_in_type} (正常)`);
   console.log(`  u_begin_time: ${signInParams.u_begin_time}`);
   console.log(`  late_time_length: ${signInParams.late_time_length} 分钟`);
   console.log(`  late_num: ${signInParams.late_num}`);
@@ -144,7 +144,7 @@ const simulateSignIn = () => {
   console.log('============================================');
   
   // 可以添加一个提示
-  alert(`✅ 签到参数已在控制台打印\n\n课程: ${info.value.className}\n签到时间: ${signInTime}\n状态: ${signInType === 1 ? '迟到' : '正常签到'}`);
+  alert(`✅ 签到参数已在控制台打印\n\n课程: ${info.value.className}\n签到时间: ${signInTime}\n状态: 正常签到`);
 };
 
 </script>
