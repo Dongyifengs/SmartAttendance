@@ -31,7 +31,7 @@
   import dayjs from 'dayjs';
   import { getZHKQUserInfo } from '@/api/anlaxy/utils';
   import { ZHKQ_SignIn, ZHKQ_SignOut } from '@/api/anlaxy';
-  import type { ZHKQ_RequestingBody_SignOutParams } from '@/api/anlaxy/type/requests';
+  import type { SignOutParam } from '@/api/anlaxy/type/requests';
 
   const info = defineModel<ClassInfo>({ required: true });
   const selectedSignInTime = ref<string>('');
@@ -228,7 +228,7 @@
     const formattedBeginTime = info.value.signInTime.format('YYYY-MM-DD HH:mm:ss');
 
     // 构建签退参数
-    const signOutParams: ZHKQ_RequestingBody_SignOutParams = {
+    const signOutParams: SignOutParam = {
       userKey: userInfo.value.token,
       pk_anlaxy_syllabus_user: info.value.pk_anlaxy_syllabus_user,
       phone_code: userInfo.value.client_id || '',

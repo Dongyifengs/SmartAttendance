@@ -51,10 +51,7 @@
   import ClassContainer from '@/components/ClassContainer.vue';
   import { ZHKQ_GetDayCourseList, ZHKQ_GetDaySignList } from '@/api/anlaxy/index.ts';
   import { getZHKQUserInfo } from '@/api/anlaxy/utils';
-  import type {
-    ZHKQ_RespondingBody_CourseList,
-    ZHKQ_RespondingBody_GetDaySignList,
-  } from '@/api/anlaxy/type/response';
+  import type { CourseList, SignListInfo } from '@/api/anlaxy/type/response';
 
   // 用户信息对象（包含姓名、学号、token等）
   const userInfo = getZHKQUserInfo();
@@ -92,8 +89,8 @@
    * - 若无签到记录，则根据当前时间判断是否迟到或未签到
    */
   const calculateStatus = (
-    course: ZHKQ_RespondingBody_CourseList,
-    signData: ZHKQ_RespondingBody_GetDaySignList
+    course: CourseList,
+    signData: SignListInfo
   ): '已签退' | '已签到' | '未签到' | '迟到' | '早退' | null => {
     const now = dayjs();
     const startTime = dayjs(`${course.lesson_date} ${course.begin_time}`);
@@ -146,7 +143,7 @@
    * 用于在课程卡片中展示“情况说明”字段
    */
   const calculateSituation = (
-    signData: ZHKQ_RespondingBody_GetDaySignList,
+    signData: SignListInfo,
     status: '已签退' | '已签到' | '未签到' | '迟到' | '早退' | null
   ): '早退' | '迟到' | '已旷课' | '已请假' | null => {
     if (signData.absent_num === '1') return '已旷课';

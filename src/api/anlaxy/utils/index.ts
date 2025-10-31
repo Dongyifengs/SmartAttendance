@@ -1,7 +1,7 @@
 import { computed, type Ref } from 'vue';
 import { Base64 } from 'js-base64';
 import { useLocalStorage } from '@vueuse/core';
-import type { ZHKQ_RespondingBody_UserInfo } from '../type/response.d.ts';
+import type { UserInfo } from '../type/response.d.ts';
 
 /**
  * 生成双层Base64编码的字符串。
@@ -17,11 +17,9 @@ export function generateInterfaceParams(obj: object): string {
 /**
  * 获取用户信息
  * @utils getZHKQUserInfo
- * @return { Ref<ZHKQ_RespondingBody_UserInfo | null> } 返回用户信息的响应体对象，如果没有则返回 null
+ * @return { Ref<UserInfo | null> } 返回用户信息的响应体对象，如果没有则返回 null
  */
-export function getZHKQUserInfo(): Ref<ZHKQ_RespondingBody_UserInfo | null> {
+export function getZHKQUserInfo(): Ref<UserInfo | null> {
   const userInfo = useLocalStorage('SA-ZHKQ-USERINFO', null);
-  return computed(() =>
-    userInfo.value ? (JSON.parse(userInfo.value) as ZHKQ_RespondingBody_UserInfo) : null
-  );
+  return computed(() => (userInfo.value ? (JSON.parse(userInfo.value) as UserInfo) : null));
 }

@@ -53,10 +53,10 @@
 
   // 获取登录时间
   const getLoginTime = (): string | null => {
-    const SAOCTIME = localStorage.getItem('SA-OC-TIMESTAMP');
-    const SAZHKQTIME = localStorage.getItem('SA-ZHKQ-TIMESTAMP');
-
-    const times = [SAOCTIME, SAZHKQTIME]
+    const times = [
+      localStorage.getItem('SA-OC-TIMESTAMP'),
+      localStorage.getItem('SA-ZHKQ-TIMESTAMP'),
+    ]
       .map((t) => (t !== null ? Number(t) : null))
       .filter((t): t is number => t !== null && !isNaN(t));
 

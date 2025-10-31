@@ -5,12 +5,12 @@
 // *************** [ 用户登录接口API请求体 - ZHKQ_Login ] *************** //
 /**
  * 智慧考勤 | 登录API请求体参数接口定义
- * @interface ZHKQ_RequestingBody_Login
+ * @interface LoginParam
  * @property { string } userid - 学号，例如 `"123456789"`
  * @property { string } userpwd - 密码，例如 `"<PASSWORD>"`
  * @property { string } client_local_id - uuid `"uuid_****"`
  */
-export interface ZHKQ_RequestingBody_Login {
+export interface LoginParam {
   userid: string;
   userpwd: string;
   client_local_id: string;
@@ -21,11 +21,11 @@ export interface ZHKQ_RequestingBody_Login {
 // *************** [ 获取当天课程列表API请求体 - ZHKQ_GetDayCourseList ] *************** //
 /**
  * 智慧考勤 | 课程列表API请求体参数接口定义
- * @interface ZHKQ_RequestingBody_GetDayCourseList
+ * @interface GetCourseListParam
  * @property { string } userKey - 用户密钥，例如 `"V0****0="`
  * @property { string } date - 日期，例如 `"YYYY-MM-DD"`
  */
-export interface ZHKQ_RequestingBody_GetDayCourseList {
+export interface GetCourseListParam {
   userKey: string;
   date: string;
 }
@@ -35,11 +35,11 @@ export interface ZHKQ_RequestingBody_GetDayCourseList {
 // *************** [ 获取签到记录API请求体 - ZHKQ_GetDaySignList ] *************** //
 /**
  * 智慧考勤 | 签到记录API请求体参数接口定义
- * @interface ZHKQ_RequestingBody_GetDaySignList
+ * @interface GetSignListParam
  * @property { string } userKey - 用户密钥，例如 `"V0****0="`
  * @property { string } date - 日期，例如 `"YYYY-MM-DD"`
  */
-export interface ZHKQ_RequestingBody_GetDaySignList {
+export interface GetSignListParam {
   userKey: string;
   date: string;
 }
@@ -60,7 +60,7 @@ export interface ZHKQ_RequestingBody_GetDaySignList {
  * @property { number } in_latitude - 签到纬度，默认 `0`
  * @property { string } phone_code - 手机识别码，例如 `uuid_****,uuid_****`
  */
-export interface ZHKQ_RequestingBody_SignInParams {
+export interface SignInParam {
   userKey: string;
   pk_anlaxy_syllabus_user: string;
   sign_in_type: number;
@@ -78,7 +78,7 @@ export interface ZHKQ_RequestingBody_SignInParams {
 // *************** [ 获取课程签退接口API请求 - ZHKQ_SignOut ] *************** //
 /**
  * 课程签退参数接口定义
- * @interface ZHKQ_RequestingBody_SignOutParams
+ * @interface SignOutParam
  * @property { string } userKey - 用户密钥，例如 `"V0****0="`
  * @property { string } pk_anlaxy_syllabus_user - 课程用户主键，例如 `"56****AD"`
  * @property { string } phone_code - 手机识别码，例如 `uuid_****,uuid_****`
@@ -99,7 +99,7 @@ export interface ZHKQ_RequestingBody_SignInParams {
  * @property { number } late_time_length - 迟到时长，默认 `0`
  * @property { number } late_num - 迟到次数，默认 `0`
  */
-export interface ZHKQ_RequestingBody_SignOutParams {
+export interface SignOutParam {
   userKey: string;
   pk_anlaxy_syllabus_user: string;
   phone_code: string;

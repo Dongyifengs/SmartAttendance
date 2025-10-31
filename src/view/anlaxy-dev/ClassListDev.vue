@@ -46,10 +46,7 @@
   import { ZHKQ_GetDayCourseList, ZHKQ_GetDaySignList } from '@/api/anlaxy';
   import { checkInFields, courseFields } from '@/view/anlaxy-dev/types.d';
   import DataTable from './components/DataTable.vue';
-  import type {
-    ZHKQ_RespondingBody_CourseList,
-    ZHKQ_RespondingBody_GetDaySignList,
-  } from '@/api/anlaxy/type/response';
+  import type { CourseList, SignListInfo } from '@/api/anlaxy/type/response';
 
   // 高亮
   const highlightValue = ref<string | undefined>(undefined);
@@ -61,8 +58,8 @@
   const getCurrentDate = () => dayjs().format('YYYY-MM-DD');
 
   // 数据
-  const todayCourseList = ref<ZHKQ_RespondingBody_CourseList[]>([]);
-  const checkInRecords = ref<ZHKQ_RespondingBody_GetDaySignList[]>([]);
+  const todayCourseList = ref<CourseList[]>([]);
+  const checkInRecords = ref<SignListInfo[]>([]);
   const loadingCourses = ref(false);
   const loadingCheckIns = ref(false);
 

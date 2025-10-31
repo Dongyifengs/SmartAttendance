@@ -19,7 +19,7 @@ window.Buffer = Buffer;
 /**
  * RSA 公钥字符串，用于加密操作。
  */
-const pb_key =
+const PB_KEY =
   'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDjxeQ8TmnvvIRreoJfTAdEdaD8Vj/n8OQuAxqD6kbrYPculdAfPNLM5B5Y289oID74Ze8CTcy5vfQK1f5kgzKMr/EywV3MMDVVjS05Z8/eQaU9xMiKeIqUkubAiL2oE/hNfBN/w/NTTGMpJ63x/yMdi6Uo0FSFNm/6JmBeTflVJQIDAQAB';
 
 /**
@@ -92,7 +92,7 @@ function escapeString(str: string) {
  */
 export function encrypt(original: string) {
   const encryptor = new JSEncrypt();
-  encryptor.setPublicKey(`-----BEGIN PUBLIC KEY-----\n${pb_key}\n-----END PUBLIC KEY-----`);
+  encryptor.setPublicKey(`-----BEGIN PUBLIC KEY-----\n${PB_KEY}\n-----END PUBLIC KEY-----`);
   const encrypted = encryptor.encrypt(original);
   if (typeof encrypted !== 'string') {
     throw new Error('RSA加密失败');

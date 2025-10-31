@@ -6,7 +6,7 @@
 /**
  * 智慧考勤登录接口响应体返回类型定义
  * 包含用户基础信息、组织信息、权限信息及登录令牌等内容。
- * @interface ZHKQ_RespondingBody_UserInfo
+ * @interface UserInfo
  * @property { string } state - 状态码，例如 `"1"` 表示成功
  * @property { string } info - 错误信息，例如 `服务端错误`
  * @property { string } birthday - 出生日期，例如 `"2000-01-01"`
@@ -36,7 +36,7 @@
  * @property { number } new_join - 是否新加入用户，`0` 表示否
  * @property { number } initUser - 是否初始化用户，`0` 表示否
  */
-export interface ZHKQ_RespondingBody_UserInfo {
+export interface UserInfo {
   state: string;
   info?: string;
   birthday: string;
@@ -84,7 +84,7 @@ export interface OrgInfo {
 /**
  * 智慧考勤课程信息接口返回类型定义
  * 包含课程基本信息、教师信息、上课时间及教室等内容
- * @interface ZHKQ_RespondingBody_CourseList
+ * @interface CourseList
  * @property { number } lesson_type - 课程类型，例如 `0` 表示必修，`1` 表示选修
  * @property { string } lesson_date - 上课日期，例如 `"2020-01-01"`
  * @property { number } selective - 是否选修，例如 `0` 表示否，`1` 表示是
@@ -110,7 +110,7 @@ export interface OrgInfo {
  * @property { number } max_count - 最大上课人数，例如 `0` 表示不限
  * @property { string } cur_count - 当前已选人数，例如 `"0"`
  */
-export interface ZHKQ_RespondingBody_CourseList {
+export interface CourseList {
   lesson_type: number;
   lesson_date: string;
   selective: number;
@@ -145,7 +145,7 @@ export type BoolString = '0' | '1';
 /**
  * 智慧考勤签到记录接口返回类型定义
  * 包含单个用户的课程签到信息、上课时间、请假/迟到/缺勤状态及教师信息等
- * @interface ZHKQ_RespondingBody_GetDaySignList
+ * @interface SignListInfo
  * @property { number } lesson_type - 课程类型，例如 `0` 表示必修，`1` 表示选修
  * @property { string } pk_anlaxy_syllabus_user - 课程用户表主键ID，例如 `"3A****4A6"`
  * @property { string } lesson_date - 上课日期，例如 `"2020-01-01"`
@@ -184,7 +184,7 @@ export type BoolString = '0' | '1';
  * @property { string } pk_anlaxy_syllabus - 教学大纲主键ID，例如 `"FE****A0"`
  * @property { string } teacher_pic - 教师头像URL，例如 `""`
  */
-export interface ZHKQ_RespondingBody_GetDaySignList {
+export interface SignListInfo {
   lesson_type: number;
   pk_anlaxy_syllabus_user: string;
   lesson_date: string;
@@ -229,13 +229,13 @@ export interface ZHKQ_RespondingBody_GetDaySignList {
 // *************** [ 获取签到操作API响应 - ZHKQ_SignIn ] *************** //
 /**
  * 课程签到响应体响应
- * @interface ZHKQ_RespondingBody_SignIn
+ * @interface SignInResponse
  * @property { string } state - 状态码，例如`"1"`
  * @property { number } sign_coin - 签名码，例如`0`
  * @property { number } sing_result - 签到结果，例如`0`
  * @property { string } source_code - 课程主键，例如`"56****AD"`
  */
-export interface ZHKQ_RespondingBody_SignIn {
+export interface SignInResponse {
   state: string;
   sign_coin: number;
   sing_result: number;
@@ -247,13 +247,13 @@ export interface ZHKQ_RespondingBody_SignIn {
 // *************** [ 课程签退接口API响应 - ZHKQ_SignOut ] *************** //
 /**
  * 课程签退接口API返回
- * @interface ZHKQ_RespondingBody_SignOut
+ * @interface SignOutResponse
  * @property { string } state - 状态码，例如`"1"`
  * @property { number } sign_coin - 签名码，例如`0`
  * @property { number } sing_result - 签到结果，例如`0`
  * @property { string } source_code - 课程主键，例如`"56****AD"`
  */
-export interface ZHKQ_RespondingBody_SignOut {
+export interface SignOutResponse {
   state: string;
   sign_coin: number;
   sing_result: number;
@@ -261,3 +261,163 @@ export interface ZHKQ_RespondingBody_SignOut {
 }
 
 // *************** [ 课程签退接口API响应 - ZHKQ_SignOut ] *************** //
+/**
+ * 考勤记录
+ */
+export interface AttendanceRecord {
+  /**
+   * 状态记录ID
+   */
+  item_pk: string;
+  /**
+   * 缺课
+   */
+  absent: number;
+  /**
+   * 迟到
+   */
+  late: number;
+  /**
+   * 已签退
+   */
+  leave: number;
+  common: number;
+  /**
+   * 早退
+   */
+  leave_before: number;
+  /**
+   * 记录日期
+   */
+  record_date: string;
+  /**
+   * 用户ID
+   */
+  pk_user: string;
+  /**
+   * 课程ID
+   */
+  pk_lesson: string;
+}
+
+/**
+ * 考勤信息
+ */
+export interface AttendanceInfo {
+  /**
+   * 学生头像
+   */
+  pic_url: string;
+  /**
+   * 教师姓名
+   */
+  teacher_name: string;
+  /**
+   * 学生姓名
+   */
+  user_name: string;
+  /**
+   * 课程名称
+   */
+  lesson_name: string;
+  /**
+   * 考勤状态信息
+   */
+  record_list: AttendanceRecord[];
+}
+/**
+ * 课程状态信息
+ */
+export interface CourseStatusInfo {
+  /**
+   * 课程名称
+   */
+  lesson_name: string;
+  /**
+   * 教师名称
+   */
+  teacher_name: string;
+  /**
+   * 节数
+   */
+  totalNum: number;
+  /**
+   * 课程ID
+   */
+  pk_lesson: string;
+
+  /**
+   * 课程状态类型
+   */
+  type: 0 | 1;
+}
+
+/**
+ * 班级学生信息
+ */
+export interface ClassStudentInfo {
+  /**
+   * 学生学号
+   */
+  user_code: string;
+  /**
+   * 学生姓名
+   */
+  user_name: string;
+  /**
+   * 用户头像
+   */
+  user_pic: string;
+  easid: string;
+  /**
+   * 用户ID
+   */
+  userpk: string;
+  /**
+   * 是否为好友
+   */
+  is_friends: 0 | 1;
+  /**
+   * 性别
+   */
+  sex: '男' | '女';
+}
+
+/**
+ * 班级信息
+ */
+export interface GroupInfo {
+  state: string;
+  /**
+   * 班级名称
+   */
+  group_name: string;
+  /**
+   * 班级简介
+   */
+  group_info: string;
+  /**
+   * 班级照片
+   */
+  group_icon: string;
+  /**
+   * 班级ID
+   */
+  group_id: string;
+  /**
+   * 班级成员信息
+   */
+  group_members: ClassStudentInfo[];
+}
+
+export interface ClassInfo {
+  /**
+   * 班级名称
+   */
+  class_name: string;
+  /**
+   * 班级ID
+   */
+  class_id: string;
+  eas_id: string;
+}

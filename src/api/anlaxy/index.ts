@@ -2,19 +2,24 @@ import { generateInterfaceParams } from '@/api/anlaxy/utils';
 import { PairAPI, RollCallAPI } from '@/api/anlaxy/endpoint';
 // 响应体
 import type {
-  ZHKQ_RespondingBody_CourseList,
-  ZHKQ_RespondingBody_GetDaySignList,
-  ZHKQ_RespondingBody_SignIn,
-  ZHKQ_RespondingBody_SignOut,
-  ZHKQ_RespondingBody_UserInfo,
+  CourseList,
+  SignListInfo,
+  SignInResponse,
+  SignOutResponse,
+  UserInfo,
+  ClassInfo,
+  GroupInfo,
+  CourseStatusInfo,
+  AttendanceInfo,
+  BoolString,
 } from './type/response.d';
 // 请求体
 import type {
-  ZHKQ_RequestingBody_GetDayCourseList,
-  ZHKQ_RequestingBody_GetDaySignList,
-  ZHKQ_RequestingBody_Login,
-  ZHKQ_RequestingBody_SignInParams,
-  ZHKQ_RequestingBody_SignOutParams,
+  GetCourseListParam,
+  GetSignListParam,
+  LoginParam,
+  SignInParam,
+  SignOutParam,
 } from '@/api/anlaxy/type/requests.d';
 
 /**
@@ -82,29 +87,27 @@ export async function apiRollCall<T>(func: string, params: object = {}): Promise
 /**
  * 用户登录接口
  * @utils ZHKQ_Login
- * @param { ZHKQ_RequestingBody_Login } param - 登录参数对象
+ * @param { LoginParam } param - 登录参数对象
  * @param { string } param.userid - 用户名：`学号`
  * @param { string } param.userpwd - 用户密码：`<PASSWORD>`
  * @param { string } param.client_local_id - 客户端本地ID: `uuid_****`
- * @returns { Promise<ZHKQ_RespondingBody_UserInfo> } 返回登录结果数据
+ * @returns { Promise<UserInfo> } 返回登录结果数据
  */
-export async function ZHKQ_Login(
-  param: ZHKQ_RequestingBody_Login
-): Promise<ZHKQ_RespondingBody_UserInfo> {
+export async function ZHKQ_Login(param: LoginParam): Promise<UserInfo> {
   return apiCall('Member_Login', param);
 }
 
 /**
  * 获取当天课程列表
  * @utils ZHKQ_GetDayCourseList
- * @param { ZHKQ_RequestingBody_GetDayCourseList } param - 请求参数对象
+ * @param { GetCourseListParam } param - 请求参数对象
  * @param { string } param.userKey - 用户密钥： `用户Token`
  * @param { string } param.date - 日期字符串：`YYYY-MM-DD`
- * @returns { Promise<state,ZHKQ_RespondingBody_CourseList >} 返回当天课程列表
+ * @returns { Promise<state,CourseList >} 返回当天课程列表
  */
-export async function ZHKQ_GetDayCourseList(param: ZHKQ_RequestingBody_GetDayCourseList): Promise<{
-  state: string;
-  sourcelist: ZHKQ_RespondingBody_CourseList[];
+export async function ZHKQ_GetDayCourseList(param: GetCourseListParam): Promise<{
+  state: BoolString;
+  sourcelist: CourseList[];
 }> {
   return apiCall('RollCall_SourceListDay', param);
 }
@@ -112,14 +115,14 @@ export async function ZHKQ_GetDayCourseList(param: ZHKQ_RequestingBody_GetDayCou
 /**
  * 获取当天签到记录
  * @utils ZHKQ_GetDaySignList
- * @param { ZHKQ_RequestingBody_GetDaySignList } param - 请求参数对象
+ * @param { GetSignListParam } param - 请求参数对象
  * @param { string } param.date - 日期字符串：`YYYY-MM-DD`
  * @param { string } param.userKey - 用户密钥： `用户Token`
- * @returns { Promise<ZHKQ_RespondingBody_GetDaySignList> } 返回签到记录数据
+ * @returns { Promise<SignListInfo> } 返回签到记录数据
  */
-export async function ZHKQ_GetDaySignList(param: ZHKQ_RequestingBody_GetDaySignList): Promise<{
-  state: string;
-  sign_record_list: ZHKQ_RespondingBody_GetDaySignList[];
+export async function ZHKQ_GetDaySignList(param: GetSignListParam): Promise<{
+  state: BoolString;
+  sign_record_list: SignListInfo[];
 }> {
   return apiCall('RollCall_SourceSignList', param);
 }
@@ -127,7 +130,7 @@ export async function ZHKQ_GetDaySignList(param: ZHKQ_RequestingBody_GetDaySignL
 /**
  * 课程签到接口
  * @utils ZHKQ_SignIn
- * @param { ZHKQ_RequestingBody_SignInParams } params - 签到参数对象
+ * @param { SignInParam } params - 签到参数对象
  * @param { string } params.userKey - 用户密钥，例如 `"V0****0="`
  * @param { string } params.pk_anlaxy_syllabus_user - 课程用户主键，例如 `"56****AD"`
  * @param { string } params.sign_in_type - 签到类型，例如 `1迟到 | 2正常`
@@ -138,18 +141,16 @@ export async function ZHKQ_GetDaySignList(param: ZHKQ_RequestingBody_GetDaySignL
  * @param { string } params.in_longitude - 签到经度，默认 `0`
  * @param { string } params.in_latitude - 签到纬度，默认 `0`
  * @param { string } params.phone_code - 手机识别码，例如 `uuid_****,uuid_****`
- * @returns { Promise<ZHKQ_RespondingBody_SignIn> } 返回签到结果
+ * @returns { Promise<SignInResponse> } 返回签到结果
  */
-export async function ZHKQ_SignIn(
-  params: ZHKQ_RequestingBody_SignInParams
-): Promise<ZHKQ_RespondingBody_SignIn> {
+export async function ZHKQ_SignIn(params: SignInParam): Promise<SignInResponse> {
   return apiCall('RollCall_SignInSource', params);
 }
 
 /**
  * 课程签退接口
  * @utils ZHKQ_SignOut
- * @param { ZHKQ_RequestingBody_SignOutParams } params - 签退参数对象
+ * @param { SignOutParam } params - 签退参数对象
  * @param { string } params.userKey - 用户密钥，例如 `"V0****0="`
  * @param { string } params.pk_anlaxy_syllabus_user - 课程用户主键，例如 `"56****AD"`
  * @param { string } params.phone_code - 手机识别码，例如 `uuid_****,uuid_****`
@@ -170,24 +171,10 @@ export async function ZHKQ_SignIn(
  * @param { string } params.late_time_length - 迟到时长，默认 `0`
  * @param { string } params.late_num - 迟到次数，默认 `0`
  *
- * @returns { Promise<ZHKQ_RespondingBody_SignOut> } 返回签退结果
+ * @returns { Promise<SignOutResponse> } 返回签退结果
  */
-export async function ZHKQ_SignOut(
-  params: ZHKQ_RequestingBody_SignOutParams
-): Promise<ZHKQ_RespondingBody_SignOut> {
+export async function ZHKQ_SignOut(params: SignOutParam): Promise<SignOutResponse> {
   return apiCall('RollCall_SignOutSource', params);
-}
-
-export interface ClassInfo {
-  /**
-   * 班级名称
-   */
-  class_name: string;
-  /**
-   * 班级ID
-   */
-  class_id: string;
-  eas_id: string;
 }
 
 /**
@@ -207,64 +194,6 @@ export async function getUserClass(
 }
 
 /**
- * 班级学生信息
- */
-export interface ClassStudentInfo {
-  /**
-   * 学生学号
-   */
-  user_code: string;
-  /**
-   * 学生姓名
-   */
-  user_name: string;
-  /**
-   * 用户头像
-   */
-  user_pic: string;
-  easid: string;
-  /**
-   * 用户ID
-   */
-  userpk: string;
-  /**
-   * 是否为好友
-   */
-  is_friends: 0 | 1;
-  /**
-   * 性别
-   */
-  sex: '男' | '女';
-}
-
-/**
- * 班级信息
- */
-export interface GroupInfo {
-  state: string;
-  /**
-   * 班级名称
-   */
-  group_name: string;
-  /**
-   * 班级简介
-   */
-  group_info: string;
-  /**
-   * 班级照片
-   */
-  group_icon: string;
-  /**
-   * 班级ID
-   */
-  group_id: string;
-  /**
-   * 班级成员信息
-   */
-  group_members: ClassStudentInfo[];
-}
-
-/**
  * 获取班级学生列表
  *
  * @async
@@ -281,33 +210,6 @@ export async function getClassStudent(userKey: string, group_id: string): Promis
 }
 
 /**
- * 课程状态信息
- */
-export interface CourseStatusInfo {
-  /**
-   * 课程名称
-   */
-  lesson_name: string;
-  /**
-   * 教师名称
-   */
-  teacher_name: string;
-  /**
-   * 节数
-   */
-  totalNum: number;
-  /**
-   * 课程ID
-   */
-  pk_lesson: string;
-
-  /**
-   * 课程状态类型
-   */
-  type: 0 | 1;
-}
-
-/**
  * 获取课程状态
  */
 export async function getCourseStatus(
@@ -317,7 +219,7 @@ export async function getCourseStatus(
   type: string,
   startDate: string,
   endDate: string
-): Promise<{ state: '1'; list: CourseStatusInfo[] }> {
+): Promise<{ state: BoolString; list: CourseStatusInfo[] }> {
   return apiRollCall('Supplement_Class_Anomaly', {
     userKey,
     pk_user,
@@ -359,7 +261,7 @@ export async function getStatusCount(
   type: string,
   startDate: string,
   endDate: string
-): Promise<{ state: '1'; list: StatusCountInfo }> {
+): Promise<{ state: BoolString; list: StatusCountInfo }> {
   return apiRollCall('Supplement_Lesson_User', {
     userKey,
     pk_user,
@@ -372,70 +274,6 @@ export async function getStatusCount(
 }
 
 /**
- * 考勤记录
- */
-export interface AttendanceRecord {
-  /**
-   * 状态记录ID
-   */
-  item_pk: string;
-  /**
-   * 缺课
-   */
-  absent: number;
-  /**
-   * 迟到
-   */
-  late: number;
-  /**
-   * 已签退
-   */
-  leave: number;
-  common: number;
-  /**
-   * 早退
-   */
-  leave_before: number;
-  /**
-   * 记录日期
-   */
-  record_date: string;
-  /**
-   * 用户ID
-   */
-  pk_user: string;
-  /**
-   * 课程ID
-   */
-  pk_lesson: string;
-}
-
-/**
- * 考勤信息
- */
-export interface AttendanceInfo {
-  /**
-   * 学生头像
-   */
-  pic_url: string;
-  /**
-   * 教师姓名
-   */
-  teacher_name: string;
-  /**
-   * 学生姓名
-   */
-  user_name: string;
-  /**
-   * 课程名称
-   */
-  lesson_name: string;
-  /**
-   * 考勤状态信息
-   */
-  record_list: AttendanceRecord[];
-}
-/**
  * 考勤状态日期查询
  */
 export async function getAttendanceDates(
@@ -446,7 +284,7 @@ export async function getAttendanceDates(
   type: string,
   start: string,
   end: string
-): Promise<{ state: '1'; data: AttendanceInfo }> {
+): Promise<{ state: BoolString; data: AttendanceInfo }> {
   return apiCall('Supplement_LessonSignDetail', {
     userKey,
     classpk,
