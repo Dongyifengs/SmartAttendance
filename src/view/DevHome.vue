@@ -80,6 +80,10 @@ import type {CourseList, SignListInfo} from '@/api/anlaxy/type/response';
 import router from "@/router";
 import {ElMessage} from 'element-plus';
 
+// 常量定义
+const LONG_PRESS_DELAY = 800; // 长按触发延迟（毫秒）
+const LONG_PRESS_DEBOUNCE_DELAY = 100; // 长按防抖延迟（毫秒）
+
 // 用户信息对象（包含姓名、学号、token等）
   const userInfo = getZHKQUserInfo();
 
@@ -123,7 +127,7 @@ import {ElMessage} from 'element-plus';
         duration: 5000,
         showClose: true,
       });
-    }, 800); // 长按800ms触发
+    }, LONG_PRESS_DELAY);
   };
 
   // 长按结束或取消
@@ -135,7 +139,7 @@ import {ElMessage} from 'element-plus';
     // 重置长按状态，延迟一点以防止误触点击事件
     setTimeout(() => {
       isLongPressing.value = false;
-    }, 100);
+    }, LONG_PRESS_DEBOUNCE_DELAY);
   };
 
   // 点击哈希值跳转到 GitHub

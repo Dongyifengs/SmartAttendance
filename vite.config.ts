@@ -80,16 +80,16 @@ function getCommitMessage(): string {
         return cachedCommitMessage
     }
     try {
-        const message = execSync('git log -1 --pretty=format:"%s"').toString().trim()
+        const message = execSync('git log -1 --pretty=format:%s').toString().trim()
         if (message) {
             cachedCommitMessage = message
             return message
         }
         console.warn('Git 提交信息为空，使用默认值')
-        cachedCommitMessage = 'No commit message'
+        cachedCommitMessage = '无提交信息'
     } catch (error) {
         console.warn('无法获取 Git 提交信息，使用默认值')
-        cachedCommitMessage = 'No commit message'
+        cachedCommitMessage = '无提交信息'
     }
     return cachedCommitMessage
 }
