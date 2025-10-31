@@ -434,6 +434,13 @@ SmartAttendance/
 - 📧 Email: 1545929126@qq.com
 - 🌐 Website: http://moyijiangnan.cn
 
+**xinsin**
+- 📧 Email: 2219291455@qq.com
+- 🌐 Website: https://github.com/xinsin-star
+
+**wzp**
+- 📧 Email: 3357223099@qq.com
+- 🌐 Website: https://github.com/Wzp-2008
 ---
 
 ## 🙏 致谢
