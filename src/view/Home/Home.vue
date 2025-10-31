@@ -10,6 +10,7 @@
             登陆时间 {{ getLoginTime() }}
           </div>
           <div class="logBtn">
+            <el-button @click="DevHomeTest">课程签到签退页面</el-button>
             <el-button @click="logout">退出登录</el-button>
             <el-button @click="logoutTest">测试退出</el-button>
             <el-button @click="classListTest">课程表测试 [开发者模式]</el-button>
@@ -57,6 +58,10 @@ const AttendanceListTest = () => {
 
 const LeaveListTest = () => {
   router.push('/LeaveDev')
+}
+
+const DevHomeTest = () => {
+  router.push('/dev/home')
 }
 
 // 获取登录时间

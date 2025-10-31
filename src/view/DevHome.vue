@@ -11,17 +11,17 @@ const data = ref<ClassInfo[]>([]);
 const loading = ref(true);
 const todayString = dayjs().format("YYYY-MM-DD")
 
-// Clean up device ID - remove uuid_ prefix and keep only first UUID if duplicated
+// 清理设备 ID - 删除uuid_前缀，如果重复，则仅保留第一个 UUID
 const cleanDeviceId = computed(() => {
   if (!userInfo.value?.client_id) return '';
   const clientId = userInfo.value.client_id;
-  // Split by comma to handle duplicates
+  // 用逗号拆分以处理重复项
   const ids = clientId.split(',');
-  // Take first ID and remove uuid_ prefix
+  // 获取第一个 ID 并删除uuid_前缀
   return ids[0].replace(/^uuid_/, '');
 });
 
-// Calculate course status based on current time
+// 根据当前时间计算课程状态
 const calculateStatus = (course: any, signData: any): "已签退" | "已签到" | "未签到" | "迟到" | "早退" | null => {
   const now = dayjs();
   const startTime = dayjs(`${course.lesson_date} ${course.begin_time}`);
@@ -32,14 +32,14 @@ const calculateStatus = (course: any, signData: any): "已签退" | "已签到" 
   const signInTime = hasSignedIn ? dayjs(signData.u_begin_time) : null;
   const signOutTime = hasSignedOut ? dayjs(signData.u_end_time) : null;
 
-  // Check for specific situations first
+  // 先检查具体情况
   if (signData.absent_num === "1") return null; // 缺勤 handled separately
   if (signData.ask_leave_num === "1") return null; // 请假 handled separately
 
-  // Check for late sign-in
+  // 检查延迟登录
   if (hasSignedIn && signInTime && signInTime.isAfter(startTime)) {
     if (hasSignedOut) {
-      // Check for early leave
+      // 检查提前请假
       if (signOutTime && signOutTime.isBefore(endTime)) {
         return "早退";
       }
@@ -48,7 +48,7 @@ const calculateStatus = (course: any, signData: any): "已签退" | "已签到" 
     return "迟到";
   }
 
-  // Check for early leave
+  // 检查提前请假
   if (hasSignedOut && signOutTime && signOutTime.isBefore(endTime)) {
     return "早退";
   }
@@ -57,7 +57,7 @@ const calculateStatus = (course: any, signData: any): "已签退" | "已签到" 
   if (hasSignedOut) return "已签退";
   if (hasSignedIn) return "已签到";
 
-  // If not signed in yet and current time is after class start time, show as late
+  // 如果尚未登录，并且当前时间在上课时间之后，则显示为迟到
   if (!hasSignedIn && now.isAfter(startTime)) {
     return "迟到";
   }
@@ -107,14 +107,14 @@ onMounted(async () => {
         return null;
       }).filter(e => !!e);
 
-      // Sort courses: incomplete courses first, completed/on-leave courses last
+      // 课程排序：未完成课程在前，已完成/休假课程在后
       data.value = courses.sort((a, b) => {
-        // Priority: higher number = lower priority (goes to bottom)
+        // 优先级：较高的数字 = 较低的优先级（从底部）
         const getPriority = (course: ClassInfo) => {
-          // Completed courses (signed in and signed out) or on leave/absent - low priority (bottom)
+          // 已完成的课程（登录和注销）或休假/缺勤 - 低优先级（底部）
           if (course.situation === "已请假" || course.situation === "已旷课") return 3;
           if (course.signInTime && course.signOutTime) return 2;
-          // Not signed in or partially signed in - high priority (top)
+          // 未登录或部分登录 - 高优先级（顶部）
           return 1;
         };
 
@@ -130,7 +130,7 @@ onMounted(async () => {
 
 <template>
   <div v-loading="loading" class="dev-home-container" element-loading-text="加载课程中...">
-    <!-- User Information Card - Compact Version -->
+    <!-- 用户信息卡 - 紧凑版 -->
     <div class="user-info-card" v-if="userInfo">
       <div class="user-info-header">
         <h3>个人信息</h3>
@@ -139,24 +139,32 @@ onMounted(async () => {
         <div class="info-line">
           <span class="info-text">姓名: {{ userInfo.user_name }}</span>
           <span class="divider">|</span>
-          <span class="info-text">{{ userInfo.sex }}</span>
-          <span class="divider">|</span>
-          <span class="info-text">{{ userInfo.birthday }}</span>
-        </div>
-        <div class="info-line">
-          <span class="info-text">手机: {{ userInfo.user_phone }}</span>
+          <span class="info-text">{{ userInfo.birthday || "未设置生日" }}</span>
           <span class="divider">|</span>
           <span class="info-text">学号: {{ userInfo.user_code }}</span>
         </div>
         <div class="info-line">
           <span class="info-text">签到日期: {{ todayString }}</span>
           <span class="divider">|</span>
-          <span class="info-text">设备: {{ cleanDeviceId }}</span>
+          <span class="info-text">设备ID: {{ cleanDeviceId }}</span>
+        </div>
+        <div class="info-line">
+          <span class="info-text">[预留]钱包余额: </span>
+          <span class="divider">|</span>
+          <span class="info-text">[预留]空调余额:</span>
+          <span class="divider">|</span>
+          <span class="info-text">[预留]个人付款码:</span>
+          <span class="divider">|</span>
+          <span class="info-text">[预留]最新消费:</span>
+          <span class="divider">|</span>
+          <span class="info-text">[预留]空调余额:</span>
+          <span class="divider">|</span>
+          <span class="info-text">[预留]用水预约:</span>
         </div>
       </div>
     </div>
 
-    <!-- Course List -->
+    <!-- 课程列表 -->
     <class-container v-model="data"></class-container>
   </div>
 </template>
