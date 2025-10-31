@@ -8,6 +8,7 @@ import {getZHKQUserInfo} from '../API/zhkqAPI/Function/Function'
 
 const userInfo = getZHKQUserInfo();
 const data = ref<ClassInfo[]>([]);
+const loading = ref(true);
 const todayString = dayjs().format("YYYY-MM-DD")
 
 // Clean up device ID - remove uuid_ prefix and keep only first UUID if duplicated
@@ -74,42 +75,61 @@ const calculateSituation = (signData: any, status: "已签退" | "已签到" | "
 
 onMounted(async () => {
   if (userInfo) {
-    const signInfo = (await ZHKQ_GetDaySignList({date: todayString, userKey: userInfo.value!.token})).sign_record_list
-    const courseList = (await ZHKQ_GetDayCourseList({date: todayString, userKey: userInfo.value!.token})).sourcelist;
-    const signMap = new Map(signInfo.map(e => [e.pk_lesson, e]));
-    data.value = courseList.map((e, index): ClassInfo | null => {
-      const signData = signMap.get(e.pk_anlaxy_lesson);
-      if (signData) {
-        const status = calculateStatus(e, signData);
-        return {
-          classIndex: index + 1,
-          className: e.lesson_name,
-          startTime: dayjs(`${e.lesson_date} ${e.begin_time}`),
-          endTime: dayjs(`${e.lesson_date} ${e.end_time}`),
-          signInTime: signData.u_begin_time ? dayjs(signData.u_begin_time) : null,
-          signOutTime: signData.u_end_time ? dayjs(signData.u_end_time) : null,
-          shouldSignInTime: dayjs(`${signData.lesson_date} ${signData.before_class_time}`),
-          shouldSignOutTime: dayjs(`${signData.lesson_date} ${signData.after_class_over_time}`),
-          classRoom: e.class_room_name,
-          teacher: {
-            name: e.teacher_name,
-            id: Number.parseInt(e.teacher_id)
-          },
-          situation: calculateSituation(signData, status),
-          computedStatus: status,
-          pk_anlaxy_syllabus_user: signData.pk_anlaxy_syllabus_user,
-          lessonDate: e.lesson_date
+    loading.value = true;
+    try {
+      const signInfo = (await ZHKQ_GetDaySignList({date: todayString, userKey: userInfo.value!.token})).sign_record_list
+      const courseList = (await ZHKQ_GetDayCourseList({date: todayString, userKey: userInfo.value!.token})).sourcelist;
+      const signMap = new Map(signInfo.map(e => [e.pk_lesson, e]));
+      const courses = courseList.map((e, index): ClassInfo | null => {
+        const signData = signMap.get(e.pk_anlaxy_lesson);
+        if (signData) {
+          const status = calculateStatus(e, signData);
+          return {
+            classIndex: index + 1,
+            className: e.lesson_name,
+            startTime: dayjs(`${e.lesson_date} ${e.begin_time}`),
+            endTime: dayjs(`${e.lesson_date} ${e.end_time}`),
+            signInTime: signData.u_begin_time ? dayjs(signData.u_begin_time) : null,
+            signOutTime: signData.u_end_time ? dayjs(signData.u_end_time) : null,
+            shouldSignInTime: dayjs(`${signData.lesson_date} ${signData.before_class_time}`),
+            shouldSignOutTime: dayjs(`${signData.lesson_date} ${signData.after_class_over_time}`),
+            classRoom: e.class_room_name,
+            teacher: {
+              name: e.teacher_name,
+              id: Number.parseInt(e.teacher_id)
+            },
+            situation: calculateSituation(signData, status),
+            computedStatus: status,
+            pk_anlaxy_syllabus_user: signData.pk_anlaxy_syllabus_user,
+            lessonDate: e.lesson_date
+          }
         }
-      }
-      return null;
-    }).filter(e => !!e);
+        return null;
+      }).filter(e => !!e);
+      
+      // Sort courses: incomplete courses first, completed/on-leave courses last
+      data.value = courses.sort((a, b) => {
+        // Priority: higher number = lower priority (goes to bottom)
+        const getPriority = (course: ClassInfo) => {
+          // Completed courses (signed in and signed out) or on leave/absent - low priority (bottom)
+          if (course.situation === "已请假" || course.situation === "已旷课") return 3;
+          if (course.signInTime && course.signOutTime) return 2;
+          // Not signed in or partially signed in - high priority (top)
+          return 1;
+        };
+        
+        return getPriority(a) - getPriority(b);
+      });
+    } finally {
+      loading.value = false;
+    }
   }
 })
 
 </script>
 
 <template>
-  <div class="dev-home-container">
+  <div class="dev-home-container" v-loading="loading" element-loading-text="加载课程中...">
     <!-- User Information Card - Compact Version -->
     <div class="user-info-card" v-if="userInfo">
       <div class="user-info-header">
