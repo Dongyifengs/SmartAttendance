@@ -171,34 +171,6 @@ VITE_GITHUB_REPO=https://github.com/Dongyifengs/SmartAttendance
 1. 打开"设置" > "通用" > "关于本机"
 2. 查找并复制 IMEI
 
-### 运行开发服务器
-
-```bash
-npm run dev
-# 或
-yarn dev
-```
-
-浏览器访问：`http://localhost:5173`
-
-### 构建生产版本
-
-```bash
-npm run build
-# 或
-yarn build
-```
-
-构建产物将输出到 `dist` 目录。
-
-### 预览生产构建
-
-```bash
-npm run preview
-# 或
-yarn preview
-```
-
 ---
 
 ## 📱 使用指南
