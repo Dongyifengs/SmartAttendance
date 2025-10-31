@@ -2,7 +2,6 @@
 //  请求体参数接口定义文件  //
 // ******************** //
 
-
 // *************** [ 用户登录接口API请求体 - ZHKQ_Login ] *************** //
 /**
  * 智慧考勤 | 登录API请求体参数接口定义
@@ -12,13 +11,12 @@
  * @property { string } client_local_id - uuid `"uuid_****"`
  */
 export interface ZHKQ_RequestingBody_Login {
-    userid: string;
-    userpwd: string;
-    client_local_id: string;
+  userid: string;
+  userpwd: string;
+  client_local_id: string;
 }
 
 // *************** [ 用户登录接口API请求体 - ZHKQ_Login ] *************** //
-
 
 // *************** [ 获取当天课程列表API请求体 - ZHKQ_GetDayCourseList ] *************** //
 /**
@@ -28,12 +26,11 @@ export interface ZHKQ_RequestingBody_Login {
  * @property { string } date - 日期，例如 `"YYYY-MM-DD"`
  */
 export interface ZHKQ_RequestingBody_GetDayCourseList {
-    userKey: string;
-    date: string;
+  userKey: string;
+  date: string;
 }
 
 // *************** [ 获取当天课程列表API请求体 - ZHKQ_GetDayCourseList ] *************** //
-
 
 // *************** [ 获取签到记录API请求体 - ZHKQ_GetDaySignList ] *************** //
 /**
@@ -43,12 +40,11 @@ export interface ZHKQ_RequestingBody_GetDayCourseList {
  * @property { string } date - 日期，例如 `"YYYY-MM-DD"`
  */
 export interface ZHKQ_RequestingBody_GetDaySignList {
-    userKey: string;
-    date: string;
+  userKey: string;
+  date: string;
 }
 
 // *************** [ 获取签到记录API请求体 - ZHKQ_GetDaySignList ] *************** //
-
 
 // *************** [ 获取签到操作API请求 - ZHKQ_SignIn ] *************** //
 /**
@@ -65,20 +61,19 @@ export interface ZHKQ_RequestingBody_GetDaySignList {
  * @property { string } phone_code - 手机识别码，例如 `uuid_****,uuid_****`
  */
 export interface ZHKQ_RequestingBody_SignInParams {
-    userKey: string;
-    pk_anlaxy_syllabus_user: string;
-    sign_in_type: number;
-    u_begin_time: string;
-    late_time_length: number;
-    late_num: number;
-    ask_leave_num: number;
-    in_longitude: number;
-    in_latitude: number;
-    phone_code: string;
+  userKey: string;
+  pk_anlaxy_syllabus_user: string;
+  sign_in_type: number;
+  u_begin_time: string;
+  late_time_length: number;
+  late_num: number;
+  ask_leave_num: number;
+  in_longitude: number;
+  in_latitude: number;
+  phone_code: string;
 }
 
 // *************** [ 获取签到操作API请求 - ZHKQ_SignIn ] *************** //
-
 
 // *************** [ 获取课程签退接口API请求 - ZHKQ_SignOut ] *************** //
 /**
@@ -105,30 +100,27 @@ export interface ZHKQ_RequestingBody_SignInParams {
  * @property { number } late_num - 迟到次数，默认 `0`
  */
 export interface ZHKQ_RequestingBody_SignOutParams {
-    userKey: string;
-    pk_anlaxy_syllabus_user: string;
-    phone_code: string;
-    sign_out_type: number;
-    u_end_time: string;
-    lesson_change_list: string;
-    lesson_change_type: string;
-    ask_leave_num: number;
-    out_longitude: number;
-    out_latitude: number;
-    in_longitude: string;
-    in_latitude: string;
-    reviewscore: number;
-    reviewcontent: string;
-    sign_in_type: string;
-    u_begin_time: Date;
-    before_class_over_time: string;
-    late_time_length: number;
-    late_num: number;
+  userKey: string;
+  pk_anlaxy_syllabus_user: string;
+  phone_code: string;
+  sign_out_type: number;
+  u_end_time: string;
+  lesson_change_list: string;
+  lesson_change_type: string;
+  ask_leave_num: number;
+  out_longitude: number;
+  out_latitude: number;
+  in_longitude: string;
+  in_latitude: string;
+  reviewscore: number;
+  reviewcontent: string;
+  sign_in_type: string;
+  u_begin_time: string;
+  before_class_over_time: string;
+  late_time_length: number;
+  late_num: number;
 }
 
 // *************** [ 获取课程签退接口API请求 - ZHKQ_SignOut ] *************** //
 
-
 //////////////////////////////////////////////////////////////////////////////////////
-
-

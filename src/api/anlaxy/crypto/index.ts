@@ -1,13 +1,13 @@
-import {Buffer} from 'buffer';
-import {JSEncrypt} from "jsencrypt";
+import { Buffer } from 'buffer';
+import { JSEncrypt } from 'jsencrypt';
 
 /**
  * 扩展 window 对象类型，允许挂载 Buffer 属性，使在浏览器环境可使用 Buffer。
  */
 declare global {
-    interface Window {
-        Buffer: typeof Buffer;
-    }
+  interface Window {
+    Buffer: typeof Buffer;
+  }
 }
 
 /**
@@ -19,7 +19,8 @@ window.Buffer = Buffer;
 /**
  * RSA 公钥字符串，用于加密操作。
  */
-const pb_key = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDjxeQ8TmnvvIRreoJfTAdEdaD8Vj/n8OQuAxqD6kbrYPculdAfPNLM5B5Y289oID74Ze8CTcy5vfQK1f5kgzKMr/EywV3MMDVVjS05Z8/eQaU9xMiKeIqUkubAiL2oE/hNfBN/w/NTTGMpJ63x/yMdi6Uo0FSFNm/6JmBeTflVJQIDAQAB";
+const pb_key =
+  'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDjxeQ8TmnvvIRreoJfTAdEdaD8Vj/n8OQuAxqD6kbrYPculdAfPNLM5B5Y289oID74Ze8CTcy5vfQK1f5kgzKMr/EywV3MMDVVjS05Z8/eQaU9xMiKeIqUkubAiL2oE/hNfBN/w/NTTGMpJ63x/yMdi6Uo0FSFNm/6JmBeTflVJQIDAQAB';
 
 /**
  * 使用 RSA 公钥加密数据，并将加密后的内容进行 Base64 编码以便存储。
@@ -28,10 +29,10 @@ const pb_key = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDjxeQ8TmnvvIRreoJfTAdEdaD8
  * @returns 加密并编码后的字符串，若加密失败则返回 null
  */
 export function encryptStorageData(data: string, key: string) {
-    const encryptor = new JSEncrypt();
-    encryptor.setPublicKey(`-----BEGIN PUBLIC KEY-----\n${key}\n-----END PUBLIC KEY-----`);
-    const encrypted = encryptor.encrypt(JSON.stringify(data));
-    return encrypted ? btoa(encrypted) : null;
+  const encryptor = new JSEncrypt();
+  encryptor.setPublicKey(`-----BEGIN PUBLIC KEY-----\n${key}\n-----END PUBLIC KEY-----`);
+  const encrypted = encryptor.encrypt(JSON.stringify(data));
+  return encrypted ? btoa(encrypted) : null;
 }
 
 /**
@@ -42,15 +43,15 @@ export function encryptStorageData(data: string, key: string) {
  * @returns 解密后的数据对象，若解密失败则返回 null
  */
 export function decryptStorageData(encryptedData: string, key: string) {
-    try {
-        const decrypt = new JSEncrypt();
-        decrypt.setPrivateKey(key);
-        const decrypted = decrypt.decrypt(atob(encryptedData));
-        return decrypted ? JSON.parse(decrypted) : null;
-    } catch (e) {
-        console.error("解密失败:", e);
-        return null;
-    }
+  try {
+    const decrypt = new JSEncrypt();
+    decrypt.setPrivateKey(key);
+    const decrypted = decrypt.decrypt(atob(encryptedData));
+    return decrypted ? JSON.parse(decrypted) : null;
+  } catch (e) {
+    console.error('解密失败:', e);
+    return null;
+  }
 }
 
 /**
@@ -60,8 +61,8 @@ export function decryptStorageData(encryptedData: string, key: string) {
  * @returns 双重 Base64 编码后的字符串
  */
 function doubleBase64Encode(str: string) {
-    const first = Buffer.from(str).toString('base64');
-    return Buffer.from(first).toString('base64');
+  const first = Buffer.from(str).toString('base64');
+  return Buffer.from(first).toString('base64');
 }
 
 /**
@@ -71,15 +72,15 @@ function doubleBase64Encode(str: string) {
  * @returns 转义后的字符串
  */
 function escapeString(str: string) {
-    return str
-        .replace(/>/g, "&gt;")     // 转义大于号
-        .replace(/</g, "&lt;")     // 转义小于号
-        .replace(/ /g, "&nbsp;")   // 转义空格
-        .replace(/"/g, "&quot;")   // 转义双引号
-        .replace(/'/g, "&#39;")    // 转义单引号
-        .replace(/\\/g, "\\\\")    // 转义反斜杠
-        .replace(/\n/g, "\\n")     // 转义换行符
-        .replace(/\r/g, "\\r");    // 转义回车符
+  return str
+    .replace(/>/g, '&gt;') // 转义大于号
+    .replace(/</g, '&lt;') // 转义小于号
+    .replace(/ /g, '&nbsp;') // 转义空格
+    .replace(/"/g, '&quot;') // 转义双引号
+    .replace(/'/g, '&#39;') // 转义单引号
+    .replace(/\\/g, '\\\\') // 转义反斜杠
+    .replace(/\n/g, '\\n') // 转义换行符
+    .replace(/\r/g, '\\r'); // 转义回车符
 }
 
 /**
@@ -90,12 +91,12 @@ function escapeString(str: string) {
  * @throws 当加密失败时抛出异常
  */
 export function encrypt(original: string) {
-    const encryptor = new JSEncrypt();
-    encryptor.setPublicKey(`-----BEGIN PUBLIC KEY-----\n${pb_key}\n-----END PUBLIC KEY-----`);
-    const encrypted = encryptor.encrypt(original);
-    if (typeof encrypted !== "string") {
-        throw new Error("RSA加密失败");
-    }
-    const escaped = escapeString(encrypted);
-    return doubleBase64Encode(escaped);
+  const encryptor = new JSEncrypt();
+  encryptor.setPublicKey(`-----BEGIN PUBLIC KEY-----\n${pb_key}\n-----END PUBLIC KEY-----`);
+  const encrypted = encryptor.encrypt(original);
+  if (typeof encrypted !== 'string') {
+    throw new Error('RSA加密失败');
+  }
+  const escaped = escapeString(encrypted);
+  return doubleBase64Encode(escaped);
 }

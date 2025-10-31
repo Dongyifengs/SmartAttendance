@@ -2,7 +2,6 @@
 //  响应体参数接口定义文件  //
 // ******************** //
 
-
 // *************** [ 用户登录接口API响应体 - ZHKQ_LOGIN ] *************** //
 /**
  * 智慧考勤登录接口响应体返回类型定义
@@ -38,34 +37,34 @@
  * @property { number } initUser - 是否初始化用户，`0` 表示否
  */
 export interface ZHKQ_RespondingBody_UserInfo {
-    state: string;
-    info?: string;
-    birthday: string;
-    pk_group: string;
-    user_name: string;
-    orgList: OrgInfo[];
-    pk_user: string;
-    client_id: string;
-    pk_org: string;
-    user_role: number;
-    user_type: string;
-    group_easid: string;
-    user_code: string;
-    user_phone: string;
-    face_id: string;
-    pk_teacher: string;
-    group_name: string;
-    sex: string;
-    user_auth: number;
-    org_type: string;
-    curryDate: string;
-    token: string;
-    user_singlekey: string;
-    super_root: string;
-    user_pic: string;
-    org_lev: string;
-    new_join: number;
-    initUser: number;
+  state: string;
+  info?: string;
+  birthday: string;
+  pk_group: string;
+  user_name: string;
+  orgList: OrgInfo[];
+  pk_user: string;
+  client_id: string;
+  pk_org: string;
+  user_role: number;
+  user_type: string;
+  group_easid: string;
+  user_code: string;
+  user_phone: string;
+  face_id: string;
+  pk_teacher: string;
+  group_name: string;
+  sex: string;
+  user_auth: number;
+  org_type: string;
+  curryDate: string;
+  token: string;
+  user_singlekey: string;
+  super_root: string;
+  user_pic: string;
+  org_lev: string;
+  new_join: number;
+  initUser: number;
 }
 
 /**
@@ -75,12 +74,11 @@ export interface ZHKQ_RespondingBody_UserInfo {
  * @property { string } orgPk - 组织主键 ID，例如 `"68****F9"`
  */
 export interface OrgInfo {
-    orgName: string;
-    orgPk: string;
+  orgName: string;
+  orgPk: string;
 }
 
 // *************** [ 用户登录接口API响应体 - ZHKQ_LOGIN ] *************** //
-
 
 // *************** [ 课程列表API响应体 - ZHKQ_GetDayCourseList ] *************** //
 /**
@@ -113,38 +111,36 @@ export interface OrgInfo {
  * @property { string } cur_count - 当前已选人数，例如 `"0"`
  */
 export interface ZHKQ_RespondingBody_CourseList {
-    lesson_type: number;
-    lesson_date: string;
-    selective: number;
-    week_num: number;
-    week_item: number;
-    week_name: string;
-    begin_time: string;
-    end_time: string;
-    section_num: number;
-    pk_anlaxy_semester: string;
-    pk_anlaxy_organize: string;
-    pk_group: string;
-    pk_anlaxy_timezone: string;
-    campus: string;
-    lesson_name: string;
-    pk_anlaxy_lesson: string;
-    teacher_id: string;
-    teacher_name: string;
-    pk_teacher: string;
-    class_room_name: string;
-    pk_anlaxy_classroom: string;
-    pk_anlaxy_syllabus: string;
-    max_count: number;
-    cur_count: string;
+  lesson_type: number;
+  lesson_date: string;
+  selective: number;
+  week_num: number;
+  week_item: number;
+  week_name: string;
+  begin_time: string;
+  end_time: string;
+  section_num: number;
+  pk_anlaxy_semester: string;
+  pk_anlaxy_organize: string;
+  pk_group: string;
+  pk_anlaxy_timezone: string;
+  campus: string;
+  lesson_name: string;
+  pk_anlaxy_lesson: string;
+  teacher_id: string;
+  teacher_name: string;
+  pk_teacher: string;
+  class_room_name: string;
+  pk_anlaxy_classroom: string;
+  pk_anlaxy_syllabus: string;
+  max_count: number;
+  cur_count: string;
 }
-
 
 // *************** [ 课程列表API响应体 - ZHKQ_GetDayCourseList ] *************** //
 
-
 // *************** [ 获取签到记录API响应 - ZHKQ_GetDaySignList ] *************** //
-export type BoolString = "0" | "1";
+export type BoolString = '0' | '1';
 
 /**
  * 智慧考勤签到记录接口返回类型定义
@@ -189,48 +185,46 @@ export type BoolString = "0" | "1";
  * @property { string } teacher_pic - 教师头像URL，例如 `""`
  */
 export interface ZHKQ_RespondingBody_GetDaySignList {
-
-    lesson_type: number;
-    pk_anlaxy_syllabus_user: string;
-    lesson_date: string;
-    user_id: string;
-    user_name: string;
-    before_class_time: string;
-    begin_time: string;
-    after_class_time: string;
-    u_begin_time: string;
-    before_class_over_time: string;
-    end_time: string;
-    after_class_over_time: string;
-    u_end_time: string;
-    late_time_length: number;
-    leave_ago_time_length: number;
-    absent_num: BoolString;
-    late_num: BoolString;
-    leave_num: BoolString;
-    ask_leave_num: BoolString;
-    ok_num: number;
-    get_num: number;
-    user_num: number;
-    section_num: number;
-    syllabus_status: number;
-    uuid: string;
-    srv_data: string;
-    mac: string;
-    reviewscore: number;
-    reviewcontent: string;
-    pk_user: string;
-    pk_class: string;
-    pk_lesson: string;
-    pk_teacher: string;
-    pk_class_room: string;
-    campus: string;
-    pk_anlaxy_syllabus: string;
-    teacher_pic: string;
+  lesson_type: number;
+  pk_anlaxy_syllabus_user: string;
+  lesson_date: string;
+  user_id: string;
+  user_name: string;
+  before_class_time: string;
+  begin_time: string;
+  after_class_time: string;
+  u_begin_time: string;
+  before_class_over_time: string;
+  end_time: string;
+  after_class_over_time: string;
+  u_end_time: string;
+  late_time_length: number;
+  leave_ago_time_length: number;
+  absent_num: BoolString;
+  late_num: BoolString;
+  leave_num: BoolString;
+  ask_leave_num: BoolString;
+  ok_num: number;
+  get_num: number;
+  user_num: number;
+  section_num: number;
+  syllabus_status: number;
+  uuid: string;
+  srv_data: string;
+  mac: string;
+  reviewscore: number;
+  reviewcontent: string;
+  pk_user: string;
+  pk_class: string;
+  pk_lesson: string;
+  pk_teacher: string;
+  pk_class_room: string;
+  campus: string;
+  pk_anlaxy_syllabus: string;
+  teacher_pic: string;
 }
 
 // *************** [ 获取签到记录API响应 - ZHKQ_GetDaySignList ] *************** //
-
 
 // *************** [ 获取签到操作API响应 - ZHKQ_SignIn ] *************** //
 /**
@@ -242,14 +236,13 @@ export interface ZHKQ_RespondingBody_GetDaySignList {
  * @property { string } source_code - 课程主键，例如`"56****AD"`
  */
 export interface ZHKQ_RespondingBody_SignIn {
-    state: string;
-    sign_coin: number;
-    sing_result: number;
-    source_code: string;
+  state: string;
+  sign_coin: number;
+  sing_result: number;
+  source_code: string;
 }
 
 // *************** [ 获取签到操作API响应 - ZHKQ_SignIn ] *************** //
-
 
 // *************** [ 课程签退接口API响应 - ZHKQ_SignOut ] *************** //
 /**
@@ -261,10 +254,10 @@ export interface ZHKQ_RespondingBody_SignIn {
  * @property { string } source_code - 课程主键，例如`"56****AD"`
  */
 export interface ZHKQ_RespondingBody_SignOut {
-    state: string;
-    sign_coin: number;
-    sing_result: number;
-    source_code: string;
+  state: string;
+  sign_coin: number;
+  sing_result: number;
+  source_code: string;
 }
 
 // *************** [ 课程签退接口API响应 - ZHKQ_SignOut ] *************** //

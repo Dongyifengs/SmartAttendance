@@ -9,10 +9,24 @@
     "email": "1545929126@qq.com",
     "url": "http://moyijiangnan.cn"
   },
+  "contributors": [
+    {
+      "name": "wzp",
+      "email": "minecraftwzpmc@163.com",
+      "url": "https://wzpmc.cn:3000/wzp"
+    },
+    {
+      "name": "XinSin",
+      "email": "L2890286955@gmail.com"
+    }
+  ],
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc -b && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "lint": "eslint --ext .js,.ts,.vue src",
+    "lint:fix": "eslint --ext .js,.ts,.vue src --fix",
+    "format": "prettier --write \"src/**/*.{js,ts,vue,css,scss,md,json}\""
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.3.2",
@@ -28,10 +42,18 @@
     "vue-router": "^4.5.1"
   },
   "devDependencies": {
+    "@eslint/eslintrc": "^3.3.1",
+    "@eslint/js": "^9.38.0",
     "@types/node": "^24.9.1",
     "@vitejs/plugin-vue": "^6.0.1",
     "@vue/tsconfig": "^0.7.0",
+    "eslint": "^9.38.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-vue": "^10.5.1",
+    "globals": "^16.4.0",
+    "prettier": "^3.6.2",
     "typescript": "~5.8.3",
+    "typescript-eslint": "^8.46.2",
     "unplugin-auto-import": "^20.1.0",
     "unplugin-vue-components": "^29.0.0",
     "vite": "7.1.11",
