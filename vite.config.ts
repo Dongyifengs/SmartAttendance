@@ -61,6 +61,39 @@ function getBuildDate(): string {
     return `${year}-${month}-${day}`
 }
 
+// 获取编译时间（包含日期和时间）
+function getBuildTimestamp(): string {
+    const now = new Date()
+    const year = now.getFullYear()
+    const month = String(now.getMonth() + 1).padStart(2, '0')
+    const day = String(now.getDate()).padStart(2, '0')
+    const hours = String(now.getHours()).padStart(2, '0')
+    const minutes = String(now.getMinutes()).padStart(2, '0')
+    const seconds = String(now.getSeconds()).padStart(2, '0')
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`
+}
+
+// 获取 Git 提交信息
+let cachedCommitMessage: string | null = null
+function getCommitMessage(): string {
+    if (cachedCommitMessage !== null) {
+        return cachedCommitMessage
+    }
+    try {
+        const message = execSync('git log -1 --pretty=format:"%s"').toString().trim()
+        if (message) {
+            cachedCommitMessage = message
+            return message
+        }
+        console.warn('Git 提交信息为空，使用默认值')
+        cachedCommitMessage = 'No commit message'
+    } catch (error) {
+        console.warn('无法获取 Git 提交信息，使用默认值')
+        cachedCommitMessage = 'No commit message'
+    }
+    return cachedCommitMessage
+}
+
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
     return {
@@ -84,12 +117,18 @@ export default defineConfig(({ mode }) => {
             'import.meta.env.VITE_BUILD_DATE': mode === 'production' 
                 ? JSON.stringify(getBuildDate())
                 : JSON.stringify(''),
+            'import.meta.env.VITE_BUILD_TIMESTAMP': mode === 'production' 
+                ? JSON.stringify(getBuildTimestamp())
+                : JSON.stringify('开发环境'),
             'import.meta.env.VITE_GIT_HASH': mode === 'production' 
                 ? JSON.stringify(getGitHash())
-                : JSON.stringify(''),
+                : JSON.stringify('dev'),
             'import.meta.env.VITE_GIT_FULL_HASH': mode === 'production' 
                 ? JSON.stringify(getFullGitHash())
-                : JSON.stringify(''),
+                : JSON.stringify('unknown'),
+            'import.meta.env.VITE_COMMIT_MESSAGE': mode === 'production' 
+                ? JSON.stringify(getCommitMessage())
+                : JSON.stringify('开发环境构建'),
             'import.meta.env.VITE_GITHUB_REPO': JSON.stringify('https://github.com/Dongyifengs/SmartAttendance'),
             // 保留 VITE_TEXT 用于开发环境
             'import.meta.env.VITE_TEXT': mode === 'production' 

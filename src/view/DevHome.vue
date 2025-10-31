@@ -2,7 +2,26 @@
   <div v-loading="loading" class="dev-home-container" element-loading-text="加载课程中...">
     <div class="header header-info">
       <div class="hash">
-        编译时间：2028-13-96 14:14:14 <a href="xx">s7f8a314</a>
+        <span 
+          class="build-time"
+          title="长按查看提交记录"
+          @mousedown="handleLongPressStart"
+          @mouseup="handleLongPressEnd"
+          @mouseleave="handleLongPressEnd"
+          @touchstart="handleLongPressStart"
+          @touchend="handleLongPressEnd"
+          @touchcancel="handleLongPressEnd"
+        >
+          编译时间：{{ buildTimestamp }}
+        </span>
+        <a 
+          :href="getCommitUrl()" 
+          target="_blank" 
+          class="hash-link"
+          @click.prevent="handleHashClick"
+        >
+          {{ gitHash }}
+        </a>
       </div>
       <div>
         <el-button @click="logOut">退出登录</el-button>
@@ -61,6 +80,7 @@ import {ZHKQ_GetDayCourseList, ZHKQ_GetDaySignList} from '@/api/anlaxy/index.ts'
 import {getZHKQUserInfo} from '@/api/anlaxy/utils';
 import type {CourseList, SignListInfo} from '@/api/anlaxy/type/response';
 import router from "@/router";
+import {ElMessage} from 'element-plus';
 
 // 用户信息对象（包含姓名、学号、token等）
   const userInfo = getZHKQUserInfo();
@@ -73,6 +93,60 @@ import router from "@/router";
 
   // 当前日期字符串（格式：YYYY-MM-DD）
   const todayString = dayjs().format('YYYY-MM-DD');
+
+  // 编译信息
+  const buildTimestamp = ref(import.meta.env.VITE_BUILD_TIMESTAMP || '开发环境');
+  const gitHash = ref(import.meta.env.VITE_GIT_HASH || 'dev');
+  const gitFullHash = ref(import.meta.env.VITE_GIT_FULL_HASH || 'unknown');
+  const commitMessage = ref(import.meta.env.VITE_COMMIT_MESSAGE || '开发环境构建');
+  const githubRepo = ref(import.meta.env.VITE_GITHUB_REPO || 'https://github.com/Dongyifengs/SmartAttendance');
+
+  // 长按相关状态
+  const longPressTimer = ref<number | null>(null);
+  const isLongPressing = ref(false);
+
+  // 获取 GitHub 提交链接
+  const getCommitUrl = () => {
+    if (gitFullHash.value && gitFullHash.value !== 'unknown') {
+      return `${githubRepo.value}/commit/${gitFullHash.value}`;
+    }
+    return '#';
+  };
+
+  // 长按开始
+  const handleLongPressStart = () => {
+    isLongPressing.value = false;
+    longPressTimer.value = window.setTimeout(() => {
+      isLongPressing.value = true;
+      // 显示提交信息
+      ElMessage({
+        message: `提交记录: ${commitMessage.value}`,
+        type: 'info',
+        duration: 5000,
+        showClose: true,
+      });
+    }, 800); // 长按800ms触发
+  };
+
+  // 长按结束或取消
+  const handleLongPressEnd = () => {
+    if (longPressTimer.value !== null) {
+      clearTimeout(longPressTimer.value);
+      longPressTimer.value = null;
+    }
+    // 重置长按状态，延迟一点以防止误触点击事件
+    setTimeout(() => {
+      isLongPressing.value = false;
+    }, 100);
+  };
+
+  // 点击哈希值跳转到 GitHub
+  const handleHashClick = () => {
+    const url = getCommitUrl();
+    if (url !== '#') {
+      window.open(url, '_blank');
+    }
+  };
 
   const logOut = () => {
     localStorage.clear()
@@ -267,6 +341,66 @@ import router from "@/router";
       opacity: 1;
       transform: translateY(0);
     }
+  }
+
+  /* =======================
+   Header 样式
+======================= */
+  .header {
+    margin-bottom: 16px;
+  }
+
+  .header-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+
+  .hash {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: #606266;
+  }
+
+  .build-time {
+    cursor: pointer;
+    user-select: none;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+  }
+
+  .build-time:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+
+  .build-time:active {
+    background-color: rgba(0, 0, 0, 0.1);
+  }
+
+  .hash-link {
+    color: #409eff;
+    text-decoration: none;
+    font-weight: 500;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+  }
+
+  .hash-link:hover {
+    background-color: #ecf5ff;
+    color: #66b1ff;
+  }
+
+  .hash-link:active {
+    background-color: #d9ecff;
   }
 
   /* =======================
