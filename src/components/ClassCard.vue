@@ -29,8 +29,8 @@ export interface ClassInfo {
 import {Clock, Location, User, CircleClose, CircleCheck} from "@element-plus/icons-vue";
 import {ref, computed, watch} from "vue";
 import dayjs from "dayjs";
-import {getZHKQUserInfo} from '@/API/zhkqAPI/Function/Function';
-import {ZHKQ_SignIn, ZHKQ_SignOut} from '@/API/zhkqAPI/index';
+import {getZHKQUserInfo} from '@/api/anlaxy/utils';
+import {ZHKQ_SignIn, ZHKQ_SignOut} from '@/api/anlaxy';
 
 const info = defineModel<ClassInfo>({required: true});
 const selectedSignInTime = ref<string>("");

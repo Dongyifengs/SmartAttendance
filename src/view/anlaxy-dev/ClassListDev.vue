@@ -43,8 +43,8 @@
 import {onMounted, ref} from 'vue'
 import {ElMessage} from 'element-plus'
 import dayjs from 'dayjs'
-import {ZHKQ_GetDayCourseList, ZHKQ_GetDaySignList} from '@/API/zhkqAPI'
-import {checkInFields, courseFields} from './Type/dataFields'
+import {ZHKQ_GetDayCourseList, ZHKQ_GetDaySignList} from '@/api/anlaxy'
+import {checkInFields, courseFields} from '@/view/anlaxy-dev/types.d'
 import DataTable from './components/DataTable.vue'
 
 // 高亮
@@ -117,5 +117,5 @@ onMounted(() => {
 </script>
 
 <style scoped>
-@import "./Style/ClassListDev.css";
+@import "style/class-list-dev.css";
 </style>

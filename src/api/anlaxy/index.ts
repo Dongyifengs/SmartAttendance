@@ -1,5 +1,5 @@
-import {generateInterfaceParams} from './Function/Function'
-import {PairAPI, RollCallAPI} from './APIStarter/APIStarter';
+import {generateInterfaceParams} from '@/api/anlaxy/utils'
+import {PairAPI, RollCallAPI} from '@/api/anlaxy/endpoint';
 // 响应体
 import type {
     ZHKQ_RespondingBody_CourseList,
@@ -7,7 +7,7 @@ import type {
     ZHKQ_RespondingBody_SignIn,
     ZHKQ_RespondingBody_SignOut,
     ZHKQ_RespondingBody_UserInfo,
-} from './type/RespondingBody'
+} from './type/response.d'
 // 请求体
 import type {
     ZHKQ_RequestingBody_GetDayCourseList,
@@ -15,13 +15,13 @@ import type {
     ZHKQ_RequestingBody_Login,
     ZHKQ_RequestingBody_SignInParams,
     ZHKQ_RequestingBody_SignOutParams
-} from "@/API/zhkqAPI/type/RequestingBody.ts";
+} from "@/api/anlaxy/type/requests.d";
 
 /**
- * 通用 API 调用方法
+ * 通用 api 调用方法
  *
  * @async
- * @function apiCall
+ * @utils apiCall
  * @param { string } func - 要调用的后端接口函数名（如 "Member_Login"）
  * @param { Record<string, any> } [params={}] - 请求参数对象，会被放入 Param 字段
  * @returns { Promise } 返回后端响应数据
@@ -32,7 +32,7 @@ export async function apiCall<T = any>(
     params: Record<string, any> = {}
 ): Promise<T> {
     const payload = {
-        CommType: "function",
+        CommType: "utils",
         Comm: func,
         Param: {
             Source_PlatForm: 2,
@@ -46,16 +46,16 @@ export async function apiCall<T = any>(
         const response = await RollCallAPI.post('', formData);
         return response.data as T;
     } catch (error) {
-        console.error('API 调用失败:', error);
+        console.error('api 调用失败:', error);
         throw error;
     }
 }
 
 /**
- * 通用 RollCall Pair API 调用器
+ * 通用 RollCall Pair api 调用器
  *
  * @async
- * @function apiRollCall
+ * @utils apiRollCall
  * @param { string } func - 要调用的后端函数名
  * @param { Record<string, any> } [params={}] - 请求参数对象，会被放入 Param 字段
  * @returns { Promise } 返回后端响应数据
@@ -66,7 +66,7 @@ export async function apiRollCall<T = any>(
     params: Record<string, any> = {}
 ): Promise<T> {
     const payload = {
-        CommType: "function",
+        CommType: "utils",
         Comm: func,
         Param: {
             Source_PlatForm: 2,
@@ -80,14 +80,14 @@ export async function apiRollCall<T = any>(
         const response = await PairAPI.post('', formData);
         return response.data as T;
     } catch (error) {
-        console.error('API 调用失败:', error);
+        console.error('api 调用失败:', error);
         throw error;
     }
 }
 
 /**
  * 用户登录接口
- * @function ZHKQ_Login
+ * @utils ZHKQ_Login
  * @param { ZHKQ_RequestingBody_Login } param - 登录参数对象
  * @param { string } param.userid - 用户名：`学号`
  * @param { string } param.userpwd - 用户密码：`<PASSWORD>`
@@ -100,7 +100,7 @@ export async function ZHKQ_Login(param: ZHKQ_RequestingBody_Login): Promise<ZHKQ
 
 /**
  * 获取当天课程列表
- * @function ZHKQ_GetDayCourseList
+ * @utils ZHKQ_GetDayCourseList
  * @param { ZHKQ_RequestingBody_GetDayCourseList } param - 请求参数对象
  * @param { string } param.userKey - 用户密钥： `用户Token`
  * @param { string } param.date - 日期字符串：`YYYY-MM-DD`
@@ -116,7 +116,7 @@ export async function ZHKQ_GetDayCourseList(param: ZHKQ_RequestingBody_GetDayCou
 
 /**
  * 获取当天签到记录
- * @function ZHKQ_GetDaySignList
+ * @utils ZHKQ_GetDaySignList
  * @param { ZHKQ_RequestingBody_GetDaySignList } param - 请求参数对象
  * @param { string } param.date - 日期字符串：`YYYY-MM-DD`
  * @param { string } param.userKey - 用户密钥： `用户Token`
@@ -132,7 +132,7 @@ export async function ZHKQ_GetDaySignList(param: ZHKQ_RequestingBody_GetDaySignL
 
 /**
  * 课程签到接口
- * @function ZHKQ_SignIn
+ * @utils ZHKQ_SignIn
  * @param { ZHKQ_RequestingBody_SignInParams } params - 签到参数对象
  * @param { string } params.userKey - 用户密钥，例如 `"V0****0="`
  * @param { string } params.pk_anlaxy_syllabus_user - 课程用户主键，例如 `"56****AD"`
@@ -153,7 +153,7 @@ export async function ZHKQ_SignIn(params: ZHKQ_RequestingBody_SignInParams,): Pr
 
 /**
  * 课程签退接口
- * @function ZHKQ_SignOut
+ * @utils ZHKQ_SignOut
  * @param { ZHKQ_RequestingBody_SignOutParams } params - 签退参数对象
  * @param { string } params.userKey - 用户密钥，例如 `"V0****0="`
  * @param { string } params.pk_anlaxy_syllabus_user - 课程用户主键，例如 `"56****AD"`
@@ -184,7 +184,7 @@ export async function ZHKQ_SignOut(params: ZHKQ_RequestingBody_SignOutParams): P
 /**
  * 获取课程结束时间
  * @async
- * @function getEndTime
+ * @utils getEndTime
  * @param { string } lessonId - 课程ID
  * @param { string } userKey - 用户密钥
  * @returns { Promise<any> } 返回课程结束时间数据
@@ -200,7 +200,7 @@ export async function getEndTime(lessonId: string, userKey: string): Promise<any
  * 获取用户班级列表
  *
  * @async
- * @function getUserClass
+ * @utils getUserClass
  * @param { string } userKey - 用户密钥
  * @returns { Promise<any> } 返回班级列表数据
  */
@@ -214,7 +214,7 @@ export async function getUserClass(userKey: string): Promise<any> {
  * 获取班级学生列表
  *
  * @async
- * @function getClassStudent
+ * @utils getClassStudent
  * @param { string } userKey - 用户密钥
  * @param { string } group_id - 班级ID
  * @returns { Promise<any> } 返回学生列表数据

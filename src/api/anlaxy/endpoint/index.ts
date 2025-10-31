@@ -1,6 +1,6 @@
 import axios from "axios";
 
-// RollCallAPI Starter
+// RollCallAPI Endpoint
 export const RollCallAPI = axios.create({
     baseURL: "https://rollcall.anlaxy.com.cn/SerApi/v02",
     headers: {
@@ -8,7 +8,7 @@ export const RollCallAPI = axios.create({
     }
 });
 
-// PairAPI Starter
+// PairAPI Endpoint
 export const PairAPI = axios.create({
     baseURL: "/PairAPI",
     headers: {

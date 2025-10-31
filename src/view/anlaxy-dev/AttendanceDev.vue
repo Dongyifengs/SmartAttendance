@@ -108,7 +108,7 @@
 <script lang="ts" setup>
 import {computed, onMounted, ref} from "vue";
 import dayjs from "dayjs";
-import {getAttendanceDates, getClassStudent, getCourseStatus, getStatusCount, getUserClass} from "@/API/zhkqAPI";
+import {getAttendanceDates, getClassStudent, getCourseStatus, getStatusCount, getUserClass} from "@/api/anlaxy";
 
 interface Student {
   user_code: string;

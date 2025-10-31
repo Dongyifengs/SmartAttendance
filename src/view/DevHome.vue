@@ -49,8 +49,8 @@ import dayjs from "dayjs";
 import type {ClassInfo} from "@/components/ClassCard.vue";
 import {computed, onMounted, ref} from "vue";
 import ClassContainer from "@/components/ClassContainer.vue";
-import {ZHKQ_GetDayCourseList, ZHKQ_GetDaySignList} from "@/API/zhkqAPI/index.ts";
-import {getZHKQUserInfo} from "../API/zhkqAPI/Function/Function";
+import {ZHKQ_GetDayCourseList, ZHKQ_GetDaySignList} from "@/api/anlaxy/index.ts";
+import {getZHKQUserInfo} from "@/api/anlaxy/utils";
 
 // 用户信息对象（包含姓名、学号、token等）
 const userInfo = getZHKQUserInfo();

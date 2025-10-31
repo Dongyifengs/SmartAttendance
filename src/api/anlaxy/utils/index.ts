@@ -1,11 +1,11 @@
 import {computed, type Ref} from "vue"
 import {Base64} from 'js-base64'
 import {useLocalStorage} from "@vueuse/core"
-import type {ZHKQ_RespondingBody_UserInfo} from '../type/RespondingBody'
+import type {ZHKQ_RespondingBody_UserInfo} from '../type/response.d.ts'
 
 /**
  * 生成双层Base64编码的字符串。
- * @function generateInterfaceParams
+ * @utils generateInterfaceParams
  * @param { object } obj - 需要进行加密的字符串源对象，例如 `"{a:1,b:2}"`
  * @return { string } 加密后的字符串，例如 `"interface=ZV****0="`
  */
@@ -17,7 +17,7 @@ export function generateInterfaceParams(obj: object): string {
 
 /**
  * 获取用户信息
- * @function getZHKQUserInfo
+ * @utils getZHKQUserInfo
  * @return { Ref<ZHKQ_RespondingBody_UserInfo | null> } 返回用户信息的响应体对象，如果没有则返回 null
  */
 export function getZHKQUserInfo(): Ref<ZHKQ_RespondingBody_UserInfo | null> {

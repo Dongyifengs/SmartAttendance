@@ -57,8 +57,8 @@
 import {computed, onMounted, ref} from 'vue'
 import {ElMessage} from 'element-plus'
 import {Cellphone, Lock, User} from "@element-plus/icons-vue";
-import {OC_LOGIN} from "@/API/ocAPI";
-import {ZHKQ_Login} from '@/API/zhkqAPI';
+import {OC_LOGIN} from "@/api/ocAPI";
+import {ZHKQ_Login} from '@/api/anlaxy';
 import router from "@/router";
 
 // 开发环境
@@ -219,5 +219,5 @@ onMounted(() => {
 </script>
 
 <style scoped>
-@import "Style/index.css";
+@import "style/index.css";
 </style>
