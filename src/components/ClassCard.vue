@@ -1,7 +1,9 @@
 <script lang="ts">
 import {Dayjs} from "dayjs";
+import {ElMessageBox} from "element-plus";
 
 export default {}
+
 export interface ClassInfo {
   classIndex: number
   className: string
@@ -179,12 +181,37 @@ const simulateSignOut = async () => {
   const now = dayjs();
   const endTime = info.value.endTime;
 
-  // 使用当前本地时间作为签退时间 - 格式为 HH:mm
-  const signOutTime = now.format('HH:mm');
-
   // 签退类型：根据当前时间判断是否为早退
   // 1 = 早退，2 = 正常
   const signOutType = now.isBefore(endTime) ? 1 : 2;
+
+  // 如果是早退，弹窗确认
+  if (signOutType === 1) {
+    try {
+      await ElMessageBox.confirm(
+          `当前时间: ${now.format('HH:mm')}，课程结束时间: ${endTime.format('HH:mm')}<br\>您确定要在课程结束前签退吗？<br\>这将记录为早退。`,
+
+          '⚠️ 早退提醒',
+          {
+            confirmButtonText: '确定签退',
+            cancelButtonText: '取消',
+            dangerouslyUseHTMLString: true,
+            type: 'warning',
+          }
+      );
+    } catch (error) {
+      // 用户取消了早退签退，这是正常的用户操作
+      if (error === 'cancel') {
+        console.log('用户取消了早退签退');
+      } else {
+        console.error('确认对话框发生错误:', error);
+      }
+      return;
+    }
+  }
+
+  // 使用当前本地时间作为签退时间 - 格式为 HH:mm
+  const signOutTime = now.format('HH:mm');
 
   // 格式化u_begin_time为 "YYYY-MM-DD HH:mm:ss" 字符串
   const formattedBeginTime = info.value.signInTime.format('YYYY-MM-DD HH:mm:ss');
@@ -267,8 +294,8 @@ const simulateSignOut = async () => {
     <div class="class-container">
       <div class="class-header">
         <div class="class-title">
-          <span class="class-index">第{{info.classIndex}}节</span>
-          <span class="class-name">{{info.className}}</span>
+          <span class="class-index">第{{ info.classIndex }}节</span>
+          <span class="class-name">{{ info.className }}</span>
         </div>
         <div class="status-tag">
           <el-tag
@@ -285,18 +312,18 @@ const simulateSignOut = async () => {
       <div class="class-content">
         <div class="info-row-compact">
           <span class="info-item-inline">
-            <el-icon class="info-icon" :color="'#667eea'"><Clock /></el-icon>
-            {{info.startTime.format("HH:mm")}} - {{info.endTime.format("HH:mm")}}
+            <el-icon :color="'#667eea'" class="info-icon"><Clock/></el-icon>
+            {{ info.startTime.format("HH:mm") }} - {{ info.endTime.format("HH:mm") }}
           </span>
           <span class="divider-inline">|</span>
           <span class="info-item-inline">
-            <el-icon class="info-icon" :color="'#f093fb'"><Location /></el-icon>
-            {{info.classRoom}}
+            <el-icon :color="'#f093fb'" class="info-icon"><Location/></el-icon>
+            {{ info.classRoom }}
           </span>
           <span class="divider-inline">|</span>
           <span class="info-item-inline">
-            <el-icon class="info-icon" :color="'#4facfe'"><User /></el-icon>
-            {{info.teacher.name}}
+            <el-icon :color="'#4facfe'" class="info-icon"><User/></el-icon>
+            {{ info.teacher.name }}
           </span>
         </div>
 
@@ -305,11 +332,15 @@ const simulateSignOut = async () => {
         <!-- Sign In/Out Section - More Compact -->
         <div class="sign-info">
           <div class="sign-row" v-if="info.signInTime">
-            <el-icon class="sign-icon" :color="'#00d2ff'"><CircleCheck /></el-icon>
-            <span class="sign-text">签到: {{info.signInTime.format("HH:mm:ss")}}</span>
+            <el-icon :color="'#00d2ff'" class="sign-icon">
+              <CircleCheck/>
+            </el-icon>
+            <span class="sign-text">签到: {{ info.signInTime.format("HH:mm:ss") }}</span>
           </div>
           <div class="sign-row" v-else-if="shouldShowSignInSelector">
-            <el-icon class="sign-icon" :color="'#f093fb'"><CircleClose /></el-icon>
+            <el-icon :color="'#f093fb'" class="sign-icon">
+              <CircleClose/>
+            </el-icon>
             <span class="sign-label">签到:</span>
             <el-time-select
                 v-model="selectedSignInTime"
@@ -331,7 +362,9 @@ const simulateSignOut = async () => {
             </el-button>
           </div>
           <div class="sign-row" v-else>
-            <el-icon class="sign-icon" :color="'#fa709a'"><CircleClose /></el-icon>
+            <el-icon :color="'#fa709a'" class="sign-icon">
+              <CircleClose/>
+            </el-icon>
             <span class="sign-text pending">未签到</span>
             <el-button
                 v-if="canShowSignInButton && !info.signInTime && info.situation !== '已请假' && info.situation !== '已旷课'"
@@ -347,11 +380,15 @@ const simulateSignOut = async () => {
 
         <div class="sign-info" v-if="info.signInTime">
           <div class="sign-row" v-if="info.signOutTime">
-            <el-icon class="sign-icon" :color="'#00d2ff'"><CircleCheck /></el-icon>
-            <span class="sign-text">签退: {{info.signOutTime.format("HH:mm:ss")}}</span>
+            <el-icon :color="'#00d2ff'" class="sign-icon">
+              <CircleCheck/>
+            </el-icon>
+            <span class="sign-text">签退: {{ info.signOutTime.format("HH:mm:ss") }}</span>
           </div>
           <div class="sign-row" v-else>
-            <el-icon class="sign-icon" :color="'#fa709a'"><CircleClose /></el-icon>
+            <el-icon :color="'#fa709a'" class="sign-icon">
+              <CircleClose/>
+            </el-icon>
             <span class="sign-text pending">待签退</span>
             <el-button
                 v-if="info.situation !== '已请假' && info.situation !== '已旷课'"
