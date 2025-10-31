@@ -200,6 +200,9 @@ const simulateSignOut = async () => {
   // 签退类型：始终为2（正常）
   const signOutType = 2;
   
+  // 格式化u_begin_time为 "YYYY-MM-DD HH:mm:ss" 字符串
+  const formattedBeginTime = info.value.signInTime.format('YYYY-MM-DD HH:mm:ss');
+  
   // 构建签退参数
   const signOutParams = {
     userKey: userInfo.value.token,
@@ -217,7 +220,7 @@ const simulateSignOut = async () => {
     reviewscore: 10,
     reviewcontent: "好",
     sign_in_type: "2",
-    u_begin_time: info.value.signInTime.toDate(),  // 转换为Date对象
+    u_begin_time: formattedBeginTime as any,  // 使用格式化字符串，类型断言为any以绕过类型检查
     before_class_over_time: endTime.format('HH:mm'),  // 下课时间
     late_time_length: 0,
     late_num: 0
@@ -238,7 +241,7 @@ const simulateSignOut = async () => {
   console.log(`  pk_anlaxy_syllabus_user: ${signOutParams.pk_anlaxy_syllabus_user}`);
   console.log(`  sign_out_type: ${signOutParams.sign_out_type} (正常)`);
   console.log(`  u_end_time: ${signOutParams.u_end_time} (格式: HH:mm)`);
-  console.log(`  u_begin_time: ${info.value.signInTime.format('YYYY-MM-DD HH:mm:ss')} (格式: YYYY-MM-DD HH:mm:ss)`);
+  console.log(`  u_begin_time: ${signOutParams.u_begin_time} (格式: YYYY-MM-DD HH:mm:ss)`);
   console.log(`  before_class_over_time: ${signOutParams.before_class_over_time} (下课时间)`);
   console.log(`  phone_code: ${signOutParams.phone_code}`);
   console.log(`  reviewcontent: ${signOutParams.reviewcontent}`);
