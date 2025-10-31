@@ -3,16 +3,17 @@
     <el-container>
       <el-header>
         <div class="header">
-          <div class="headerTitle">
-            账户总览
-          </div>
           <div class="loginTime">
             登陆时间 {{ getLoginTime() }}
           </div>
           <div class="logBtn">
+            <h5>正式功能</h5>
             <el-button @click="DevHomeTest">课程签到签退页面</el-button>
             <el-button @click="logout">退出登录</el-button>
+            <h5>测试功能</h5>
             <el-button @click="logoutTest">测试退出</el-button>
+            <br>
+            <h5>测试按钮</h5>
             <el-button @click="classListTest">课程表测试 [开发者模式]</el-button>
             <el-button @click="AttendanceListTest">考勤查询测试 [开发者模式]</el-button>
             <el-button @click="LeaveListTest">请假页面测试 [开发者模式]</el-button>
@@ -20,12 +21,9 @@
         </div>
       </el-header>
       <el-main>
-        <span>钱包余额：￥55.55</span>
-        <span>E2南217空调余额：￥99.99</span>
-        <span>个人付款码：显示二维码</span>
+
       </el-main>
       <el-footer>
-        课程表列表
       </el-footer>
     </el-container>
   </div>
