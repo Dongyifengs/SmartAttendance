@@ -28,7 +28,7 @@ import {Clock, Location, User, CircleClose, CircleCheck} from "@element-plus/ico
 import {ref, computed, watch} from "vue";
 import dayjs from "dayjs";
 import {getZHKQUserInfo} from '@/API/zhkqAPI/Function/Function';
-import {ZHKQ_SignIn, ZHKQ_SignOut} from '@/API/zhkqAPI/index';
+import {ZHKQ_SignIn} from '@/API/zhkqAPI/index';
 
 const info = defineModel<ClassInfo>({required: true});
 const selectedSignInTime = ref<string>("");
@@ -46,7 +46,8 @@ const shouldShowSignInSelector = computed(() => {
 });
 
 const shouldShowSignOutSelector = computed(() => {
-  return (info.value.situation === "早退" || displayStatus.value === "早退") && !info.value.signOutTime;
+  // Always show sign-out selector when signed in but not signed out
+  return info.value.signInTime && !info.value.signOutTime;
 });
 
 // Set default sign-in time when in late status
@@ -58,11 +59,11 @@ watch(shouldShowSignInSelector, (newVal) => {
   }
 }, { immediate: true });
 
-// Set default sign-out time when in early leave status
-watch(shouldShowSignOutSelector, (newVal) => {
-  if (newVal && !selectedSignOutTime.value) {
-    // Default to 9 minutes after class end
-    const defaultTime = info.value.endTime.add(9, 'minute');
+// Set default sign-out time - always set to 1 minute after class end
+watch(() => info.value.signInTime, (newVal) => {
+  if (newVal && !selectedSignOutTime.value && !info.value.signOutTime) {
+    // Default to 1 minute after class end
+    const defaultTime = info.value.endTime.add(1, 'minute');
     selectedSignOutTime.value = defaultTime.format('HH:mm');
   }
 }, { immediate: true });
@@ -175,40 +176,32 @@ const simulateSignIn = async () => {
   }
 };
 
-// 签退函数 - 实际调用API
-const simulateSignOut = async () => {
+// 签退函数 - 模拟调用（只打印参数，不真正调用API）
+const simulateSignOut = () => {
   if (!userInfo.value || !info.value.pk_anlaxy_syllabus_user || !info.value.signInTime) {
     console.error('❌ 缺少必要的签退信息或未签到');
     alert('❌ 缺少必要的签退信息或未签到');
     return;
   }
 
-  const now = dayjs();
   const endTime = info.value.endTime;
   
-  // 获取签退时间
+  // 获取签退时间 - 格式为 HH:mm
   let signOutTime: string;
-  const isCurrentlyEarly = now.isBefore(endTime);
-  
-  if (isCurrentlyEarly && selectedSignOutTime.value) {
-    // 如果是早退且用户选择了时间，使用选择的时间
-    signOutTime = `${info.value.lessonDate} ${selectedSignOutTime.value}:00`;
-  } else if (isCurrentlyEarly && !selectedSignOutTime.value) {
-    // 如果是早退但没有选择时间，默认使用课程结束后9分钟
-    const defaultSignOutTime = endTime.add(9, 'minute');
-    signOutTime = defaultSignOutTime.format('YYYY-MM-DD HH:mm:ss');
+  if (selectedSignOutTime.value) {
+    // 如果用户选择了时间，使用选择的时间
+    signOutTime = selectedSignOutTime.value;
   } else {
-    // 正常情况使用当前时间
-    signOutTime = now.format('YYYY-MM-DD HH:mm:ss');
+    // 默认使用课程结束后1分钟
+    const defaultSignOutTime = endTime.add(1, 'minute');
+    signOutTime = defaultSignOutTime.format('HH:mm');
   }
   
   // 签退类型：始终为2（正常）
   const signOutType = 2;
-  const actualSignOutTime = dayjs(signOutTime);
-  const isEarlyLeave = actualSignOutTime.isBefore(endTime);
   
-  // 计算早退时长（分钟）
-  const leaveAgoTimeLength = isEarlyLeave ? Math.max(0, endTime.diff(actualSignOutTime, 'minute')) : 0;
+  // 格式化u_begin_time为 "YYYY-MM-DD HH:mm:ss" 格式
+  const formattedBeginTime = info.value.signInTime.format('YYYY-MM-DD HH:mm:ss');
   
   // 构建签退参数
   const signOutParams = {
@@ -216,7 +209,7 @@ const simulateSignOut = async () => {
     pk_anlaxy_syllabus_user: info.value.pk_anlaxy_syllabus_user,
     phone_code: userInfo.value.client_id || '',
     sign_out_type: signOutType,
-    u_end_time: signOutTime,
+    u_end_time: signOutTime,  // 格式: "HH:mm"
     lesson_change_list: info.value.pk_anlaxy_syllabus_user,
     lesson_change_type: "0",
     ask_leave_num: 0,
@@ -225,17 +218,17 @@ const simulateSignOut = async () => {
     in_longitude: "0",
     in_latitude: "0",
     reviewscore: 10,
-    reviewcontent: "",
+    reviewcontent: "好",
     sign_in_type: "2",
-    u_begin_time: info.value.signInTime.toDate(),
-    before_class_over_time: info.value.shouldSignOutTime.format('HH:mm'),
+    u_begin_time: formattedBeginTime,  // 格式: "YYYY-MM-DD HH:mm:ss"
+    before_class_over_time: endTime.format('HH:mm'),  // 下课时间
     late_time_length: 0,
     late_num: 0
   };
 
   // 在控制台打印签退参数
   console.log('============================================');
-  console.log('📋 签退 - ZHKQ_SignOut 参数');
+  console.log('📋 模拟签退 - ZHKQ_SignOut 参数预览');
   console.log('============================================');
   console.log('课程信息:');
   console.log(`  课程名称: ${info.value.className}`);
@@ -247,36 +240,21 @@ const simulateSignOut = async () => {
   console.log(`  userKey: ${signOutParams.userKey}`);
   console.log(`  pk_anlaxy_syllabus_user: ${signOutParams.pk_anlaxy_syllabus_user}`);
   console.log(`  sign_out_type: ${signOutParams.sign_out_type} (正常)`);
-  console.log(`  u_end_time: ${signOutParams.u_end_time}`);
-  console.log(`  u_begin_time: ${info.value.signInTime.format('YYYY-MM-DD HH:mm:ss')}`);
+  console.log(`  u_end_time: ${signOutParams.u_end_time} (格式: HH:mm)`);
+  console.log(`  u_begin_time: ${signOutParams.u_begin_time} (格式: YYYY-MM-DD HH:mm:ss)`);
+  console.log(`  before_class_over_time: ${signOutParams.before_class_over_time} (下课时间)`);
   console.log(`  phone_code: ${signOutParams.phone_code}`);
-  console.log(`  早退时长: ${leaveAgoTimeLength} 分钟`);
+  console.log(`  reviewcontent: ${signOutParams.reviewcontent}`);
+  console.log(`  reviewscore: ${signOutParams.reviewscore}`);
   console.log('--------------------------------------------');
   console.log('完整参数对象:');
   console.log(signOutParams);
   console.log('============================================');
+  console.log('ℹ️ 注意: 这是模拟调用，未真正执行签退操作');
+  console.log('============================================');
   
-  try {
-    // 调用真实的签退API
-    console.log('🚀 正在调用签退API...');
-    const response = await ZHKQ_SignOut(signOutParams);
-    console.log('✅ 签退API响应:');
-    console.log(response);
-    console.log('============================================');
-    
-    // 检查响应状态
-    if (response.state === '1') {
-      alert(`✅ 签退成功！\n\n课程: ${info.value.className}\n签退时间: ${signOutTime}\n状态: 正常签退`);
-      // 刷新页面以更新签退状态
-      window.location.reload();
-    } else {
-      alert(`⚠️ 签退失败\n\nstate: ${response.state}\nsing_result: ${response.sing_result}`);
-      console.error('签退失败:', response);
-    }
-  } catch (error) {
-    console.error('❌ 签退API调用失败:', error);
-    alert(`❌ 签退失败\n\n网络错误或服务器异常`);
-  }
+  // 提示用户
+  alert(`✅ 签退参数已在控制台打印\n\n课程: ${info.value.className}\n签退时间: ${signOutTime}\n状态: 模拟签退`);
 };
 
 </script>
@@ -384,21 +362,9 @@ const simulateSignOut = async () => {
               size="small" 
               @click="simulateSignOut"
               class="sign-button"
+              v-if="info.situation !== '已请假' && info.situation !== '已旷课'"
             >
-              签退
-            </el-button>
-          </div>
-          <div class="sign-row" v-else>
-            <el-icon class="sign-icon" :color="'#fa709a'"><CircleClose /></el-icon>
-            <span class="sign-text pending">待签退</span>
-            <el-button 
-              type="success" 
-              size="small" 
-              @click="simulateSignOut"
-              class="sign-button"
-              v-if="!info.signOutTime && info.situation !== '已请假' && info.situation !== '已旷课'"
-            >
-              签退
+              模拟签退
             </el-button>
           </div>
         </div>
