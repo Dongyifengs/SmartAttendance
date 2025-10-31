@@ -197,8 +197,12 @@ const simulateSignOut = async () => {
         }
       );
     } catch (error) {
-      // 用户点击取消
-      console.log('用户取消了早退签退');
+      // 用户取消了早退签退，这是正常的用户操作
+      if (error === 'cancel') {
+        console.log('用户取消了早退签退');
+      } else {
+        console.error('确认对话框发生错误:', error);
+      }
       return;
     }
   }
