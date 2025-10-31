@@ -116,16 +116,16 @@ export default defineConfig(({ mode }) => {
             // 在生产环境下，将编译信息注入到环境变量中
             'import.meta.env.VITE_BUILD_DATE': mode === 'production' 
                 ? JSON.stringify(getBuildDate())
-                : JSON.stringify(''),
+                : JSON.stringify('开发环境'),
             'import.meta.env.VITE_BUILD_TIMESTAMP': mode === 'production' 
                 ? JSON.stringify(getBuildTimestamp())
                 : JSON.stringify('开发环境'),
             'import.meta.env.VITE_GIT_HASH': mode === 'production' 
                 ? JSON.stringify(getGitHash())
-                : JSON.stringify('dev'),
+                : JSON.stringify('开发中'),
             'import.meta.env.VITE_GIT_FULL_HASH': mode === 'production' 
                 ? JSON.stringify(getFullGitHash())
-                : JSON.stringify('unknown'),
+                : JSON.stringify('开发中'),
             'import.meta.env.VITE_COMMIT_MESSAGE': mode === 'production' 
                 ? JSON.stringify(getCommitMessage())
                 : JSON.stringify('开发环境构建'),

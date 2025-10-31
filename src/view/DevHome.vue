@@ -14,14 +14,12 @@
         >
           编译时间：{{ buildTimestamp }}
         </span>
-        <a 
-          :href="getCommitUrl()" 
-          target="_blank" 
+        <span 
           class="hash-link"
-          @click.prevent="handleHashClick"
+          @click="handleHashClick"
         >
           {{ gitHash }}
-        </a>
+        </span>
       </div>
       <div>
         <el-button @click="logOut">退出登录</el-button>
@@ -74,7 +72,7 @@
 <script lang="ts" setup>
 import dayjs from 'dayjs';
 import type {ClassInfo} from '@/components/ClassCard.vue';
-import {computed, onMounted, ref} from 'vue';
+import {computed, onMounted, onUnmounted, ref} from 'vue';
 import ClassContainer from '@/components/ClassContainer.vue';
 import {ZHKQ_GetDayCourseList, ZHKQ_GetDaySignList} from '@/api/anlaxy/index.ts';
 import {getZHKQUserInfo} from '@/api/anlaxy/utils';
@@ -96,8 +94,8 @@ import {ElMessage} from 'element-plus';
 
   // 编译信息
   const buildTimestamp = ref(import.meta.env.VITE_BUILD_TIMESTAMP || '开发环境');
-  const gitHash = ref(import.meta.env.VITE_GIT_HASH || 'dev');
-  const gitFullHash = ref(import.meta.env.VITE_GIT_FULL_HASH || 'unknown');
+  const gitHash = ref(import.meta.env.VITE_GIT_HASH || '开发中');
+  const gitFullHash = ref(import.meta.env.VITE_GIT_FULL_HASH || '开发中');
   const commitMessage = ref(import.meta.env.VITE_COMMIT_MESSAGE || '开发环境构建');
   const githubRepo = ref(import.meta.env.VITE_GITHUB_REPO || 'https://github.com/Dongyifengs/SmartAttendance');
 
@@ -107,7 +105,7 @@ import {ElMessage} from 'element-plus';
 
   // 获取 GitHub 提交链接
   const getCommitUrl = () => {
-    if (gitFullHash.value && gitFullHash.value !== 'unknown') {
+    if (gitFullHash.value && gitFullHash.value !== '开发中') {
       return `${githubRepo.value}/commit/${gitFullHash.value}`;
     }
     return '#';
@@ -152,6 +150,14 @@ import {ElMessage} from 'element-plus';
     localStorage.clear()
     router.push('/');
   }
+
+  // 清理定时器
+  onUnmounted(() => {
+    if (longPressTimer.value !== null) {
+      clearTimeout(longPressTimer.value);
+      longPressTimer.value = null;
+    }
+  });
 
   /**
    * 计算属性：清理设备 ID
