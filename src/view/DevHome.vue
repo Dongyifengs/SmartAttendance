@@ -74,7 +74,7 @@ import dayjs from 'dayjs';
 import type {ClassInfo} from '@/components/ClassCard.vue';
 import {computed, onMounted, onUnmounted, ref} from 'vue';
 import ClassContainer from '@/components/ClassContainer.vue';
-import {ZHKQ_GetDayCourseList, ZHKQ_GetDaySignList} from '@/api/anlaxy/index.ts';
+import {ZHKQ_GetDayCourseList, ZHKQ_GetDaySignList} from '@/api/anlaxy';
 import {getZHKQUserInfo} from '@/api/anlaxy/utils';
 import type {CourseList, SignListInfo} from '@/api/anlaxy/type/response';
 import router from "@/router";
