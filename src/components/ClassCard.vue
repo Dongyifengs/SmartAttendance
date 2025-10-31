@@ -179,12 +179,27 @@ const simulateSignOut = async () => {
   const now = dayjs();
   const endTime = info.value.endTime;
 
-  // 使用当前本地时间作为签退时间 - 格式为 HH:mm
-  const signOutTime = now.format('HH:mm');
-
   // 签退类型：根据当前时间判断是否为早退
   // 1 = 早退，2 = 正常
   const signOutType = now.isBefore(endTime) ? 1 : 2;
+
+  // 如果是早退，弹窗确认
+  if (signOutType === 1) {
+    const confirmEarlySignOut = confirm(
+      `⚠️ 早退提醒\n\n` +
+      `当前时间: ${now.format('HH:mm')}\n` +
+      `课程结束时间: ${endTime.format('HH:mm')}\n\n` +
+      `您确定要在课程结束前签退吗？这将记录为早退。`
+    );
+    
+    if (!confirmEarlySignOut) {
+      console.log('用户取消了早退签退');
+      return;
+    }
+  }
+
+  // 使用当前本地时间作为签退时间 - 格式为 HH:mm
+  const signOutTime = now.format('HH:mm');
 
   // 格式化u_begin_time为 "YYYY-MM-DD HH:mm:ss" 字符串
   const formattedBeginTime = info.value.signInTime.format('YYYY-MM-DD HH:mm:ss');
