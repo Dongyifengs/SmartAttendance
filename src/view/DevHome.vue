@@ -1,4 +1,45 @@
-<script setup lang="ts">
+<template>
+  <div v-loading="loading" class="dev-home-container" element-loading-text="加载课程中...">
+    <!-- 用户信息卡 - 紧凑版 -->
+    <div class="user-info-card" v-if="userInfo">
+      <div class="user-info-header">
+        <h3>个人信息</h3>
+      </div>
+      <div class="user-info-content">
+        <div class="info-line">
+          <span class="info-text">姓名: {{ userInfo.user_name }}</span>
+          <span class="divider">|</span>
+          <span class="info-text">{{ userInfo.birthday || "未设置生日" }}</span>
+          <span class="divider">|</span>
+          <span class="info-text">学号: {{ userInfo.user_code }}</span>
+        </div>
+        <div class="info-line">
+          <span class="info-text">签到日期: {{ todayString }}</span>
+          <span class="divider">|</span>
+          <span class="info-text">设备ID: {{ cleanDeviceId }}</span>
+        </div>
+        <div class="info-line">
+          <span class="info-text">[预留]钱包余额: </span>
+          <span class="divider">|</span>
+          <span class="info-text">[预留]空调余额:</span>
+          <span class="divider">|</span>
+          <span class="info-text">[预留]个人付款码:</span>
+          <span class="divider">|</span>
+          <span class="info-text">[预留]最新消费:</span>
+          <span class="divider">|</span>
+          <span class="info-text">[预留]空调余额:</span>
+          <span class="divider">|</span>
+          <span class="info-text">[预留]用水预约:</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 课程列表 -->
+    <class-container v-model="data"></class-container>
+  </div>
+</template>
+
+<script lang="ts" setup>
 import dayjs from "dayjs";
 import type {ClassInfo} from "@/components/ClassCard.vue";
 import {computed, onMounted, ref} from "vue";
@@ -128,46 +169,6 @@ onMounted(async () => {
 
 </script>
 
-<template>
-  <div v-loading="loading" class="dev-home-container" element-loading-text="加载课程中...">
-    <!-- 用户信息卡 - 紧凑版 -->
-    <div class="user-info-card" v-if="userInfo">
-      <div class="user-info-header">
-        <h3>个人信息</h3>
-      </div>
-      <div class="user-info-content">
-        <div class="info-line">
-          <span class="info-text">姓名: {{ userInfo.user_name }}</span>
-          <span class="divider">|</span>
-          <span class="info-text">{{ userInfo.birthday || "未设置生日" }}</span>
-          <span class="divider">|</span>
-          <span class="info-text">学号: {{ userInfo.user_code }}</span>
-        </div>
-        <div class="info-line">
-          <span class="info-text">签到日期: {{ todayString }}</span>
-          <span class="divider">|</span>
-          <span class="info-text">设备ID: {{ cleanDeviceId }}</span>
-        </div>
-        <div class="info-line">
-          <span class="info-text">[预留]钱包余额: </span>
-          <span class="divider">|</span>
-          <span class="info-text">[预留]空调余额:</span>
-          <span class="divider">|</span>
-          <span class="info-text">[预留]个人付款码:</span>
-          <span class="divider">|</span>
-          <span class="info-text">[预留]最新消费:</span>
-          <span class="divider">|</span>
-          <span class="info-text">[预留]空调余额:</span>
-          <span class="divider">|</span>
-          <span class="info-text">[预留]用水预约:</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- 课程列表 -->
-    <class-container v-model="data"></class-container>
-  </div>
-</template>
 
 <style scoped>
 .dev-home-container {
