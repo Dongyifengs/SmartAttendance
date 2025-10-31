@@ -179,17 +179,12 @@ const simulateSignOut = async () => {
   const now = dayjs();
   const endTime = info.value.endTime;
 
-  // 检查课程是否已结束
-  if (now.isBefore(endTime)) {
-    alert(`⚠️ 课程尚未结束\n\n当前时间: ${now.format('HH:mm')}\n下课时间: ${endTime.format('HH:mm')}\n\n请在课程结束后再进行签退`);
-    return;
-  }
-
   // 使用当前本地时间作为签退时间 - 格式为 HH:mm
   const signOutTime = now.format('HH:mm');
 
-  // 签退类型：始终为2（正常）
-  const signOutType = 2;
+  // 签退类型：根据当前时间判断是否为早退
+  // 1 = 早退，2 = 正常
+  const signOutType = now.isBefore(endTime) ? 1 : 2;
 
   // 格式化u_begin_time为 "YYYY-MM-DD HH:mm:ss" 字符串
   const formattedBeginTime = info.value.signInTime.format('YYYY-MM-DD HH:mm:ss');
@@ -230,7 +225,7 @@ const simulateSignOut = async () => {
   console.log('签退参数:');
   console.log(`  userKey: ${signOutParams.userKey}`);
   console.log(`  pk_anlaxy_syllabus_user: ${signOutParams.pk_anlaxy_syllabus_user}`);
-  console.log(`  sign_out_type: ${signOutParams.sign_out_type} (正常)`);
+  console.log(`  sign_out_type: ${signOutParams.sign_out_type} (${signOutParams.sign_out_type === 1 ? '早退' : '正常'})`);
   console.log(`  u_end_time: ${signOutParams.u_end_time} (格式: HH:mm - 当前时间)`);
   console.log(`  u_begin_time: ${signOutParams.u_begin_time} (格式: YYYY-MM-DD HH:mm:ss)`);
   console.log(`  before_class_over_time: ${signOutParams.before_class_over_time} (下课时间)`);
@@ -252,7 +247,8 @@ const simulateSignOut = async () => {
 
     // 检查响应状态
     if (response.state === '1') {
-      alert(`✅ 签退成功！\n\n课程: ${info.value.className}\n签退时间: ${signOutTime}\n状态: 正常签退`);
+      const statusText = signOutType === 1 ? '早退' : '正常签退';
+      alert(`✅ 签退成功！\n\n课程: ${info.value.className}\n签退时间: ${signOutTime}\n状态: ${statusText}`);
       // 刷新页面以更新签退状态
       window.location.reload();
     } else {
