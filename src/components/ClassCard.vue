@@ -26,6 +26,7 @@ export interface ClassInfo {
 <script setup lang="ts">
 import {Clock, Location, User, CircleClose, CircleCheck} from "@element-plus/icons-vue";
 import {ref, computed, watch} from "vue";
+import {ElMessageBox} from "element-plus";
 import dayjs from "dayjs";
 import {getZHKQUserInfo} from '@/API/zhkqAPI/Function/Function';
 import {ZHKQ_SignIn, ZHKQ_SignOut} from '@/API/zhkqAPI/index';
@@ -185,14 +186,18 @@ const simulateSignOut = async () => {
 
   // 如果是早退，弹窗确认
   if (signOutType === 1) {
-    const confirmEarlySignOut = confirm(
-      `⚠️ 早退提醒\n\n` +
-      `当前时间: ${now.format('HH:mm')}\n` +
-      `课程结束时间: ${endTime.format('HH:mm')}\n\n` +
-      `您确定要在课程结束前签退吗？这将记录为早退。`
-    );
-    
-    if (!confirmEarlySignOut) {
+    try {
+      await ElMessageBox.confirm(
+        `当前时间: ${now.format('HH:mm')}\n课程结束时间: ${endTime.format('HH:mm')}\n\n您确定要在课程结束前签退吗？这将记录为早退。`,
+        '⚠️ 早退提醒',
+        {
+          confirmButtonText: '确定签退',
+          cancelButtonText: '取消',
+          type: 'warning',
+        }
+      );
+    } catch (error) {
+      // 用户点击取消
       console.log('用户取消了早退签退');
       return;
     }
