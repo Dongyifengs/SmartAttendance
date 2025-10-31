@@ -28,6 +28,7 @@ import {Clock, Location, User, CircleClose, CircleCheck} from "@element-plus/ico
 import {ref, computed, watch} from "vue";
 import dayjs from "dayjs";
 import {getZHKQUserInfo} from '@/API/zhkqAPI/Function/Function';
+import {ZHKQ_SignIn} from '@/API/zhkqAPI/index';
 
 const info = defineModel<ClassInfo>({required: true});
 const selectedSignInTime = ref<string>("");
@@ -67,10 +68,11 @@ const tagType = computed(() => {
   return 'info';
 });
 
-// 模拟签到函数 - 只打印参数，不真正调用API
-const simulateSignIn = () => {
+// 签到函数 - 实际调用API
+const simulateSignIn = async () => {
   if (!userInfo.value || !info.value.pk_anlaxy_syllabus_user) {
     console.error('❌ 缺少必要的签到信息');
+    alert('❌ 缺少必要的签到信息');
     return;
   }
 
@@ -117,7 +119,7 @@ const simulateSignIn = () => {
 
   // 在控制台打印签到参数
   console.log('============================================');
-  console.log('📋 模拟签到 - ZHKQ_SignIn 参数预览');
+  console.log('📋 签到 - ZHKQ_SignIn 参数');
   console.log('============================================');
   console.log('课程信息:');
   console.log(`  课程名称: ${info.value.className}`);
@@ -140,11 +142,28 @@ const simulateSignIn = () => {
   console.log('完整参数对象:');
   console.log(signInParams);
   console.log('============================================');
-  console.log('ℹ️ 注意: 这是模拟调用，未真正执行签到操作');
-  console.log('============================================');
   
-  // 可以添加一个提示
-  alert(`✅ 签到参数已在控制台打印\n\n课程: ${info.value.className}\n签到时间: ${signInTime}\n状态: 正常签到`);
+  try {
+    // 调用真实的签到API
+    console.log('🚀 正在调用签到API...');
+    const response = await ZHKQ_SignIn(signInParams);
+    console.log('✅ 签到API响应:');
+    console.log(response);
+    console.log('============================================');
+    
+    // 检查响应状态
+    if (response.state === '1') {
+      alert(`✅ 签到成功！\n\n课程: ${info.value.className}\n签到时间: ${signInTime}\n状态: 正常签到`);
+      // 刷新页面以更新签到状态
+      window.location.reload();
+    } else {
+      alert(`⚠️ 签到失败\n\nstate: ${response.state}\nsing_result: ${response.sing_result}`);
+      console.error('签到失败:', response);
+    }
+  } catch (error) {
+    console.error('❌ 签到API调用失败:', error);
+    alert(`❌ 签到失败\n\n网络错误或服务器异常`);
+  }
 };
 
 </script>
@@ -212,7 +231,7 @@ const simulateSignIn = () => {
               @click="simulateSignIn"
               class="sign-button"
             >
-              模拟签到
+              签到
             </el-button>
           </div>
           <div class="sign-row" v-else>
@@ -225,7 +244,7 @@ const simulateSignIn = () => {
               class="sign-button"
               v-if="!info.signInTime && info.situation !== '已请假' && info.situation !== '已旷课'"
             >
-              模拟签到
+              签到
             </el-button>
           </div>
         </div>
