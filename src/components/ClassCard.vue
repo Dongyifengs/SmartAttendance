@@ -16,17 +16,23 @@ export interface ClassInfo {
   signOutTime: Dayjs | null
   shouldSignInTime: Dayjs
   shouldSignOutTime: Dayjs,
-  situation: "早退" | "迟到" | "缺勤" | "请假" | null
+  situation: "早退" | "迟到" | "已旷课" | "已请假" | null
   computedStatus?: "已签退" | "已签到" | "未签到" | "迟到" | "早退" | null
+  // 签到所需的额外字段
+  pk_anlaxy_syllabus_user?: string
+  lessonDate?: string
 }
 </script>
 <script setup lang="ts">
 import {Clock, Location, User, CircleClose, CircleCheck} from "@element-plus/icons-vue";
-import {ref, computed} from "vue";
+import {ref, computed, watch} from "vue";
+import dayjs from "dayjs";
+import {getZHKQUserInfo} from '@/API/zhkqAPI/Function/Function';
+import {ZHKQ_SignIn, ZHKQ_SignOut} from '@/API/zhkqAPI/index';
 
 const info = defineModel<ClassInfo>({required: true});
 const selectedSignInTime = ref<string>("");
-const selectedSignOutTime = ref<string>("");
+const userInfo = getZHKQUserInfo();
 
 // Determine the status to display
 const displayStatus = computed(() => {
@@ -34,23 +40,230 @@ const displayStatus = computed(() => {
 });
 
 // Check if we should show time selectors (for 迟到 or 早退)
+// Check if we can show sign-in button (30 minutes before class)
+const canShowSignInButton = computed(() => {
+  const now = dayjs();
+  const thirtyMinutesBeforeClass = info.value.startTime.subtract(30, 'minute');
+  return now.isAfter(thirtyMinutesBeforeClass) || now.isSame(thirtyMinutesBeforeClass);
+});
+
 const shouldShowSignInSelector = computed(() => {
   return (info.value.situation === "迟到" || displayStatus.value === "迟到") && !info.value.signInTime;
 });
 
-const shouldShowSignOutSelector = computed(() => {
-  return (info.value.situation === "早退" || displayStatus.value === "早退") && !info.value.signOutTime;
-});
+// Set default sign-in time when in late status
+watch(shouldShowSignInSelector, (newVal) => {
+  if (newVal && !selectedSignInTime.value) {
+    // Default to 9 minutes before class start
+    const defaultTime = info.value.startTime.subtract(9, 'minute');
+    selectedSignInTime.value = defaultTime.format('HH:mm');
+  }
+}, {immediate: true});
 
 // Compute tag type based on status
 const tagType = computed(() => {
-  if (info.value.situation === '缺勤') return 'danger';
+  if (info.value.situation === '已旷课') return 'danger';
   if (info.value.situation === '迟到' || info.value.situation === '早退') return 'warning';
-  if (info.value.situation === '请假') return 'info';
+  if (info.value.situation === '已请假') return 'info';
   if (displayStatus.value === '已签退') return 'success';
   if (displayStatus.value === '已签到') return 'primary';
   return 'info';
 });
+
+// 签到函数 - 实际调用API
+const simulateSignIn = async () => {
+  if (!userInfo.value || !info.value.pk_anlaxy_syllabus_user) {
+    console.error('❌ 缺少必要的签到信息');
+    alert('❌ 缺少必要的签到信息');
+    return;
+  }
+
+  const now = dayjs();
+  const startTime = info.value.startTime;
+
+  // 获取签到时间
+  let signInTime: string;
+  const isCurrentlyLate = now.isAfter(startTime);
+
+  if (isCurrentlyLate && selectedSignInTime.value) {
+    // 如果是迟到且用户选择了时间，使用选择的时间
+    signInTime = `${info.value.lessonDate} ${selectedSignInTime.value}:00`;
+  } else if (isCurrentlyLate && !selectedSignInTime.value) {
+    // 如果是迟到但没有选择时间，默认使用课程开始前9分钟
+    const defaultSignInTime = startTime.subtract(9, 'minute');
+    signInTime = defaultSignInTime.format('YYYY-MM-DD HH:mm:ss');
+  } else {
+    // 正常情况使用当前时间
+    signInTime = now.format('YYYY-MM-DD HH:mm:ss');
+  }
+
+  // 签到类型：始终为2（正常）
+  const signInType = 2;
+  const actualSignInTime = dayjs(signInTime);
+  const isLate = actualSignInTime.isAfter(startTime);
+
+  // 计算迟到时长（分钟）
+  const lateTimeLength = isLate ? Math.max(0, actualSignInTime.diff(startTime, 'minute')) : 0;
+
+  // 构建签到参数
+  const signInParams = {
+    userKey: userInfo.value.token,
+    pk_anlaxy_syllabus_user: info.value.pk_anlaxy_syllabus_user,
+    sign_in_type: signInType,
+    u_begin_time: signInTime,
+    late_time_length: lateTimeLength,
+    late_num: isLate ? 1 : 0,
+    ask_leave_num: 0,
+    in_longitude: 0,
+    in_latitude: 0,
+    phone_code: userInfo.value.client_id || ''
+  };
+
+  // 在控制台打印签到参数
+  console.log('============================================');
+  console.log('📋 签到 - ZHKQ_SignIn 参数');
+  console.log('============================================');
+  console.log('课程信息:');
+  console.log(`  课程名称: ${info.value.className}`);
+  console.log(`  课程时间: ${info.value.startTime.format('YYYY-MM-DD HH:mm')} - ${info.value.endTime.format('HH:mm')}`);
+  console.log(`  教室: ${info.value.classRoom}`);
+  console.log(`  教师: ${info.value.teacher.name}`);
+  console.log('--------------------------------------------');
+  console.log('签到参数:');
+  console.log(`  userKey: ${signInParams.userKey}`);
+  console.log(`  pk_anlaxy_syllabus_user: ${signInParams.pk_anlaxy_syllabus_user}`);
+  console.log(`  sign_in_type: ${signInParams.sign_in_type} (正常)`);
+  console.log(`  u_begin_time: ${signInParams.u_begin_time}`);
+  console.log(`  late_time_length: ${signInParams.late_time_length} 分钟`);
+  console.log(`  late_num: ${signInParams.late_num}`);
+  console.log(`  ask_leave_num: ${signInParams.ask_leave_num}`);
+  console.log(`  in_longitude: ${signInParams.in_longitude}`);
+  console.log(`  in_latitude: ${signInParams.in_latitude}`);
+  console.log(`  phone_code: ${signInParams.phone_code}`);
+  console.log('--------------------------------------------');
+  console.log('完整参数对象:');
+  console.log(signInParams);
+  console.log('============================================');
+
+  try {
+    // 调用真实的签到API
+    console.log('🚀 正在调用签到API...');
+    const response = await ZHKQ_SignIn(signInParams);
+    console.log('✅ 签到API响应:');
+    console.log(response);
+    console.log('============================================');
+
+    // 检查响应状态
+    if (response.state === '1') {
+      alert(`✅ 签到成功！\n\n课程: ${info.value.className}\n签到时间: ${signInTime}\n状态: 正常签到`);
+      // 刷新页面以更新签到状态
+      window.location.reload();
+    } else {
+      alert(`⚠️ 签到失败\n\nstate: ${response.state}\nsing_result: ${response.sing_result}`);
+      console.error('签到失败:', response);
+    }
+  } catch (error) {
+    console.error('❌ 签到API调用失败:', error);
+    alert(`❌ 签到失败\n\n网络错误或服务器异常`);
+  }
+};
+
+// 签退函数 - 实际调用API
+const simulateSignOut = async () => {
+  if (!userInfo.value || !info.value.pk_anlaxy_syllabus_user || !info.value.signInTime) {
+    console.error('❌ 缺少必要的签退信息或未签到');
+    alert('❌ 缺少必要的签退信息或未签到');
+    return;
+  }
+
+  const now = dayjs();
+  const endTime = info.value.endTime;
+
+  // 检查课程是否已结束
+  if (now.isBefore(endTime)) {
+    alert(`⚠️ 课程尚未结束\n\n当前时间: ${now.format('HH:mm')}\n下课时间: ${endTime.format('HH:mm')}\n\n请在课程结束后再进行签退`);
+    return;
+  }
+
+  // 使用当前本地时间作为签退时间 - 格式为 HH:mm
+  const signOutTime = now.format('HH:mm');
+
+  // 签退类型：始终为2（正常）
+  const signOutType = 2;
+
+  // 格式化u_begin_time为 "YYYY-MM-DD HH:mm:ss" 字符串
+  const formattedBeginTime = info.value.signInTime.format('YYYY-MM-DD HH:mm:ss');
+
+  // 构建签退参数
+  const signOutParams = {
+    userKey: userInfo.value.token,
+    pk_anlaxy_syllabus_user: info.value.pk_anlaxy_syllabus_user,
+    phone_code: userInfo.value.client_id || '',
+    sign_out_type: signOutType,
+    u_end_time: signOutTime,  // 格式: "HH:mm" - 使用当前时间
+    lesson_change_list: info.value.pk_anlaxy_syllabus_user,
+    lesson_change_type: "0",
+    ask_leave_num: 0,
+    out_longitude: 0,
+    out_latitude: 0,
+    in_longitude: "0",
+    in_latitude: "0",
+    reviewscore: 10,
+    reviewcontent: "好",
+    sign_in_type: "2",
+    u_begin_time: formattedBeginTime as any,  // 使用格式化字符串，类型断言为any以绕过类型检查
+    before_class_over_time: endTime.format('HH:mm'),  // 下课时间
+    late_time_length: 0,
+    late_num: 0
+  };
+
+  // 在控制台打印签退参数
+  console.log('============================================');
+  console.log('📋 签退 - ZHKQ_SignOut 参数');
+  console.log('============================================');
+  console.log('课程信息:');
+  console.log(`  课程名称: ${info.value.className}`);
+  console.log(`  课程时间: ${info.value.startTime.format('YYYY-MM-DD HH:mm')} - ${info.value.endTime.format('HH:mm')}`);
+  console.log(`  教室: ${info.value.classRoom}`);
+  console.log(`  教师: ${info.value.teacher.name}`);
+  console.log('--------------------------------------------');
+  console.log('签退参数:');
+  console.log(`  userKey: ${signOutParams.userKey}`);
+  console.log(`  pk_anlaxy_syllabus_user: ${signOutParams.pk_anlaxy_syllabus_user}`);
+  console.log(`  sign_out_type: ${signOutParams.sign_out_type} (正常)`);
+  console.log(`  u_end_time: ${signOutParams.u_end_time} (格式: HH:mm - 当前时间)`);
+  console.log(`  u_begin_time: ${signOutParams.u_begin_time} (格式: YYYY-MM-DD HH:mm:ss)`);
+  console.log(`  before_class_over_time: ${signOutParams.before_class_over_time} (下课时间)`);
+  console.log(`  phone_code: ${signOutParams.phone_code}`);
+  console.log(`  reviewcontent: ${signOutParams.reviewcontent}`);
+  console.log(`  reviewscore: ${signOutParams.reviewscore}`);
+  console.log('--------------------------------------------');
+  console.log('完整参数对象:');
+  console.log(signOutParams);
+  console.log('============================================');
+
+  try {
+    // 调用真实的签退API
+    console.log('🚀 正在调用签退API...');
+    const response = await ZHKQ_SignOut(signOutParams);
+    console.log('✅ 签退API响应:');
+    console.log(response);
+    console.log('============================================');
+
+    // 检查响应状态
+    if (response.state === '1') {
+      alert(`✅ 签退成功！\n\n课程: ${info.value.className}\n签退时间: ${signOutTime}\n状态: 正常签退`);
+      // 刷新页面以更新签退状态
+      window.location.reload();
+    } else {
+      alert(`⚠️ 签退失败\n\nstate: ${response.state}\nsing_result: ${response.sing_result}`);
+      console.error('签退失败:', response);
+    }
+  } catch (error) {
+    console.error('❌ 签退API调用失败:', error);
+    alert(`❌ 签退失败\n\n网络错误或服务器异常`);
+  }
+};
 
 </script>
 <template>
@@ -62,17 +275,17 @@ const tagType = computed(() => {
           <span class="class-name">{{info.className}}</span>
         </div>
         <div class="status-tag">
-          <el-tag 
-            :type="tagType"
-            effect="dark"
-            size="small"
-            round
+          <el-tag
+              :type="tagType"
+              effect="dark"
+              round
+              size="small"
           >
             {{ info.situation || displayStatus }}
           </el-tag>
         </div>
       </div>
-      
+
       <div class="class-content">
         <div class="info-row-compact">
           <span class="info-item-inline">
@@ -90,9 +303,9 @@ const tagType = computed(() => {
             {{info.teacher.name}}
           </span>
         </div>
-        
+
         <div class="divider"></div>
-        
+
         <!-- Sign In/Out Section - More Compact -->
         <div class="sign-info">
           <div class="sign-row" v-if="info.signInTime">
@@ -102,43 +315,57 @@ const tagType = computed(() => {
           <div class="sign-row" v-else-if="shouldShowSignInSelector">
             <el-icon class="sign-icon" :color="'#f093fb'"><CircleClose /></el-icon>
             <span class="sign-label">签到:</span>
-            <el-time-select 
-              size="small" 
-              v-model="selectedSignInTime" 
-              :start="info.shouldSignInTime.format('HH:mm')" 
-              step="00:01" 
-              :end="info.startTime.format('HH:mm')" 
-              placeholder="选择时间" 
-              class="time-selector"
+            <el-time-select
+                v-model="selectedSignInTime"
+                :end="info.startTime.format('HH:mm')"
+                :start="info.shouldSignInTime.format('HH:mm')"
+                class="time-selector"
+                placeholder="选择时间"
+                size="small"
+                step="00:01"
             />
+            <el-button
+                v-if="canShowSignInButton"
+                class="sign-button"
+                size="small"
+                type="primary"
+                @click="simulateSignIn"
+            >
+              签到
+            </el-button>
           </div>
           <div class="sign-row" v-else>
             <el-icon class="sign-icon" :color="'#fa709a'"><CircleClose /></el-icon>
             <span class="sign-text pending">未签到</span>
+            <el-button
+                v-if="canShowSignInButton && !info.signInTime && info.situation !== '已请假' && info.situation !== '已旷课'"
+                class="sign-button"
+                size="small"
+                type="primary"
+                @click="simulateSignIn"
+            >
+              签到
+            </el-button>
           </div>
         </div>
-        
+
         <div class="sign-info" v-if="info.signInTime">
           <div class="sign-row" v-if="info.signOutTime">
             <el-icon class="sign-icon" :color="'#00d2ff'"><CircleCheck /></el-icon>
             <span class="sign-text">签退: {{info.signOutTime.format("HH:mm:ss")}}</span>
           </div>
-          <div class="sign-row" v-else-if="shouldShowSignOutSelector">
-            <el-icon class="sign-icon" :color="'#f093fb'"><CircleClose /></el-icon>
-            <span class="sign-label">签退:</span>
-            <el-time-select 
-              size="small" 
-              v-model="selectedSignOutTime" 
-              :start="info.endTime.format('HH:mm')" 
-              step="00:01" 
-              :end="info.shouldSignOutTime.format('HH:mm')" 
-              placeholder="选择时间" 
-              class="time-selector"
-            />
-          </div>
           <div class="sign-row" v-else>
             <el-icon class="sign-icon" :color="'#fa709a'"><CircleClose /></el-icon>
             <span class="sign-text pending">待签退</span>
+            <el-button
+                v-if="info.situation !== '已请假' && info.situation !== '已旷课'"
+                class="sign-button"
+                size="small"
+                type="success"
+                @click="simulateSignOut"
+            >
+              签退
+            </el-button>
           </div>
         </div>
       </div>
@@ -314,28 +541,35 @@ const tagType = computed(() => {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
+.sign-button {
+  margin-left: auto;
+  border-radius: 8px;
+  font-size: 12px;
+  padding: 6px 12px;
+}
+
 @media (max-width: 768px) {
   .class-container {
     min-width: 260px;
     padding: 12px 14px;
     border-radius: 14px;
   }
-  
+
   .class-name {
     font-size: 15px;
   }
-  
+
   .info-row-compact {
     font-size: 12px;
     gap: 6px;
   }
-  
+
   .sign-row {
     padding: 5px 7px;
     font-size: 12px;
     flex-wrap: wrap;
   }
-  
+
   .time-selector {
     max-width: 100%;
     width: 100%;

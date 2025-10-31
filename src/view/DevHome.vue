@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import dayjs from "dayjs";
 import type {ClassInfo} from "@/components/ClassCard.vue";
-import {onMounted, ref, computed} from "vue";
+import {computed, onMounted, ref} from "vue";
 import ClassContainer from "@/components/ClassContainer.vue";
 import {ZHKQ_GetDayCourseList, ZHKQ_GetDaySignList} from "@/API/zhkqAPI/index.ts";
 import {getZHKQUserInfo} from '../API/zhkqAPI/Function/Function'
 
 const userInfo = getZHKQUserInfo();
 const data = ref<ClassInfo[]>([]);
+const loading = ref(true);
 const todayString = dayjs().format("YYYY-MM-DD")
 
 // Clean up device ID - remove uuid_ prefix and keep only first UUID if duplicated
@@ -22,18 +23,19 @@ const cleanDeviceId = computed(() => {
 
 // Calculate course status based on current time
 const calculateStatus = (course: any, signData: any): "已签退" | "已签到" | "未签到" | "迟到" | "早退" | null => {
+  const now = dayjs();
   const startTime = dayjs(`${course.lesson_date} ${course.begin_time}`);
   const endTime = dayjs(`${course.lesson_date} ${course.end_time}`);
-  
+
   const hasSignedIn = signData.u_begin_time && signData.u_begin_time !== "";
   const hasSignedOut = signData.u_end_time && signData.u_end_time !== "";
   const signInTime = hasSignedIn ? dayjs(signData.u_begin_time) : null;
   const signOutTime = hasSignedOut ? dayjs(signData.u_end_time) : null;
-  
+
   // Check for specific situations first
   if (signData.absent_num === "1") return null; // 缺勤 handled separately
   if (signData.ask_leave_num === "1") return null; // 请假 handled separately
-  
+
   // Check for late sign-in
   if (hasSignedIn && signInTime && signInTime.isAfter(startTime)) {
     if (hasSignedOut) {
@@ -45,22 +47,27 @@ const calculateStatus = (course: any, signData: any): "已签退" | "已签到" 
     }
     return "迟到";
   }
-  
+
   // Check for early leave
   if (hasSignedOut && signOutTime && signOutTime.isBefore(endTime)) {
     return "早退";
   }
-  
+
   // Normal flow
   if (hasSignedOut) return "已签退";
   if (hasSignedIn) return "已签到";
-  
+
+  // If not signed in yet and current time is after class start time, show as late
+  if (!hasSignedIn && now.isAfter(startTime)) {
+    return "迟到";
+  }
+
   return "未签到";
 };
 
-const calculateSituation = (signData: any, status: "已签退" | "已签到" | "未签到" | "迟到" | "早退" | null): "早退" | "迟到" | "缺勤" | "请假" | null => {
-  if (signData.absent_num === "1") return "缺勤";
-  if (signData.ask_leave_num === "1") return "请假";
+const calculateSituation = (signData: any, status: "已签退" | "已签到" | "未签到" | "迟到" | "早退" | null): "早退" | "迟到" | "已旷课" | "已请假" | null => {
+  if (signData.absent_num === "1") return "已旷课";
+  if (signData.ask_leave_num === "1") return "已请假";
   if (status === "迟到") return "迟到";
   if (status === "早退") return "早退";
   return null;
@@ -68,40 +75,61 @@ const calculateSituation = (signData: any, status: "已签退" | "已签到" | "
 
 onMounted(async () => {
   if (userInfo) {
-    const signInfo = (await ZHKQ_GetDaySignList({date: todayString, userKey: userInfo.value!.token})).sign_record_list
-    const courseList = (await ZHKQ_GetDayCourseList({date: todayString, userKey: userInfo.value!.token})).sourcelist;
-    const signMap = new Map(signInfo.map(e => [e.pk_lesson, e]));
-    data.value = courseList.map((e, index): ClassInfo | null => {
-      const signData = signMap.get(e.pk_anlaxy_lesson);
-      if (signData) {
-        const status = calculateStatus(e, signData);
-        return {
-          classIndex: index + 1,
-          className: e.lesson_name,
-          startTime: dayjs(`${e.lesson_date} ${e.begin_time}`),
-          endTime: dayjs(`${e.lesson_date} ${e.end_time}`),
-          signInTime: signData.u_begin_time ? dayjs(signData.u_begin_time) : null,
-          signOutTime: signData.u_end_time ? dayjs(signData.u_end_time) : null,
-          shouldSignInTime: dayjs(`${signData.lesson_date} ${signData.before_class_time}`),
-          shouldSignOutTime: dayjs(`${signData.lesson_date} ${signData.after_class_over_time}`),
-          classRoom: e.class_room_name,
-          teacher: {
-            name: e.teacher_name,
-            id: Number.parseInt(e.teacher_id)
-          },
-          situation: calculateSituation(signData, status),
-          computedStatus: status
+    loading.value = true;
+    try {
+      const signInfo = (await ZHKQ_GetDaySignList({date: todayString, userKey: userInfo.value!.token})).sign_record_list
+      const courseList = (await ZHKQ_GetDayCourseList({date: todayString, userKey: userInfo.value!.token})).sourcelist;
+      const signMap = new Map(signInfo.map(e => [e.pk_lesson, e]));
+      const courses = courseList.map((e, index): ClassInfo | null => {
+        const signData = signMap.get(e.pk_anlaxy_lesson);
+        if (signData) {
+          const status = calculateStatus(e, signData);
+          return {
+            classIndex: index + 1,
+            className: e.lesson_name,
+            startTime: dayjs(`${e.lesson_date} ${e.begin_time}`),
+            endTime: dayjs(`${e.lesson_date} ${e.end_time}`),
+            signInTime: signData.u_begin_time ? dayjs(signData.u_begin_time) : null,
+            signOutTime: signData.u_end_time ? dayjs(signData.u_end_time) : null,
+            shouldSignInTime: dayjs(`${signData.lesson_date} ${signData.before_class_time}`),
+            shouldSignOutTime: dayjs(`${signData.lesson_date} ${signData.after_class_over_time}`),
+            classRoom: e.class_room_name,
+            teacher: {
+              name: e.teacher_name,
+              id: Number.parseInt(e.teacher_id)
+            },
+            situation: calculateSituation(signData, status),
+            computedStatus: status,
+            pk_anlaxy_syllabus_user: signData.pk_anlaxy_syllabus_user,
+            lessonDate: e.lesson_date
+          }
         }
-      }
-      return null;
-    }).filter(e => !!e);
+        return null;
+      }).filter(e => !!e);
+
+      // Sort courses: incomplete courses first, completed/on-leave courses last
+      data.value = courses.sort((a, b) => {
+        // Priority: higher number = lower priority (goes to bottom)
+        const getPriority = (course: ClassInfo) => {
+          // Completed courses (signed in and signed out) or on leave/absent - low priority (bottom)
+          if (course.situation === "已请假" || course.situation === "已旷课") return 3;
+          if (course.signInTime && course.signOutTime) return 2;
+          // Not signed in or partially signed in - high priority (top)
+          return 1;
+        };
+
+        return getPriority(a) - getPriority(b);
+      });
+    } finally {
+      loading.value = false;
+    }
   }
 })
 
 </script>
 
 <template>
-  <div class="dev-home-container">
+  <div v-loading="loading" class="dev-home-container" element-loading-text="加载课程中...">
     <!-- User Information Card - Compact Version -->
     <div class="user-info-card" v-if="userInfo">
       <div class="user-info-header">
@@ -127,7 +155,7 @@ onMounted(async () => {
         </div>
       </div>
     </div>
-    
+
     <!-- Course List -->
     <class-container v-model="data"></class-container>
   </div>
@@ -215,17 +243,17 @@ onMounted(async () => {
   .dev-home-container {
     padding: 10px;
   }
-  
+
   .user-info-card {
     padding: 14px 16px;
     border-radius: 14px;
   }
-  
+
   .user-info-header h3 {
     font-size: 16px;
     margin-bottom: 10px;
   }
-  
+
   .info-line {
     font-size: 13px;
     gap: 6px;
