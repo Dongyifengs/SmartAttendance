@@ -3,32 +3,32 @@
     <div class="loginContainer">
 
       <div class="brand">
-        <span v-for="(char, i) in '欢迎使用SmartAttendance'" :key="i" class="brand-char"
-              :style="{ animationDelay: (i * 0.08) + 's' }">
+        <span v-for="(char, i) in '欢迎使用SmartAttendance'" :key="i" :style="{ animationDelay: (i * 0.08) + 's' }"
+              class="brand-char">
           {{ char }}
         </span>
-        <el-tag v-if="buildInfo" type="danger" class="build-info-tag">
+        <el-tag v-if="buildInfo" class="build-info-tag" type="danger">
           <span>在{{ buildInfo.date }}编译</span>
-          <a :href="buildInfo.commitUrl" target="_blank" class="commit-hash-link">({{ buildInfo.hash }})</a>
+          <a :href="buildInfo.commitUrl" class="commit-hash-link" target="_blank">({{ buildInfo.hash }})</a>
         </el-tag>
         <el-tag v-else type="danger">{{ isDev }}</el-tag>
       </div>
 
-      <el-tabs v-model="activeTab" type="card" class="loginTabs" :class="activeTab === 'ocLogin' ? 'dy_item' : ''">
+      <el-tabs v-model="activeTab" :class="activeTab === 'ocLogin' ? 'dy_item' : ''" class="loginTabs" type="card">
         <el-tab-pane label="智慧考勤登录" name="zhkqLogin">
           <el-form :model="zhkqForm" class="loginForm" @submit.prevent="onLogin(1)">
             <el-form-item prop="username">
-              <el-input v-model="zhkqForm.username" placeholder="请输入学号" :prefix-icon="User" clearable/>
+              <el-input v-model="zhkqForm.username" :prefix-icon="User" clearable placeholder="请输入学号"/>
             </el-form-item>
             <el-form-item prop="password">
-              <el-input v-model="zhkqForm.password" type="password" placeholder="请输入密码" :prefix-icon="Lock"
-                        show-password clearable/>
+              <el-input v-model="zhkqForm.password" :prefix-icon="Lock" clearable placeholder="请输入密码"
+                        show-password type="password"/>
             </el-form-item>
-            <el-alert title="手机拨号键*#06#的IMEI1" type="warning" :closable="false" center/>
+            <el-alert :closable="false" center title="手机拨号键*#06#的IMEI1" type="warning"/>
             <el-form-item prop="deviceId">
-              <el-input v-model="zhkqForm.deviceId" placeholder="请输入设备ID" :prefix-icon="Cellphone" clearable/>
+              <el-input v-model="zhkqForm.deviceId" :prefix-icon="Cellphone" clearable placeholder="请输入设备ID"/>
             </el-form-item>
-            <el-button class="loginBtn" type="primary" round @click="onLogin(1)" size="large" style="width:100%">
+            <el-button class="loginBtn" round size="large" style="width:100%" type="primary" @click="onLogin(1)">
               登录智慧考勤
             </el-button>
           </el-form>
@@ -37,13 +37,13 @@
         <el-tab-pane label="一卡通账号登录" name="ocLogin">
           <el-form :model="ocForm" class="loginForm" @submit.prevent="onLogin(2)">
             <el-form-item prop="username">
-              <el-input v-model="ocForm.username" placeholder="请输入考生号" :prefix-icon="User" clearable/>
+              <el-input v-model="ocForm.username" :prefix-icon="User" clearable placeholder="请输入考生号"/>
             </el-form-item>
             <el-form-item prop="password">
-              <el-input v-model="ocForm.password" type="password" placeholder="请输入密码" :prefix-icon="Lock"
-                        show-password clearable/>
+              <el-input v-model="ocForm.password" :prefix-icon="Lock" clearable placeholder="请输入密码"
+                        show-password type="password"/>
             </el-form-item>
-            <el-button class="loginBtn" type="primary" round @click="onLogin(2)" size="large" style="width:100%">
+            <el-button class="loginBtn" round size="large" style="width:100%" type="primary" @click="onLogin(2)">
               登录一卡通
             </el-button>
           </el-form>
@@ -53,13 +53,13 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import {computed, onMounted, ref} from 'vue'
 import {ElMessage} from 'element-plus'
 import {Cellphone, Lock, User} from "@element-plus/icons-vue";
-import {OC_LOGIN} from "../../API/ocAPI";
-import {ZHKQ_Login} from '../../API/zhkqAPI';
-import router from "../../router";
+import {OC_LOGIN} from "@/API/ocAPI";
+import {ZHKQ_Login} from '@/API/zhkqAPI';
+import router from "@/router";
 
 // 开发环境
 const isDev = import.meta.env.VITE_TEXT

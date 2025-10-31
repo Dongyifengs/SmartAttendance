@@ -1,7 +1,7 @@
 <template>
   <div v-loading="loading" class="dev-home-container" element-loading-text="加载课程中...">
     <!-- 用户信息卡片 - 紧凑版展示 -->
-    <div class="user-info-card" v-if="userInfo">
+    <div v-if="userInfo" class="user-info-card">
       <div class="user-info-header">
         <h3>个人信息</h3>
       </div>

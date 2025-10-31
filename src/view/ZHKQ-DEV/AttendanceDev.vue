@@ -108,7 +108,7 @@
 <script lang="ts" setup>
 import {computed, onMounted, ref} from "vue";
 import dayjs from "dayjs";
-import {getAttendanceDates, getClassStudent, getCourseStatus, getStatusCount, getUserClass} from "../../API/zhkqAPI";
+import {getAttendanceDates, getClassStudent, getCourseStatus, getStatusCount, getUserClass} from "@/API/zhkqAPI";
 
 interface Student {
   user_code: string;
@@ -217,7 +217,7 @@ const getCoursesByType = async (type: string) => {
     );
 
     if (res.list && Array.isArray(res.list)) {
-      const courses: Course[] = await Promise.all(res.list.map(async (c: any) => {
+      coursesByType.value[type] = await Promise.all(res.list.map(async (c: any) => {
         let totalNum = 0;
         let recordDates = "";
 
@@ -262,8 +262,6 @@ const getCoursesByType = async (type: string) => {
           recordDates
         };
       }));
-
-      coursesByType.value[type] = courses;
     }
   } catch (err) {
     console.error(`获取${attendanceTypeMap[type]}课程失败`, err);
@@ -288,27 +286,34 @@ onMounted(async () => {
   padding: 20px;
   font-size: 14px;
 }
+
 .header {
   display: flex;
   align-items: center;
   margin-bottom: 10px;
 }
+
 .user-info {
   margin-top: 10px;
   margin-bottom: 15px;
 }
+
 .ml-2 {
   margin-left: 10px;
 }
+
 .mt-3 {
   margin-top: 10px;
 }
+
 .mb-2 {
   margin-bottom: 10px;
 }
+
 .mt-5 {
   margin-top: 40px;
 }
+
 .course-table {
   margin-top: 20px;
 }

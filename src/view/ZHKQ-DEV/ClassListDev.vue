@@ -39,11 +39,11 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import {onMounted, ref} from 'vue'
 import {ElMessage} from 'element-plus'
 import dayjs from 'dayjs'
-import {ZHKQ_GetDayCourseList, ZHKQ_GetDaySignList} from '../../API/zhkqAPI'
+import {ZHKQ_GetDayCourseList, ZHKQ_GetDaySignList} from '@/API/zhkqAPI'
 import {checkInFields, courseFields} from './Type/dataFields'
 import DataTable from './components/DataTable.vue'
 

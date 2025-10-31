@@ -25,7 +25,7 @@ export interface ClassInfo {
   lessonDate?: string
 }
 </script>
-<script setup lang="ts">
+<script lang="ts" setup>
 import {Clock, Location, User, CircleClose, CircleCheck} from "@element-plus/icons-vue";
 import {ref, computed, watch} from "vue";
 import dayjs from "dayjs";
@@ -331,13 +331,13 @@ const simulateSignOut = async () => {
 
         <!-- Sign In/Out Section - More Compact -->
         <div class="sign-info">
-          <div class="sign-row" v-if="info.signInTime">
+          <div v-if="info.signInTime" class="sign-row">
             <el-icon :color="'#00d2ff'" class="sign-icon">
               <CircleCheck/>
             </el-icon>
             <span class="sign-text">签到: {{ info.signInTime.format("HH:mm:ss") }}</span>
           </div>
-          <div class="sign-row" v-else-if="shouldShowSignInSelector">
+          <div v-else-if="shouldShowSignInSelector" class="sign-row">
             <el-icon :color="'#f093fb'" class="sign-icon">
               <CircleClose/>
             </el-icon>
@@ -361,7 +361,7 @@ const simulateSignOut = async () => {
               签到
             </el-button>
           </div>
-          <div class="sign-row" v-else>
+          <div v-else class="sign-row">
             <el-icon :color="'#fa709a'" class="sign-icon">
               <CircleClose/>
             </el-icon>
@@ -378,14 +378,14 @@ const simulateSignOut = async () => {
           </div>
         </div>
 
-        <div class="sign-info" v-if="info.signInTime">
-          <div class="sign-row" v-if="info.signOutTime">
+        <div v-if="info.signInTime" class="sign-info">
+          <div v-if="info.signOutTime" class="sign-row">
             <el-icon :color="'#00d2ff'" class="sign-icon">
               <CircleCheck/>
             </el-icon>
             <span class="sign-text">签退: {{ info.signOutTime.format("HH:mm:ss") }}</span>
           </div>
-          <div class="sign-row" v-else>
+          <div v-else class="sign-row">
             <el-icon :color="'#fa709a'" class="sign-icon">
               <CircleClose/>
             </el-icon>
