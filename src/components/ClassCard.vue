@@ -16,7 +16,7 @@ export interface ClassInfo {
   signOutTime: Dayjs | null
   shouldSignInTime: Dayjs
   shouldSignOutTime: Dayjs,
-  situation: "早退" | "迟到" | "缺勤" | "请假" | null
+  situation: "早退" | "迟到" | "已旷课" | "已请假" | null
   computedStatus?: "已签退" | "已签到" | "未签到" | "迟到" | "早退" | null
 }
 </script>
@@ -44,9 +44,9 @@ const shouldShowSignOutSelector = computed(() => {
 
 // Compute tag type based on status
 const tagType = computed(() => {
-  if (info.value.situation === '缺勤') return 'danger';
+  if (info.value.situation === '已旷课') return 'danger';
   if (info.value.situation === '迟到' || info.value.situation === '早退') return 'warning';
-  if (info.value.situation === '请假') return 'info';
+  if (info.value.situation === '已请假') return 'info';
   if (displayStatus.value === '已签退') return 'success';
   if (displayStatus.value === '已签到') return 'primary';
   return 'info';

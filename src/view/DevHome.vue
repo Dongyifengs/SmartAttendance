@@ -58,9 +58,9 @@ const calculateStatus = (course: any, signData: any): "已签退" | "已签到" 
   return "未签到";
 };
 
-const calculateSituation = (signData: any, status: "已签退" | "已签到" | "未签到" | "迟到" | "早退" | null): "早退" | "迟到" | "缺勤" | "请假" | null => {
-  if (signData.absent_num === "1") return "缺勤";
-  if (signData.ask_leave_num === "1") return "请假";
+const calculateSituation = (signData: any, status: "已签退" | "已签到" | "未签到" | "迟到" | "早退" | null): "早退" | "迟到" | "已旷课" | "已请假" | null => {
+  if (signData.absent_num === "1") return "已旷课";
+  if (signData.ask_leave_num === "1") return "已请假";
   if (status === "迟到") return "迟到";
   if (status === "早退") return "早退";
   return null;
