@@ -32,7 +32,6 @@ import {ZHKQ_SignIn, ZHKQ_SignOut} from '@/API/zhkqAPI/index';
 
 const info = defineModel<ClassInfo>({required: true});
 const selectedSignInTime = ref<string>("");
-const selectedSignOutTime = ref<string>("");
 const userInfo = getZHKQUserInfo();
 
 // Determine the status to display
@@ -41,13 +40,15 @@ const displayStatus = computed(() => {
 });
 
 // Check if we should show time selectors (for 迟到 or 早退)
-const shouldShowSignInSelector = computed(() => {
-  return (info.value.situation === "迟到" || displayStatus.value === "迟到") && !info.value.signInTime;
+// Check if we can show sign-in button (30 minutes before class)
+const canShowSignInButton = computed(() => {
+  const now = dayjs();
+  const thirtyMinutesBeforeClass = info.value.startTime.subtract(30, 'minute');
+  return now.isAfter(thirtyMinutesBeforeClass) || now.isSame(thirtyMinutesBeforeClass);
 });
 
-const shouldShowSignOutSelector = computed(() => {
-  // Always show sign-out selector when signed in but not signed out
-  return info.value.signInTime && !info.value.signOutTime;
+const shouldShowSignInSelector = computed(() => {
+  return (info.value.situation === "迟到" || displayStatus.value === "迟到") && !info.value.signInTime;
 });
 
 // Set default sign-in time when in late status
@@ -56,15 +57,6 @@ watch(shouldShowSignInSelector, (newVal) => {
     // Default to 9 minutes before class start
     const defaultTime = info.value.startTime.subtract(9, 'minute');
     selectedSignInTime.value = defaultTime.format('HH:mm');
-  }
-}, { immediate: true });
-
-// Set default sign-out time - always set to 1 minute after class end
-watch(() => info.value.signInTime, (newVal) => {
-  if (newVal && !selectedSignOutTime.value && !info.value.signOutTime) {
-    // Default to 1 minute after class end
-    const defaultTime = info.value.endTime.add(1, 'minute');
-    selectedSignOutTime.value = defaultTime.format('HH:mm');
   }
 }, { immediate: true });
 
@@ -184,18 +176,17 @@ const simulateSignOut = async () => {
     return;
   }
 
+  const now = dayjs();
   const endTime = info.value.endTime;
   
-  // 获取签退时间 - 格式为 HH:mm
-  let signOutTime: string;
-  if (selectedSignOutTime.value) {
-    // 如果用户选择了时间，使用选择的时间
-    signOutTime = selectedSignOutTime.value;
-  } else {
-    // 默认使用课程结束后1分钟
-    const defaultSignOutTime = endTime.add(1, 'minute');
-    signOutTime = defaultSignOutTime.format('HH:mm');
+  // 检查课程是否已结束
+  if (now.isBefore(endTime)) {
+    alert(`⚠️ 课程尚未结束\n\n当前时间: ${now.format('HH:mm')}\n下课时间: ${endTime.format('HH:mm')}\n\n请在课程结束后再进行签退`);
+    return;
   }
+  
+  // 使用当前本地时间作为签退时间 - 格式为 HH:mm
+  const signOutTime = now.format('HH:mm');
   
   // 签退类型：始终为2（正常）
   const signOutType = 2;
@@ -209,7 +200,7 @@ const simulateSignOut = async () => {
     pk_anlaxy_syllabus_user: info.value.pk_anlaxy_syllabus_user,
     phone_code: userInfo.value.client_id || '',
     sign_out_type: signOutType,
-    u_end_time: signOutTime,  // 格式: "HH:mm"
+    u_end_time: signOutTime,  // 格式: "HH:mm" - 使用当前时间
     lesson_change_list: info.value.pk_anlaxy_syllabus_user,
     lesson_change_type: "0",
     ask_leave_num: 0,
@@ -240,7 +231,7 @@ const simulateSignOut = async () => {
   console.log(`  userKey: ${signOutParams.userKey}`);
   console.log(`  pk_anlaxy_syllabus_user: ${signOutParams.pk_anlaxy_syllabus_user}`);
   console.log(`  sign_out_type: ${signOutParams.sign_out_type} (正常)`);
-  console.log(`  u_end_time: ${signOutParams.u_end_time} (格式: HH:mm)`);
+  console.log(`  u_end_time: ${signOutParams.u_end_time} (格式: HH:mm - 当前时间)`);
   console.log(`  u_begin_time: ${signOutParams.u_begin_time} (格式: YYYY-MM-DD HH:mm:ss)`);
   console.log(`  before_class_over_time: ${signOutParams.before_class_over_time} (下课时间)`);
   console.log(`  phone_code: ${signOutParams.phone_code}`);
@@ -338,6 +329,7 @@ const simulateSignOut = async () => {
               size="small" 
               @click="simulateSignIn"
               class="sign-button"
+              v-if="canShowSignInButton"
             >
               签到
             </el-button>
@@ -350,7 +342,7 @@ const simulateSignOut = async () => {
               size="small" 
               @click="simulateSignIn"
               class="sign-button"
-              v-if="!info.signInTime && info.situation !== '已请假' && info.situation !== '已旷课'"
+              v-if="canShowSignInButton && !info.signInTime && info.situation !== '已请假' && info.situation !== '已旷课'"
             >
               签到
             </el-button>
@@ -362,18 +354,9 @@ const simulateSignOut = async () => {
             <el-icon class="sign-icon" :color="'#00d2ff'"><CircleCheck /></el-icon>
             <span class="sign-text">签退: {{info.signOutTime.format("HH:mm:ss")}}</span>
           </div>
-          <div class="sign-row" v-else-if="shouldShowSignOutSelector">
-            <el-icon class="sign-icon" :color="'#f093fb'"><CircleClose /></el-icon>
-            <span class="sign-label">签退:</span>
-            <el-time-select 
-              size="small" 
-              v-model="selectedSignOutTime" 
-              :start="info.endTime.format('HH:mm')" 
-              step="00:01" 
-              :end="info.shouldSignOutTime.format('HH:mm')" 
-              placeholder="选择时间" 
-              class="time-selector"
-            />
+          <div class="sign-row" v-else>
+            <el-icon class="sign-icon" :color="'#fa709a'"><CircleClose /></el-icon>
+            <span class="sign-text pending">待签退</span>
             <el-button 
               type="success" 
               size="small" 
