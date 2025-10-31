@@ -77,8 +77,12 @@ const simulateSignIn = () => {
   if (isLate && selectedSignInTime.value) {
     // 如果是迟到且用户选择了时间，使用选择的时间
     signInTime = `${info.value.lessonDate} ${selectedSignInTime.value}:00`;
+  } else if (isLate && !selectedSignInTime.value) {
+    // 如果是迟到但没有选择时间，默认使用课程开始前9分钟
+    const defaultSignInTime = startTime.subtract(9, 'minute');
+    signInTime = defaultSignInTime.format('YYYY-MM-DD HH:mm:ss');
   } else {
-    // 否则使用当前时间
+    // 正常情况使用当前时间
     signInTime = now.format('YYYY-MM-DD HH:mm:ss');
   }
   
