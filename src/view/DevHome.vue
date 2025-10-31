@@ -1,5 +1,13 @@
 <template>
   <div v-loading="loading" class="dev-home-container" element-loading-text="加载课程中...">
+    <div class="header header-info">
+      <div class="hash">
+        编译时间：2028-13-96 14:14:14 <a href="xx">s7f8a314</a>
+      </div>
+      <div>
+        <el-button @click="logOut">退出登录</el-button>
+      </div>
+    </div>
     <!-- 用户信息卡片 - 紧凑版展示 -->
     <div v-if="userInfo" class="user-info-card">
       <div class="user-info-header">
@@ -45,15 +53,16 @@
 </template>
 
 <script lang="ts" setup>
-  import dayjs from 'dayjs';
-  import type { ClassInfo } from '@/components/ClassCard.vue';
-  import { computed, onMounted, ref } from 'vue';
-  import ClassContainer from '@/components/ClassContainer.vue';
-  import { ZHKQ_GetDayCourseList, ZHKQ_GetDaySignList } from '@/api/anlaxy/index.ts';
-  import { getZHKQUserInfo } from '@/api/anlaxy/utils';
-  import type { CourseList, SignListInfo } from '@/api/anlaxy/type/response';
+import dayjs from 'dayjs';
+import type {ClassInfo} from '@/components/ClassCard.vue';
+import {computed, onMounted, ref} from 'vue';
+import ClassContainer from '@/components/ClassContainer.vue';
+import {ZHKQ_GetDayCourseList, ZHKQ_GetDaySignList} from '@/api/anlaxy/index.ts';
+import {getZHKQUserInfo} from '@/api/anlaxy/utils';
+import type {CourseList, SignListInfo} from '@/api/anlaxy/type/response';
+import router from "@/router";
 
-  // 用户信息对象（包含姓名、学号、token等）
+// 用户信息对象（包含姓名、学号、token等）
   const userInfo = getZHKQUserInfo();
 
   // 当天课程数据（课程列表）
@@ -64,6 +73,11 @@
 
   // 当前日期字符串（格式：YYYY-MM-DD）
   const todayString = dayjs().format('YYYY-MM-DD');
+
+  const logOut = () => {
+    localStorage.clear()
+    router.push('/');
+  }
 
   /**
    * 计算属性：清理设备 ID
