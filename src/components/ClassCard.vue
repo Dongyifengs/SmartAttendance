@@ -25,7 +25,7 @@ export interface ClassInfo {
 </script>
 <script setup lang="ts">
 import {Clock, Location, User, CircleClose, CircleCheck} from "@element-plus/icons-vue";
-import {ref, computed} from "vue";
+import {ref, computed, watch} from "vue";
 import dayjs from "dayjs";
 import {getZHKQUserInfo} from '@/API/zhkqAPI/Function/Function';
 
@@ -48,6 +48,15 @@ const shouldShowSignOutSelector = computed(() => {
   return (info.value.situation === "早退" || displayStatus.value === "早退") && !info.value.signOutTime;
 });
 
+// Set default sign-in time when in late status
+watch(shouldShowSignInSelector, (newVal) => {
+  if (newVal && !selectedSignInTime.value) {
+    // Default to 9 minutes before class start
+    const defaultTime = info.value.startTime.subtract(9, 'minute');
+    selectedSignInTime.value = defaultTime.format('HH:mm');
+  }
+}, { immediate: true });
+
 // Compute tag type based on status
 const tagType = computed(() => {
   if (info.value.situation === '已旷课') return 'danger';
@@ -68,16 +77,14 @@ const simulateSignIn = () => {
   const now = dayjs();
   const startTime = info.value.startTime;
   
-  // 判断签到类型：1=迟到, 2=正常
-  const isLate = now.isAfter(startTime);
-  const signInType = isLate ? 1 : 2;
-  
   // 获取签到时间
   let signInTime: string;
-  if (isLate && selectedSignInTime.value) {
+  const isCurrentlyLate = now.isAfter(startTime);
+  
+  if (isCurrentlyLate && selectedSignInTime.value) {
     // 如果是迟到且用户选择了时间，使用选择的时间
     signInTime = `${info.value.lessonDate} ${selectedSignInTime.value}:00`;
-  } else if (isLate && !selectedSignInTime.value) {
+  } else if (isCurrentlyLate && !selectedSignInTime.value) {
     // 如果是迟到但没有选择时间，默认使用课程开始前9分钟
     const defaultSignInTime = startTime.subtract(9, 'minute');
     signInTime = defaultSignInTime.format('YYYY-MM-DD HH:mm:ss');
@@ -86,8 +93,13 @@ const simulateSignIn = () => {
     signInTime = now.format('YYYY-MM-DD HH:mm:ss');
   }
   
+  // 判断签到类型：根据实际签到时间判断，1=迟到, 2=正常
+  const actualSignInTime = dayjs(signInTime);
+  const isLate = actualSignInTime.isAfter(startTime);
+  const signInType = isLate ? 1 : 2;
+  
   // 计算迟到时长（分钟）
-  const lateTimeLength = isLate ? Math.max(0, dayjs(signInTime).diff(startTime, 'minute')) : 0;
+  const lateTimeLength = isLate ? Math.max(0, actualSignInTime.diff(startTime, 'minute')) : 0;
   
   // 构建签到参数
   const signInParams = {
