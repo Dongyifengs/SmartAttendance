@@ -4,15 +4,14 @@
       <div class="loginTime">登陆时间 {{ getLoginTime() }}</div>
       <div class="logBtn">
         <h5>正式功能</h5>
-        <el-button @click="DevHomeTest">课程签到签退页面</el-button>
-        <el-button @click="logout">退出登录</el-button>
+        <el-button class="custom_btn" @click="DevHomeTest">课程签到签退页面</el-button>
+        <el-button class="custom_btn" @click="logout">退出登录</el-button>
         <h5>测试功能</h5>
-        <el-button @click="logoutTest">测试退出</el-button>
-        <br />
+        <el-button class="custom_btn" @click="logoutTest">测试退出</el-button>
         <h5>测试按钮</h5>
-        <el-button @click="classListTest">课程表测试 [开发者模式]</el-button>
-        <el-button @click="AttendanceListTest">考勤查询测试 [开发者模式]</el-button>
-        <el-button @click="LeaveListTest">请假页面测试 [开发者模式]</el-button>
+        <el-button class="custom_btn" @click="classListTest">课程表测试 [开发者模式]</el-button>
+        <el-button class="custom_btn" @click="AttendanceListTest">考勤查询测试 [开发者模式]</el-button>
+        <el-button class="custom_btn" @click="LeaveListTest">请假页面测试 [开发者模式]</el-button>
       </div>
     </div>
   </div>
@@ -20,6 +19,7 @@
 
 <script lang="ts" setup>
   import router from '@/router';
+  import dayjs from 'dayjs';
 
   // 退出登录
   const logout = () => {
@@ -63,11 +63,16 @@
     if (!times.length) return null;
 
     const maxTime = Math.max(...times);
-    const date = new Date(maxTime);
 
     // 格式化输出
-    return `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+    return dayjs(maxTime).format("HH:mm:ss.SSS");
   };
 </script>
 
-<style scoped></style>
+<style scoped>
+@import "@/App.css";
+@import "style/index.css";
+::v-deep(.el-button+.el-button) {
+  margin-left: 0;
+}
+</style>
