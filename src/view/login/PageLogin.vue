@@ -63,7 +63,7 @@
               </el-form-item>
               <div class="build-info-tag" style="text-align: center">
                 <span>手机拨号键</span>
-                <a href="#" class="commit-hash-link">{{'*#06#'}}</a>
+                <a href="javascript:void(0)" class="commit-hash-link">{{'*#06#'}}</a>
                 <span>的IMEI1</span>
               </div>
               <el-form-item prop="deviceId">
