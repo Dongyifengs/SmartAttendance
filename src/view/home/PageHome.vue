@@ -70,7 +70,6 @@
 </script>
 
 <style scoped>
-@import "@/App.css";
 @import "style/index.css";
 ::v-deep(.el-button+.el-button) {
   margin-left: 0;

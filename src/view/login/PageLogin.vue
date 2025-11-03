@@ -315,5 +315,4 @@
 
 <style scoped>
   @import 'style/index.css';
-  @import "@/App.css";
 </style>
