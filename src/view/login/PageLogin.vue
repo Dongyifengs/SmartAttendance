@@ -76,7 +76,7 @@
                 />
               </el-form-item>
               <el-button
-                  class="loginBtn"
+                  class="custom_btn"
                   round
                   size="large"
                   style="width: 100%"
@@ -113,7 +113,7 @@
                 />
               </el-form-item>
               <el-button
-                  class="loginBtn"
+                  class="custom_btn"
                   round
                   size="large"
                   style="width: 100%"
@@ -315,4 +315,5 @@
 
 <style scoped>
   @import 'style/index.css';
+  @import "@/App.css";
 </style>

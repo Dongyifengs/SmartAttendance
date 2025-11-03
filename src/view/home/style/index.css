@@ -1,0 +1,77 @@
+/* 外层布局容器 */
+.common-layout {
+    width: 100%;
+    background-color: rgba(255, 251, 245, 0.85); /* 半透奶油白，可根据整体风格调整 */
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.6);
+    box-shadow: 0 2px 10px rgba(212, 181, 158, 0.08);
+}
+
+/* 头部主容器 */
+.header {
+    display: flex;
+    justify-content: space-between; /* 左右两端对齐 */
+    align-items: center; /* 垂直居中 */
+    padding: 0.8rem 2rem; /* 上下内边距稍小，左右稍大 */
+    max-width: 1400px; /* 限制最大宽度，避免大屏过宽 */
+    margin: 0 auto; /* 居中显示 */
+}
+
+/* 登录时间样式 */
+.loginTime {
+    color: #8B7355; /* 奶油风文字色 */
+    font-size: 0.95rem;
+    padding: 0.5rem 0;
+    /* 左侧轻微分隔线（可选） */
+    border-right: 1px solid rgba(240, 223, 204, 0.5);
+    padding-right: 1.5rem;
+}
+
+/* 按钮组容器 */
+.logBtn {
+    display: flex;
+    flex-direction: column; /* 垂直排列按钮组 */
+    gap: 0.8rem; /* 组与组之间的间距 */
+    padding-left: 1.5rem; /* 与左侧登录时间保持距离 */
+}
+
+/* 按钮组标题（h5） */
+.logBtn h5 {
+    color: #D4B59E; /* 淡棕色标题 */
+    font-size: 0.9rem;
+    margin: 0;
+    padding-bottom: 0.3rem;
+    font-weight: 500;
+    /* 标题下方轻微下划线，增强分组感 */
+    border-bottom: 1px dashed rgba(212, 181, 158, 0.3);
+    width: fit-content; /* 宽度适配内容 */
+}
+
+/* 响应式适配：小屏幕下垂直排列 */
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column; /* 垂直排列 */
+        align-items: flex-start; /* 左对齐 */
+        gap: 1rem;
+        padding: 1rem;
+    }
+
+    .loginTime {
+        border-right: none; /* 移除右侧分隔线 */
+        padding-right: 0;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid rgba(240, 223, 204, 0.5); /* 改为底部分隔线 */
+        width: 100%;
+    }
+
+    .logBtn {
+        padding-left: 0;
+        width: 100%;
+    }
+
+    /* 小屏幕按钮自动换行，保持紧凑 */
+    .logBtn > div {
+        display: flex;
+        flex-wrap: wrap; /* 自动换行 */
+    }
+}
