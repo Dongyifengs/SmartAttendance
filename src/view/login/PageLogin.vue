@@ -10,12 +10,24 @@
         >
           {{ char }}
         </span>
-        <el-tag v-if="buildInfo" class="build-info-tag" type="danger">
+        <div v-if="buildInfo" class="build-info-tag">
           <span>在{{ buildInfo.date }}编译</span>
+          <span>(</span>
           <a :href="buildInfo.commitUrl" class="commit-hash-link" target="_blank"
-            >({{ buildInfo.hash }})</a
-          >
-        </el-tag>
+          >{{ buildInfo.hash }}</a>
+          <span>)</span>
+        </div>
+<!--        <el-tag v-if="buildInfo" class="build-info-tag" type="danger">-->
+<!--          <span>在{{ buildInfo.date }}编译</span>-->
+<!--          <span>-->
+<!--            (-->
+<!--          </span>-->
+<!--          <a :href="buildInfo.commitUrl" class="commit-hash-link" target="_blank"-->
+<!--          >{{ buildInfo.hash }}</a>-->
+<!--          <span>-->
+<!--            )-->
+<!--          </span>-->
+<!--        </el-tag>-->
         <el-tag v-else type="danger">{{ isDev }}</el-tag>
       </div>
 
@@ -24,80 +36,94 @@
         :class="activeTab === 'ocLogin' ? 'dy_item' : ''"
         class="loginTabs"
         type="card"
+        @tab-change="handleTabChange"
       >
         <el-tab-pane label="智慧考勤登录" name="zhkqLogin">
-          <el-form :model="zhkqForm" class="loginForm" @submit.prevent="onLogin(1)">
-            <el-form-item prop="username">
-              <el-input
-                v-model="zhkqForm.username"
-                :prefix-icon="User"
-                clearable
-                placeholder="请输入学号"
-              />
-            </el-form-item>
-            <el-form-item prop="password">
-              <el-input
-                v-model="zhkqForm.password"
-                :prefix-icon="Lock"
-                clearable
-                placeholder="请输入密码"
-                show-password
-                type="password"
-              />
-            </el-form-item>
-            <el-alert :closable="false" center title="手机拨号键*#06#的IMEI1" type="warning" />
-            <el-form-item prop="deviceId">
-              <el-input
-                v-model="zhkqForm.deviceId"
-                :prefix-icon="Cellphone"
-                clearable
-                placeholder="请输入设备ID"
-              />
-            </el-form-item>
-            <el-button
-              class="loginBtn"
-              round
-              size="large"
-              style="width: 100%"
-              type="primary"
-              @click="onLogin(1)"
-            >
-              登录智慧考勤
-            </el-button>
-          </el-form>
+          <div class="tab-content" :class="{ 'animate-enter': isAnimating }">
+            <el-form :model="zhkqForm" class="loginForm" @submit.prevent="onLogin(1)">
+              <el-form-item prop="username">
+                <el-input
+                    v-model="zhkqForm.username"
+                    :prefix-icon="User"
+                    clearable
+                    placeholder="请输入学号"
+                    class="form-input"
+                />
+              </el-form-item>
+              <el-form-item prop="password">
+                <el-input
+                    v-model="zhkqForm.password"
+                    :prefix-icon="Lock"
+                    clearable
+                    placeholder="请输入密码"
+                    show-password
+                    type="password"
+                    class="form-input"
+                />
+              </el-form-item>
+              <div class="build-info-tag" style="text-align: center">
+                <span>手机拨号键</span>
+                <a href="#" class="commit-hash-link">{{'*#06#'}}</a>
+                <span>的IMEI1</span>
+              </div>
+              <el-form-item prop="deviceId">
+                <el-input
+                    v-model="zhkqForm.deviceId"
+                    :prefix-icon="Cellphone"
+                    clearable
+                    placeholder="请输入设备ID"
+                    class="form-input"
+                />
+              </el-form-item>
+              <el-button
+                  class="loginBtn"
+                  round
+                  size="large"
+                  style="width: 100%"
+                  type="primary"
+                  @click="onLogin(1)"
+              >
+                登录智慧考勤
+              </el-button>
+            </el-form>
+          </div>
         </el-tab-pane>
 
         <el-tab-pane label="一卡通账号登录" name="ocLogin">
-          <el-form :model="ocForm" class="loginForm" @submit.prevent="onLogin(2)">
-            <el-form-item prop="username">
-              <el-input
-                v-model="ocForm.username"
-                :prefix-icon="User"
-                clearable
-                placeholder="请输入考生号"
-              />
-            </el-form-item>
-            <el-form-item prop="password">
-              <el-input
-                v-model="ocForm.password"
-                :prefix-icon="Lock"
-                clearable
-                placeholder="请输入密码"
-                show-password
-                type="password"
-              />
-            </el-form-item>
-            <el-button
-              class="loginBtn"
-              round
-              size="large"
-              style="width: 100%"
-              type="primary"
-              @click="onLogin(2)"
-            >
-              登录一卡通
-            </el-button>
-          </el-form>
+          <div class="tab-content" :class="{ 'animate-enter': isAnimating }">
+            <el-form :model="ocForm" class="loginForm" @submit.prevent="onLogin(2)">
+              <el-form-item prop="username">
+                <el-input
+                    v-model="ocForm.username"
+                    :prefix-icon="User"
+                    clearable
+                    placeholder="请输入考生号"
+                    class="form-input"
+                />
+              </el-form-item>
+              <el-form-item prop="password">
+                <el-input
+                    v-model="ocForm.password"
+                    :prefix-icon="Lock"
+                    clearable
+                    placeholder="请输入密码"
+                    show-password
+                    type="password"
+                    class="form-input"
+                />
+              </el-form-item>
+              <el-button
+                  class="loginBtn"
+                  round
+                  size="large"
+                  style="width: 100%"
+                  type="primary"
+                  @click="onLogin(2)"
+              >
+                登录一卡通
+              </el-button>
+            </el-form>
+          </div>
         </el-tab-pane>
       </el-tabs>
     </div>
@@ -114,6 +140,16 @@
 
   // 开发环境
   const isDev = import.meta.env.VITE_TEXT;
+
+  const isAnimating = ref(false)
+  const handleTabChange = () => {
+    // 开始动画
+    isAnimating.value = true
+    // 动画结束后移除类（需与CSS动画时长一致）
+    setTimeout(() => {
+      isAnimating.value = false
+    }, 1000)
+  }
 
   // 构建信息（生产环境）
   const buildInfo = computed(() => {
