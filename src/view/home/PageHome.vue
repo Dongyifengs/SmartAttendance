@@ -63,10 +63,9 @@
     if (!times.length) return null;
 
     const maxTime = Math.max(...times);
-    const date = new Date(maxTime);
 
     // 格式化输出
-    return `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+    return dayjs(maxTime).format("HH:mm:ss.SSS");
   };
 </script>
 
