@@ -6,6 +6,7 @@ import IconsResolver from 'unplugin-icons/resolver'
 import {ElementPlusResolver} from 'unplugin-vue-components/resolvers'
 import {resolve} from "path"
 import {execSync} from 'child_process'
+import dayjs from "dayjs";
 
 // 获取 Git 提交哈希值（8位）
 let cachedGitHash: string | null = null
@@ -54,23 +55,12 @@ function getFullGitHash(): string {
 
 // 获取编译日期
 function getBuildDate(): string {
-    const now = new Date()
-    const year = now.getFullYear()
-    const month = String(now.getMonth() + 1).padStart(2, '0')
-    const day = String(now.getDate()).padStart(2, '0')
-    return `${year}-${month}-${day}`
+    return dayjs().format("YYYY-MM-DD")
 }
 
 // 获取编译时间（包含日期和时间）
 function getBuildTimestamp(): string {
-    const now = new Date()
-    const year = now.getFullYear()
-    const month = String(now.getMonth() + 1).padStart(2, '0')
-    const day = String(now.getDate()).padStart(2, '0')
-    const hours = String(now.getHours()).padStart(2, '0')
-    const minutes = String(now.getMinutes()).padStart(2, '0')
-    const seconds = String(now.getSeconds()).padStart(2, '0')
-    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`
+    return dayjs().format("YYYY-MM-DD HH:mm:ss")
 }
 
 // 获取 Git 提交信息
@@ -114,29 +104,29 @@ export default defineConfig(({ mode }) => {
         ],
         define: {
             // 在生产环境下，将编译信息注入到环境变量中
-            'import.meta.env.VITE_BUILD_DATE': mode === 'production' 
+            'import.meta.env.VITE_BUILD_DATE': mode === 'production'
                 ? JSON.stringify(getBuildDate())
                 : JSON.stringify('开发环境'),
-            'import.meta.env.VITE_BUILD_TIMESTAMP': mode === 'production' 
+            'import.meta.env.VITE_BUILD_TIMESTAMP': mode === 'production'
                 ? JSON.stringify(getBuildTimestamp())
                 : JSON.stringify('开发环境'),
-            'import.meta.env.VITE_GIT_HASH': mode === 'production' 
+            'import.meta.env.VITE_GIT_HASH': mode === 'production'
                 ? JSON.stringify(getGitHash())
                 : JSON.stringify('开发中'),
-            'import.meta.env.VITE_GIT_FULL_HASH': mode === 'production' 
+            'import.meta.env.VITE_GIT_FULL_HASH': mode === 'production'
                 ? JSON.stringify(getFullGitHash())
                 : JSON.stringify('开发中'),
-            'import.meta.env.VITE_COMMIT_MESSAGE': mode === 'production' 
+            'import.meta.env.VITE_COMMIT_MESSAGE': mode === 'production'
                 ? JSON.stringify(getCommitMessage())
                 : JSON.stringify('开发环境构建'),
             'import.meta.env.VITE_GITHUB_REPO': JSON.stringify('https://github.com/Dongyifengs/SmartAttendance'),
             // 保留 VITE_TEXT 用于开发环境
-            'import.meta.env.VITE_TEXT': mode === 'production' 
+            'import.meta.env.VITE_TEXT': mode === 'production'
                 ? JSON.stringify('')
                 : JSON.stringify(process.env.VITE_TEXT || '开发环境')
         },
         server: {
-            port: 3000,
+            port: 25113,
             host: '0.0.0.0',
             open: true,
             proxy: {
