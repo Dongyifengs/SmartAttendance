@@ -134,7 +134,7 @@
   import { computed, onMounted, ref } from 'vue';
   import { ElMessage } from 'element-plus';
   import { Cellphone, Lock, User } from '@element-plus/icons-vue';
-  import { OC_LOGIN } from '@/api/ocAPI';
+  import { OC_Login } from '@/api/ocAPI';
   import { ZHKQ_Login } from '@/api/anlaxy';
   import router from '@/router';
 
@@ -280,10 +280,18 @@
         ElMessage.warning('请填写完整信息！');
         return;
       } else {
-        OC_LOGIN(ocForm.value.username, ocForm.value.password).then(async (res) => {
+        OC_Login(ocForm.value.username, ocForm.value.password).then(async (res) => {
           if (res.code === 200) {
             ElMessage.success('登录成功！');
-            localStorage.setItem('SA-OC-USERINFO', JSON.stringify(res));
+
+            // 创建副本并将backUrl和logoUrl的值设为空字符串
+            const userInfoToSave = JSON.parse(JSON.stringify(res));
+            if (userInfoToSave.data) {
+              userInfoToSave.data.backUrl = "";
+              userInfoToSave.data.logoUrl = "";
+            }
+
+            localStorage.setItem('SA-OC-USERINFO', JSON.stringify(userInfoToSave));
             localStorage.setItem('SA-OC-TIMESTAMP', getTimestamp().toString());
             localStorage.setItem(
               'SA-OC-ACCOUNT',
