@@ -30,7 +30,7 @@ function getGitHash(): string {
     console.warn('Git 哈希值格式无效，使用默认值');
     cachedGitHash = 'unknown';
   } catch (error) {
-    console.warn('无法获取 Git 提交哈希值，使用默认值');
+    console.warn('无法获取 Git 提交哈希值，使用默认值', error);
     cachedGitHash = 'unknown';
   }
   return 'unknown';
@@ -52,7 +52,7 @@ function getFullGitHash(): string {
     console.warn('完整 Git 哈希值格式无效，使用默认值');
     cachedFullGitHash = 'unknown';
   } catch (error) {
-    console.warn('无法获取完整 Git 提交哈希值，使用默认值');
+    console.warn('无法获取完整 Git 提交哈希值，使用默认值', error);
     cachedFullGitHash = 'unknown';
   }
   return 'unknown';
@@ -83,7 +83,7 @@ function getCommitMessage(): string {
     console.warn('Git 提交信息为空，使用默认值');
     cachedCommitMessage = '无提交信息';
   } catch (error) {
-    console.warn('无法获取 Git 提交信息，使用默认值');
+    console.warn('无法获取 Git 提交信息，使用默认值', error);
     cachedCommitMessage = '无提交信息';
   }
   return cachedCommitMessage;
