@@ -69,7 +69,7 @@ export interface OC_GetBalanceData {
   code: number;
   data: OC_GetBalanceInfo;
 }
-
+// 秉持着能用先别动的原则，看着难受也给我忍者
 export interface OC_GetBalanceInfo {
   data: OC_GetBalanceInfo;
   card_status: number;
