@@ -2,7 +2,7 @@
   <div v-loading="loading" class="dev-home-container" element-loading-text="加载课程中...">
     <div class="header header-info">
       <div class="hash">
-        <span 
+        <span
           class="build-time"
           title="长按查看提交记录"
           @mousedown="handleLongPressStart"
@@ -14,10 +14,7 @@
         >
           编译时间：{{ buildTimestamp }}
         </span>
-        <span 
-          class="hash-link"
-          @click="handleHashClick"
-        >
+        <span class="hash-link" @click="handleHashClick">
           {{ gitHash }}
         </span>
       </div>
@@ -49,7 +46,7 @@
 
         <!-- 第三行：预留字段（钱包余额、空调余额等） -->
         <div class="info-line">
-          <span class="info-text">[预留]钱包余额: </span>
+          <span class="info-text">钱包余额: {{ OC_QBYS }}</span>
           <span class="divider">|</span>
           <span class="info-text">[预留]空调余额:</span>
           <span class="divider">|</span>
@@ -70,21 +67,44 @@
 </template>
 
 <script lang="ts" setup>
-import dayjs from 'dayjs';
-import type {ClassInfo} from '@/components/ClassCard.vue';
-import {computed, onMounted, onUnmounted, ref} from 'vue';
-import ClassContainer from '@/components/ClassContainer.vue';
-import {ZHKQ_GetDayCourseList, ZHKQ_GetDaySignList} from '@/api/anlaxy';
-import {getZHKQUserInfo} from '@/api/anlaxy/utils';
-import type {CourseList, SignListInfo} from '@/api/anlaxy/type/response';
-import router from "@/router";
-import {ElMessage} from 'element-plus';
+  import dayjs from 'dayjs';
+  import type { ClassInfo } from '@/components/ClassCard.vue';
+  import { computed, onMounted, onUnmounted, ref } from 'vue';
+  import ClassContainer from '@/components/ClassContainer.vue';
+  import { ZHKQ_GetDayCourseList, ZHKQ_GetDaySignList } from '@/api/anlaxy';
+  import { getZHKQUserInfo } from '@/api/anlaxy/utils';
+  import type { CourseList, SignListInfo } from '@/api/anlaxy/type/response';
+  import router from '@/router';
+  import { ElMessage } from 'element-plus';
+  import { OC_GetBalance } from '@/api/ocAPI';
 
-// 常量定义
-const LONG_PRESS_DELAY = 800; // 长按触发延迟（毫秒）
-const LONG_PRESS_DEBOUNCE_DELAY = 100; // 长按防抖延迟（毫秒）
+  // 常量定义
+  const LONG_PRESS_DELAY = 800; // 长按触发延迟（毫秒）
+  const LONG_PRESS_DEBOUNCE_DELAY = 100; // 长按防抖延迟（毫秒）
 
-// 用户信息对象（包含姓名、学号、token等）
+  // ===== 一卡通API函数区域 ===== //
+
+  const OC_QBYS = ref('加载中...');
+
+
+  // 获取一卡通信息
+  const getUserInfo_OC = () => {
+    const userInfoStr = localStorage.getItem('SA-OC-USERINFO');
+    return userInfoStr ? JSON.parse(userInfoStr) : null;
+  };
+
+  // 获取钱包余额
+  const oc_Get_WalletBalance = async () => {
+    const userInfo = getUserInfo_OC();
+
+    const userKey = userInfo.data.token;
+    const res = await OC_GetBalance(userKey);
+    OC_QBYS.value = res.data.wallet0_amount / 100 + ' 元';
+  };
+
+  // ===== 一卡通API函数区域 ===== //
+
+  // 用户信息对象（包含姓名、学号、token等）
   const userInfo = getZHKQUserInfo();
 
   // 当天课程数据（课程列表）
@@ -101,7 +121,9 @@ const LONG_PRESS_DEBOUNCE_DELAY = 100; // 长按防抖延迟（毫秒）
   const gitHash = ref(import.meta.env.VITE_GIT_HASH || '开发中');
   const gitFullHash = ref(import.meta.env.VITE_GIT_FULL_HASH || '开发中');
   const commitMessage = ref(import.meta.env.VITE_COMMIT_MESSAGE || '开发环境构建');
-  const githubRepo = ref(import.meta.env.VITE_GITHUB_REPO || 'https://github.com/Dongyifengs/SmartAttendance');
+  const githubRepo = ref(
+    import.meta.env.VITE_GITHUB_REPO || 'https://github.com/Dongyifengs/SmartAttendance'
+  );
 
   // 长按相关状态
   const longPressTimer = ref<number | null>(null);
@@ -151,9 +173,9 @@ const LONG_PRESS_DEBOUNCE_DELAY = 100; // 长按防抖延迟（毫秒）
   };
 
   const logOut = () => {
-    localStorage.clear()
+    localStorage.clear();
     router.push('/');
-  }
+  };
 
   // 清理定时器
   onUnmounted(() => {
@@ -328,6 +350,7 @@ const LONG_PRESS_DEBOUNCE_DELAY = 100; // 长按防抖延迟（毫秒）
         loading.value = false;
       }
     }
+    await oc_Get_WalletBalance();
   });
 </script>
 

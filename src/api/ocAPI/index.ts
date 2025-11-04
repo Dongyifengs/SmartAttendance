@@ -1,13 +1,22 @@
-const OC_API_LOGIN = 'https://api.etslink.net/api/user/login';
+import { OCAPI } from '@/api/ocAPI/edpoint';
+import type {
+  OC_GetBalanceData,
+  OC_GetBalanceRequestBody,
+  OCLoginRequestBody,
+} from '@/api/ocAPI/type.ts';
 
-import axios from 'axios';
-import type { OCLoginRequestBody } from './class.ts'; // OC登录函数，需要传递用户名和密码，返回结果为API返回的JSON对象
+const OCDEVICE_ID = import.meta.env.VITE_OC_DEVICE_ID;
 
-// OC登录函数，需要传递用户名和密码，返回结果为API返回的JSON对象
-export async function OC_LOGIN(username: string, password: string) {
-  // 构建请求体
+/**
+ * 一卡通登录函数
+ * @param username - 用户名
+ * @param password - 密码
+ * @returns response data
+ * @constructor
+ */
+export async function OC_Login(username: string, password: string) {
   const body: OCLoginRequestBody = {
-    appid: 'VlRCRlBRPT0=',
+    appid: OCDEVICE_ID,
     from: 4,
     data: {
       school_no: import.meta.env.VITE_OC_SCHOOL_NO,
@@ -16,12 +25,20 @@ export async function OC_LOGIN(username: string, password: string) {
     },
     token: '',
   };
-  // 使用axios发送POST请求
-  const response = await axios.post(OC_API_LOGIN, body, {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
-  // 返回API响应内容
+  const response = await OCAPI.post('user/login', body);
+  return response.data;
+}
+
+/**
+ * 一卡通获取钱包余额
+ * @param token - 用户登录后获取的 token
+ */
+export async function OC_GetBalance(token: string) {
+  const body: OC_GetBalanceRequestBody = {
+    appid: OCDEVICE_ID,
+    from: 4,
+    token: token,
+  };
+  const response: OC_GetBalanceData = await OCAPI.post('user/querycardinfo', body);
   return response.data;
 }

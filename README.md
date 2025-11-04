@@ -249,7 +249,7 @@ SmartAttendance/
 │   ├── API/                    # API 接口层
 │   │   ├── ocAPI/             # 一卡通 API
 │   │   │   ├── index.ts       # 一卡通主接口
-│   │   │   └── class.ts       # 一卡通类定义
+│   │   │   └── type.ts       # 一卡通类定义
 │   │   └── zhkqAPI/           # 智慧考勤 API
 │   │       ├── index.ts       # 考勤主接口
 │   │       ├── APIStarter/    # API 请求器
