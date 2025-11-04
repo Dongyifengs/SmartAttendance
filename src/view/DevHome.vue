@@ -54,8 +54,6 @@
           <span class="divider">|</span>
           <span class="info-text">[预留]最新消费:</span>
           <span class="divider">|</span>
-          <span class="info-text">[预留]空调余额:</span>
-          <span class="divider">|</span>
           <span class="info-text">[预留]用水预约:</span>
         </div>
       </div>
@@ -85,7 +83,6 @@
   // ===== 一卡通API函数区域 ===== //
 
   const OC_QBYS = ref('加载中...');
-
 
   // 获取一卡通信息
   const getUserInfo_OC = () => {
