@@ -44,3 +44,12 @@ export interface OCLoginResponse {
   data: OCLoginResponseData;
   count: string | null;
 }
+
+
+// =============== [一卡通一卡通余额返回类型] =============== //
+export interface OC_GetBalanceData {
+  msg: string;
+  code: number;
+  data: OC_GetBalanceInfo;
+}
+// =============== [一卡通一卡通余额返回类型] =============== //

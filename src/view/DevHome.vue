@@ -99,7 +99,7 @@
 
     const userKey = userInfo.data.token;
     const res = await OC_GetBalance(userKey);
-    OC_QBYS.value = res.data.data.wallet0_amount / 100 + ' 元';
+    OC_QBYS.value = res.data.wallet0_amount / 100 + ' 元';
   };
 
   // ===== 一卡通API函数区域 ===== //

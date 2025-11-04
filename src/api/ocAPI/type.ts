@@ -58,17 +58,7 @@ export interface OCLoginData {
 // =============== [一卡通登录请求类型] =============== //
 
 // =============== [一卡通获取钱包请求类型] =============== //
-export interface OC_GetBalanceRequestBody {
-  appid: string;
-  from: number;
-  token: string;
-}
 
-export interface OC_GetBalanceData {
-  msg: string;
-  code: number;
-  data: OC_GetBalanceInfo;
-}
 // 秉持着能用先别动的原则，看着难受也给我忍者
 export interface OC_GetBalanceInfo {
   data: OC_GetBalanceInfo;
