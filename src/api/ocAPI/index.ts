@@ -1,17 +1,19 @@
 import { OCAPI } from '@/api/ocAPI/edpoint';
-import type { OC_GetBalanceData, OC_GetBalanceRequestBody, OCLoginRequestBody, } from '@/api/ocAPI/type.ts';
+import type {
+  OC_GetBalanceData,
+  OC_GetBalanceRequestBody,
+} from '@/api/ocAPI/type.ts';
+import type { OCLoginResponse } from '@/api/ocAPI/type/response';
+import type { OC_LoginRequestsBody } from '@/api/ocAPI/type/requests';
 
+// 获取平台ID
 const OCDEVICE_ID = import.meta.env.VITE_OC_DEVICE_ID;
 
 /**
  * 一卡通登录函数
- * @param username - 用户名
- * @param password - 密码
- * @returns response data
- * @constructor
  */
-export async function OC_Login(username: string, password: string) {
-  const body: OCLoginRequestBody = {
+export async function OC_Login(username: string, password: string): Promise<OCLoginResponse> {
+  const body: OC_LoginRequestsBody = {
     appid: OCDEVICE_ID,
     from: 4,
     data: {
@@ -21,7 +23,7 @@ export async function OC_Login(username: string, password: string) {
     },
     token: '',
   };
-  const response = await OCAPI.post('user/login', body);
+  const response = await OCAPI.post<OCLoginResponse>('user/login', body);
   return response.data;
 }
 
