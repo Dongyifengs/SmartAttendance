@@ -71,6 +71,7 @@ export interface OC_GetBalanceData {
 }
 
 export interface OC_GetBalanceInfo {
+  data: OC_GetBalanceInfo;
   card_status: number;
   wallet2_amount:number
   amount: number;

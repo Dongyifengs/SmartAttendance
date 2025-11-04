@@ -1,9 +1,5 @@
 import { OCAPI } from '@/api/ocAPI/edpoint';
-import type {
-  OC_GetBalanceData,
-  OC_GetBalanceRequestBody,
-  OCLoginRequestBody,
-} from '@/api/ocAPI/type.ts';
+import type { OC_GetBalanceData, OC_GetBalanceRequestBody, OCLoginRequestBody, } from '@/api/ocAPI/type.ts';
 
 const OCDEVICE_ID = import.meta.env.VITE_OC_DEVICE_ID;
 
@@ -33,12 +29,12 @@ export async function OC_Login(username: string, password: string) {
  * 一卡通获取钱包余额
  * @param token - 用户登录后获取的 token
  */
-export async function OC_GetBalance(token: string) {
+export async function OC_GetBalance(token: string): Promise<OC_GetBalanceData> {
   const body: OC_GetBalanceRequestBody = {
     appid: OCDEVICE_ID,
     from: 4,
     token: token,
   };
-  const response: OC_GetBalanceData = await OCAPI.post('user/querycardinfo', body);
-  return response.data;
+
+  return await OCAPI.post('user/querycardinfo', body); // 返回完整响应
 }
