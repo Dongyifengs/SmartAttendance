@@ -193,3 +193,27 @@ export interface OC_GetUserInfoResponseInfo {
 
 }
 // =============== [一卡通获取用户信息返回类型] =============== //
+
+// =============== [一卡通获取支付二维码返回类型] =============== //
+/**
+ * 一卡通获取支付二维码返回体类型
+ * @interface OC_GetPayQrcodeResponse
+ * @property {number} code - 响应状态码
+ * @property {OC_GetPayQrcodeData} data - 支付二维码数据
+ * @property {string} msg - 响应消息
+ */
+export interface OC_GetPayQrcodeResponse {
+  code: number,
+  data: OC_GetPayQrcodeData,
+  msg: string
+}
+
+/**
+ * 一卡通获取支付二维码数据类型
+ * @interface OC_GetPayQrcodeData
+ * @property {string} code_info - 二维码信息
+ */
+export interface OC_GetPayQrcodeData {
+  code_info: string
+}
+// =============== [一卡通获取支付二维码返回类型] =============== //

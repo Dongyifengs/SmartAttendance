@@ -78,3 +78,18 @@ export interface OC_GetUserInfoRequestBody {
   token: string;
 }
 // =============== [一卡通获取用户信息请求类型] =============== //
+
+// =============== [一卡通获取支付二维码请求类型] =============== //
+/**
+ * 获取一卡通支付二维码请求体类型
+ * @interface OC_GetPayQrcodeRequestBody
+ * @property {string} appid - 应用ID
+ * @property {number} from - 来源标识
+ * @property {string} token - 令牌
+ */
+export interface OC_GetPayQrcodeRequestBody {
+  appid: string;
+  from: number;
+  token: string;
+}
+// =============== [一卡通获取支付二维码请求类型] =============== //

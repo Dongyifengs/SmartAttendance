@@ -4,10 +4,12 @@ import type {
   OC_GetBalanceData,
   OC_BillRetrievalResponse,
   OC_GetUserInfoResponse,
+  OC_GetPayQrcodeResponse,
 } from '@/api/ocAPI/type/response';
 import type {
   OC_BillRetrievalRequestBody,
   OC_GetBalanceRequestBody,
+  OC_GetPayQrcodeRequestBody,
   OC_GetUserInfoRequestBody,
   OC_LoginRequestsBody,
 } from '@/api/ocAPI/type/requests';
@@ -91,5 +93,20 @@ export async function OC_GetUserInfo(token: string): Promise<OC_GetUserInfoRespo
     token: token,
   };
   const response = await OCAPI.post<OC_GetUserInfoResponse>('user/getUserInfo', body);
+  return response.data;
+}
+
+/**
+ * 获取支付二维码
+ * @param token - 用户登录后获取的 token
+ * @return 支付二维码响应数据
+ */
+export async function OC_GetPayQRCode(token: string): Promise<OC_GetPayQrcodeResponse> {
+  const body: OC_GetPayQrcodeRequestBody = {
+    appid: OCDEVICE_ID,
+    from: 4,
+    token: token,
+  };
+  const response = await OCAPI.post<OC_GetPayQrcodeResponse>('user/schoolcod', body);
   return response.data;
 }
