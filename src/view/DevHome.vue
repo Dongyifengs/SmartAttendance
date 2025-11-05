@@ -285,7 +285,9 @@
     const userKey = userInfo.data.token;
     const res = await OC_BillRetrieval(1, 1, 7, userKey);
     console.log('最近消费记录API返回：', res);
-    if (res.data.all_count > 0) {
+    if (res.code == 400) {
+      OC_BR.value = res.msg;
+    } else if (res.data.all_count > 0) {
       OC_BR.value = res.data.list[0].trade_amount / 100 + '元';
     } else {
       OC_BR.value = '近7天未消费';
