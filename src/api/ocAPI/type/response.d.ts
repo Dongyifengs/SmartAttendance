@@ -124,3 +124,27 @@ export interface OC_GetBalanceInfo {
   card_type: number
 }
 // =============== [一卡通余额返回类型] =============== //
+
+// =============== [一卡通获取账单返回类型] =============== //
+export interface OC_BillRetrievalResponse {
+  code: number,
+  data: OC_BillRetrievalInfo,
+  msg: string
+}
+
+export interface OC_BillRetrievalInfo {
+  all_count: number,
+  list: OC_BillRetrievalList[]
+}
+
+export interface OC_BillRetrievalList {
+  acc_code:     number;
+  createTime:   Date;
+  desc:         string;
+  is_recharge:  number;
+  pay_way:      number;
+  trade_amount: number;
+  trade_no:     string;
+  trade_time:   Date;
+}
+// =============== [一卡通获取账单返回类型] =============== //

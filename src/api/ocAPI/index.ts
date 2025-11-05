@@ -1,6 +1,14 @@
 import { OCAPI } from '@/api/ocAPI/edpoint';
-import type { OCLoginResponse, OC_GetBalanceData } from '@/api/ocAPI/type/response';
-import type { OC_GetBalanceRequestBody, OC_LoginRequestsBody } from '@/api/ocAPI/type/requests';
+import type {
+  OCLoginResponse,
+  OC_GetBalanceData,
+  OC_BillRetrievalResponse,
+} from '@/api/ocAPI/type/response';
+import type {
+  OC_BillRetrievalRequestBody,
+  OC_GetBalanceRequestBody,
+  OC_LoginRequestsBody,
+} from '@/api/ocAPI/type/requests';
 
 // 获取平台ID
 const OCDEVICE_ID = import.meta.env.VITE_OC_DEVICE_ID;
@@ -39,4 +47,20 @@ export async function OC_GetBalance(token: string): Promise<OC_GetBalanceData> {
   };
   const response = await OCAPI.post<OC_GetBalanceData>('user/querycardinfo', body);
   return response.data;
+}
+
+export async function OC_BillRetrieval(pageNum: number, pageSize: number, day_num: number, token: string
+): Promise<OC_BillRetrievalResponse> {
+  const body: OC_BillRetrievalRequestBody = {
+    appid: OCDEVICE_ID,
+    data: {
+      day_num: day_num,
+      pageNum: pageNum,
+      pageSize: pageSize,
+    },
+    from: 4,
+    token: token,
+  };
+  const response = await OCAPI.post<OC_BillRetrievalResponse>('user/tradeinfolist', body);
+  return response.data
 }

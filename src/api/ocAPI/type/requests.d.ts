@@ -39,3 +39,27 @@ export interface OC_GetBalanceRequestBody {
   token: string;
 }
 // =============== [一卡通获取钱包余额请求类型] =============== //
+
+// =============== [一卡通获取账单请求类型] =============== //
+/**
+ * 一卡通获取账单请求体
+ * @interface OC_BillRetrievalRequestBody
+ * @property { string } appid 平台ID
+ * @property { any } data 数据
+ * @property { number } data.day_num 天数
+ * @property { number } data.pageNum 一页数量
+ * @property { number } data.pageSize 页数
+ * @property { number } from 来源
+ * @property { string } token 用户token
+ */
+export interface OC_BillRetrievalRequestBody {
+  appid: string,
+  data: {
+    day_num: number,
+    pageNum: number,
+    pageSize: number
+  },
+  from: number,
+  token: string
+}
+// =============== [一卡通获取账单请求类型] =============== //

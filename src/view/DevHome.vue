@@ -52,7 +52,7 @@
           <span class="divider">|</span>
           <span class="info-text">[预留]个人付款码:</span>
           <span class="divider">|</span>
-          <span class="info-text">[预留]最新消费:</span>
+          <span class="info-text">最新消费: {{ OC_BR }}</span>
           <span class="divider">|</span>
           <span class="info-text">[预留]用水预约:</span>
         </div>
@@ -74,7 +74,7 @@
   import type { CourseList, SignListInfo } from '@/api/anlaxy/type/response';
   import router from '@/router';
   import { ElMessage } from 'element-plus';
-  import { OC_GetBalance } from '@/api/ocAPI';
+  import { OC_BillRetrieval, OC_GetBalance } from '@/api/ocAPI';
 
   // 常量定义
   const LONG_PRESS_DELAY = 800; // 长按触发延迟（毫秒）
@@ -82,7 +82,8 @@
 
   // ===== 一卡通API函数区域 ===== //
 
-  const OC_QBYS = ref('加载中...');
+  const OC_QBYS = ref('加载中...'); // 一卡通余额
+  const OC_BR = ref('7日内没有消费'); // 最近一次消费
 
   // 获取一卡通信息
   const getUserInfo_OC = () => {
@@ -97,6 +98,18 @@
     const userKey = userInfo.data.token;
     const res = await OC_GetBalance(userKey);
     OC_QBYS.value = res.data.wallet0_amount / 100 + ' 元';
+  };
+
+  const oc_Get_BillRetrieval = async () => {
+    const userInfo = getUserInfo_OC();
+
+    const userKey = userInfo.data.token;
+    const res = await OC_BillRetrieval(1,1,7,userKey);
+    if (res.data.all_count > 0) {
+      OC_BR.value = res.data.list[0].trade_amount / 100 + '元'
+    } else {
+      OC_BR.value = "近7天未消费"
+    }
   };
 
   // ===== 一卡通API函数区域 ===== //
@@ -348,6 +361,7 @@
       }
     }
     await oc_Get_WalletBalance();
+    await oc_Get_BillRetrieval();
   });
 </script>
 
