@@ -52,12 +52,51 @@
           <span class="divider">|</span>
           <span class="info-text">[预留]个人付款码:</span>
           <span class="divider">|</span>
-          <span class="info-text">最新消费: {{ OC_BR }}</span>
+          <span class="info-text" @click="showBillDialog = true" style="cursor: pointer"
+            >最新消费: {{ OC_BR }}</span
+          >
           <span class="divider">|</span>
           <span class="info-text">[预留]用水预约:</span>
         </div>
       </div>
     </div>
+
+    <!-- 账单详情弹窗 -->
+    <el-dialog
+      v-model="showBillDialog"
+      title="账单详情"
+      width="400px"
+      class="bill-dialog"
+      :close-on-click-modal="false"
+    >
+      <div style="display: flex; justify-content: center; gap: 10px; margin-bottom: 16px">
+        <el-button
+          v-for="day in dayOptions"
+          :key="day.value"
+          :type="day.value === currentDays ? 'primary' : 'default'"
+          size="small"
+          @click="fetchBill(day.value)"
+        >
+          {{ day.label }}
+        </el-button>
+      </div>
+
+      <!-- 账单列表区域 -->
+      <div v-if="billList.length">
+        <el-table :data="billList" style="width: 100%" size="small">
+          <el-table-column prop="trade_time" label="时间" min-width="35%" align="center" />
+          <el-table-column prop="desc" label="说明" min-width="33%" align="center" />
+          <el-table-column
+            prop="trade_amount"
+            label="金额"
+            min-width="32%"
+            align="center"
+            :formatter="(row: OC_BillRetrievalList) => (row.trade_amount / 100).toFixed(2) + ' 元'"
+          />
+        </el-table>
+      </div>
+      <div v-else style="text-align: center; color: #999">暂无账单数据</div>
+    </el-dialog>
 
     <!-- 课程列表组件 -->
     <class-container v-model="data"></class-container>
@@ -75,6 +114,7 @@
   import router from '@/router';
   import { ElMessage } from 'element-plus';
   import { OC_BillRetrieval, OC_GetBalance } from '@/api/ocAPI';
+  import type { OC_BillRetrievalList } from '@/api/ocAPI/type/response';
 
   // 常量定义
   const LONG_PRESS_DELAY = 800; // 长按触发延迟（毫秒）
@@ -100,15 +140,45 @@
     OC_QBYS.value = res.data.wallet0_amount / 100 + ' 元';
   };
 
+  // 获取最近的消费记录
   const oc_Get_BillRetrieval = async () => {
     const userInfo = getUserInfo_OC();
 
     const userKey = userInfo.data.token;
-    const res = await OC_BillRetrieval(1,1,7,userKey);
+    const res = await OC_BillRetrieval(1, 1, 7, userKey);
     if (res.data.all_count > 0) {
-      OC_BR.value = res.data.list[0].trade_amount / 100 + '元'
+      OC_BR.value = res.data.list[0].trade_amount / 100 + '元';
     } else {
-      OC_BR.value = "近7天未消费"
+      OC_BR.value = '近7天未消费';
+    }
+  };
+
+  // ======= 账单详情弹窗逻辑 ======= //
+  const showBillDialog = ref(false);
+  const billList = ref<OC_BillRetrievalList[]>([]);
+  const currentDays = ref(7);
+
+  const dayOptions = [
+    { label: '1天', value: 1 },
+    { label: '7天', value: 7 },
+    { label: '14天', value: 14 },
+    { label: '1个月', value: 30 },
+  ];
+
+  // 拉取账单详情
+  const fetchBill = async (days: number) => {
+    currentDays.value = days;
+    const userInfo = getUserInfo_OC();
+    if (!userInfo) return;
+    const userKey = userInfo.data.token;
+
+    // 每次切换时间范围重新加载账单
+    const res = await OC_BillRetrieval(1, 100, days, userKey);
+
+    if (res.data?.list?.length) {
+      billList.value = res.data.list;
+    } else {
+      billList.value = [];
     }
   };
 
@@ -362,6 +432,7 @@
     }
     await oc_Get_WalletBalance();
     await oc_Get_BillRetrieval();
+    await fetchBill(7);
   });
 </script>
 
@@ -531,5 +602,23 @@
       font-size: 13px;
       gap: 6px;
     }
+  }
+
+  /* 弹窗宽度在手机端适配 */
+  .bill-dialog {
+    max-width: 90vw;
+  }
+
+  .bill-dialog .el-dialog__body {
+    padding: 12px;
+  }
+
+  /* 让表格列文字更紧凑 */
+  .bill-dialog .el-table .cell {
+    padding: 4px 0;
+    font-size: 13px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
   }
 </style>
