@@ -20,6 +20,7 @@
       </div>
       <div>
         <el-button @click="logOut">退出登录</el-button>
+        <el-button @click="logBakc">返回</el-button>
       </div>
     </div>
     <!-- 用户信息卡片 - 紧凑版展示 -->
@@ -402,6 +403,10 @@
     localStorage.clear();
     router.push('/');
   };
+
+  const logBakc = () => {
+    router.push('/home')
+  }
 
   // 清理定时器
   onUnmounted(() => {
