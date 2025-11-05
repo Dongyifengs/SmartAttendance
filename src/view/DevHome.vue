@@ -77,7 +77,7 @@
         <el-button
           v-for="day in dayOptions"
           :key="day.value"
-          :ref="(el: HTMLElement | { $el: HTMLElement } | null) => setDayButtonRef(el, day.value)"
+          :ref="(el: any) => { if (el) setDayButtonRef(el, day.value) }"
           :type="day.value === currentDays ? 'primary' : 'default'"
           size="small"
           @click="fetchBill(day.value)"
@@ -109,7 +109,8 @@
     <!-- Tour Guide -->
     <el-tour
       v-model="tourOpen"
-      :mask="{ color: 'rgba(0, 0, 0, 0.5)' }"
+      :z-index="3001"
+      :mask="{ color: 'rgba(0, 0, 0, 0.5)', style: { zIndex: 3000 } }"
       :close-icon="false"
       @change="handleTourChange"
     >
@@ -183,9 +184,11 @@
   const dayButtonRefs = ref<Map<number, HTMLElement>>(new Map());
 
   // 设置按钮 ref 的辅助函数
-  const setDayButtonRef = (el: HTMLElement | { $el: HTMLElement } | null, value: number) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const setDayButtonRef = (el: any, value: number) => {
     if (el) {
-      const element = '$el' in el ? el.$el : el;
+      // ElementPlus button 组件，需要获取 $el
+      const element = el.$el || el;
       dayButtonRefs.value.set(value, element);
     }
   };
@@ -239,7 +242,10 @@
     // 当进入第3步（索引为2）时，需要打开详情弹窗以显示按钮
     if (current === 2) {
       showBillDialog.value = true;
+      // 等待对话框完全渲染并且按钮 refs 已设置
       await nextTick();
+      // 额外延迟以确保 DOM 和 refs 完全就绪
+      await new Promise((resolve) => setTimeout(resolve, 300));
     }
   };
 
