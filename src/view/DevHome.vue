@@ -46,13 +46,17 @@
 
         <!-- 第三行：预留字段（钱包余额、空调余额等） -->
         <div class="info-line">
-          <span class="info-text">钱包余额: {{ OC_QBYS }}</span>
+          <span ref="walletBalanceRef" class="info-text">钱包余额: {{ OC_QBYS }}</span>
           <span class="divider">|</span>
           <span class="info-text">[预留]空调余额:</span>
           <span class="divider">|</span>
           <span class="info-text">[预留]个人付款码:</span>
           <span class="divider">|</span>
-          <span class="info-text" @click="showBillDialog = true" style="cursor: pointer"
+          <span
+            ref="recentConsumptionRef"
+            class="info-text"
+            style="cursor: pointer"
+            @click="showBillDialog = true"
             >最新消费: {{ OC_BR }}</span
           >
           <span class="divider">|</span>
@@ -73,6 +77,7 @@
         <el-button
           v-for="day in dayOptions"
           :key="day.value"
+          :ref="(el: HTMLElement | { $el: HTMLElement } | null) => setDayButtonRef(el, day.value)"
           :type="day.value === currentDays ? 'primary' : 'default'"
           size="small"
           @click="fetchBill(day.value)"
@@ -100,13 +105,58 @@
 
     <!-- 课程列表组件 -->
     <class-container v-model="data"></class-container>
+
+    <!-- Tour Guide -->
+    <el-tour v-model="tourOpen" :mask="{ color: 'rgba(0, 0, 0, 0.5)' }" :close-icon="false">
+      <el-tour-step
+        :target="walletBalanceRef"
+        title="钱包余额"
+        description="登录一卡通就能看见钱包的余额"
+        :next-button-props="{ children: '下一步' }"
+      />
+      <el-tour-step
+        :target="recentConsumptionRef"
+        title="最近消费记录"
+        description="默认显示最近7天的消费记录，点击之后会显示详细模式，可以自己选择时间范围"
+        :prev-button-props="{ children: '上一步' }"
+        :next-button-props="{ children: '下一步' }"
+      />
+      <el-tour-step
+        :target="dayButton1Ref"
+        title="1天账单"
+        description="点击查看最近1天的消费账单"
+        :prev-button-props="{ children: '上一步' }"
+        :next-button-props="{ children: '下一步' }"
+      />
+      <el-tour-step
+        :target="dayButton7Ref"
+        title="7天账单"
+        description="点击查看最近7天的消费账单"
+        :prev-button-props="{ children: '上一步' }"
+        :next-button-props="{ children: '下一步' }"
+      />
+      <el-tour-step
+        :target="dayButton14Ref"
+        title="14天账单"
+        description="点击查看最近14天的消费账单"
+        :prev-button-props="{ children: '上一步' }"
+        :next-button-props="{ children: '下一步' }"
+      />
+      <el-tour-step
+        :target="dayButton30Ref"
+        title="1个月账单"
+        description="点击查看最近1个月的消费账单"
+        :prev-button-props="{ children: '上一步' }"
+        :next-button-props="{ children: '完成' }"
+      />
+    </el-tour>
   </div>
 </template>
 
 <script lang="ts" setup>
   import dayjs from 'dayjs';
   import type { ClassInfo } from '@/components/ClassCard.vue';
-  import { computed, onMounted, onUnmounted, ref } from 'vue';
+  import { computed, onMounted, onUnmounted, ref, watch, nextTick } from 'vue';
   import ClassContainer from '@/components/ClassContainer.vue';
   import { ZHKQ_GetDayCourseList, ZHKQ_GetDaySignList } from '@/api/anlaxy';
   import { getZHKQUserInfo } from '@/api/anlaxy/utils';
@@ -119,11 +169,70 @@
   // 常量定义
   const LONG_PRESS_DELAY = 800; // 长按触发延迟（毫秒）
   const LONG_PRESS_DEBOUNCE_DELAY = 100; // 长按防抖延迟（毫秒）
+  const TOUR_COMPLETED_KEY = 'SA-TOUR-COMPLETED'; // localStorage key for tour completion
+
+  // ===== Tour Guide 相关 ===== //
+  const tourOpen = ref(false);
+  const walletBalanceRef = ref<HTMLElement>();
+  const recentConsumptionRef = ref<HTMLElement>();
+  const dayButton1Ref = ref<HTMLElement>();
+  const dayButton7Ref = ref<HTMLElement>();
+  const dayButton14Ref = ref<HTMLElement>();
+  const dayButton30Ref = ref<HTMLElement>();
+
+  // 设置按钮 ref 的辅助函数
+  const setDayButtonRef = (el: HTMLElement | { $el: HTMLElement } | null, value: number) => {
+    if (el) {
+      if (value === 1) dayButton1Ref.value = '$el' in el ? el.$el : el;
+      else if (value === 7) dayButton7Ref.value = '$el' in el ? el.$el : el;
+      else if (value === 14) dayButton14Ref.value = '$el' in el ? el.$el : el;
+      else if (value === 30) dayButton30Ref.value = '$el' in el ? el.$el : el;
+    }
+  };
+
+  // 检查用户是否已完成 Tour
+  const checkTourCompleted = () => {
+    const completed = localStorage.getItem(TOUR_COMPLETED_KEY);
+    return completed === 'true';
+  };
+
+  // 标记 Tour 已完成
+  const markTourCompleted = () => {
+    localStorage.setItem(TOUR_COMPLETED_KEY, 'true');
+  };
 
   // ===== 一卡通API函数区域 ===== //
 
   const OC_QBYS = ref('加载中...'); // 一卡通余额
   const OC_BR = ref('7日内没有消费'); // 最近一次消费
+
+  // ======= 账单详情弹窗逻辑 ======= //
+  const showBillDialog = ref(false);
+  const billList = ref<OC_BillRetrievalList[]>([]);
+  const currentDays = ref(7);
+
+  const dayOptions = [
+    { label: '1天', value: 1 },
+    { label: '7天', value: 7 },
+    { label: '14天', value: 14 },
+    { label: '1个月', value: 30 },
+  ];
+
+  // 监听 Tour 关闭事件，保存完成状态
+  watch(tourOpen, (newVal) => {
+    if (!newVal) {
+      markTourCompleted();
+    }
+  });
+
+  // 监听弹窗打开，在打开后启动 Tour（如果是第一次且 Tour 尚未完成）
+  watch(showBillDialog, async (newVal) => {
+    if (newVal && !checkTourCompleted() && tourOpen.value) {
+      // 等待弹窗完全渲染后再更新 Tour
+      await nextTick();
+      // Tour 组件会自动更新步骤目标位置
+    }
+  });
 
   // 获取一卡通信息
   const getUserInfo_OC = () => {
@@ -162,18 +271,6 @@
       OC_BR.value = '近7天未消费';
     }
   };
-
-  // ======= 账单详情弹窗逻辑 ======= //
-  const showBillDialog = ref(false);
-  const billList = ref<OC_BillRetrievalList[]>([]);
-  const currentDays = ref(7);
-
-  const dayOptions = [
-    { label: '1天', value: 1 },
-    { label: '7天', value: 7 },
-    { label: '14天', value: 14 },
-    { label: '1个月', value: 30 },
-  ];
 
   // 拉取账单详情
   const fetchBill = async (days: number) => {
@@ -444,6 +541,12 @@
     await oc_Get_WalletBalance();
     await oc_Get_BillRetrieval();
     await fetchBill(7);
+
+    // 检查是否需要显示 Tour
+    await nextTick();
+    if (!checkTourCompleted()) {
+      tourOpen.value = true;
+    }
   });
 </script>
 
