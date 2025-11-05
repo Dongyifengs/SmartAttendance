@@ -191,7 +191,15 @@
     if (el) {
       // ElementPlus button 组件，需要获取 $el
       const element = el.$el || el;
-      dayButtonRefs.value.set(value, element);
+      // 强制触发 Map 的更新
+      const newMap = new Map(dayButtonRefs.value);
+      newMap.set(value, element);
+      dayButtonRefs.value = newMap;
+    } else {
+      // 元素被卸载时，从 Map 中移除
+      const newMap = new Map(dayButtonRefs.value);
+      newMap.delete(value);
+      dayButtonRefs.value = newMap;
     }
   };
 
@@ -258,8 +266,12 @@
         showBillDialog.value = true;
         // 等待对话框完全渲染并且按钮 refs 已设置
         await nextTick();
-        // 额外延迟以确保 DOM 和 refs 完全就绪
-        await new Promise((resolve) => setTimeout(resolve, 300));
+        // 增加延迟时间，确保 ElementPlus 组件完全挂载和 refs 设置完成
+        await new Promise((resolve) => setTimeout(resolve, 500));
+      } else {
+        // 对话框已经打开，但仍需等待确保 refs 可用
+        await nextTick();
+        await new Promise((resolve) => setTimeout(resolve, 100));
       }
     }
   };
