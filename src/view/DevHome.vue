@@ -127,28 +127,28 @@
         :next-button-props="{ children: '下一步' }"
       />
       <el-tour-step
-        :target="dayButton1Ref"
+        :target="getDayButtonRef(1)"
         title="1天账单"
         description="点击查看最近1天的消费账单"
         :prev-button-props="{ children: '上一步' }"
         :next-button-props="{ children: '下一步' }"
       />
       <el-tour-step
-        :target="dayButton7Ref"
+        :target="getDayButtonRef(7)"
         title="7天账单"
         description="点击查看最近7天的消费账单"
         :prev-button-props="{ children: '上一步' }"
         :next-button-props="{ children: '下一步' }"
       />
       <el-tour-step
-        :target="dayButton14Ref"
+        :target="getDayButtonRef(14)"
         title="14天账单"
         description="点击查看最近14天的消费账单"
         :prev-button-props="{ children: '上一步' }"
         :next-button-props="{ children: '下一步' }"
       />
       <el-tour-step
-        :target="dayButton30Ref"
+        :target="getDayButtonRef(30)"
         title="1个月账单"
         description="点击查看最近1个月的消费账单"
         :prev-button-props="{ children: '上一步' }"
@@ -180,19 +180,19 @@
   const tourOpen = ref(false);
   const walletBalanceRef = ref<HTMLElement>();
   const recentConsumptionRef = ref<HTMLElement>();
-  const dayButton1Ref = ref<HTMLElement>();
-  const dayButton7Ref = ref<HTMLElement>();
-  const dayButton14Ref = ref<HTMLElement>();
-  const dayButton30Ref = ref<HTMLElement>();
+  const dayButtonRefs = ref<Map<number, HTMLElement>>(new Map());
 
   // 设置按钮 ref 的辅助函数
   const setDayButtonRef = (el: HTMLElement | { $el: HTMLElement } | null, value: number) => {
     if (el) {
-      if (value === 1) dayButton1Ref.value = '$el' in el ? el.$el : el;
-      else if (value === 7) dayButton7Ref.value = '$el' in el ? el.$el : el;
-      else if (value === 14) dayButton14Ref.value = '$el' in el ? el.$el : el;
-      else if (value === 30) dayButton30Ref.value = '$el' in el ? el.$el : el;
+      const element = '$el' in el ? el.$el : el;
+      dayButtonRefs.value.set(value, element);
     }
+  };
+
+  // 根据时间天数获取按钮 ref
+  const getDayButtonRef = (days: number): HTMLElement | undefined => {
+    return dayButtonRefs.value.get(days);
   };
 
   // 检查用户是否已完成 Tour
@@ -230,8 +230,12 @@
     }
   });
 
+  // 当前 Tour 步骤索引
+  const currentTourStep = ref(0);
+
   // 处理 Tour 步骤变化
   const handleTourChange = async (current: number) => {
+    currentTourStep.value = current;
     // 当进入第3步（索引为2）时，需要打开详情弹窗以显示按钮
     if (current === 2) {
       showBillDialog.value = true;
@@ -239,11 +243,14 @@
     }
   };
 
-  // 监听弹窗关闭，如果 Tour 还在进行且在按钮引导步骤中，则关闭 Tour
+  // 监听弹窗关闭，如果 Tour 还在进行且在按钮引导步骤中（步骤3-6），则关闭 Tour
   watch(showBillDialog, async (newVal) => {
     if (!newVal && !checkTourCompleted() && tourOpen.value) {
-      // 用户在 Tour 进行中关闭了对话框，结束 Tour
-      tourOpen.value = false;
+      // 检查是否在需要对话框的步骤中（步骤索引 2-5 对应步骤 3-6）
+      if (currentTourStep.value >= 2 && currentTourStep.value <= 5) {
+        // 用户在按钮引导步骤中关闭了对话框，结束 Tour
+        tourOpen.value = false;
+      }
     }
   });
 
