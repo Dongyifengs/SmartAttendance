@@ -106,8 +106,9 @@
     <!-- 课程列表组件 -->
     <class-container v-model="data"></class-container>
 
-    <!-- Tour Guide -->
+    <!-- Tour Guide - Only render if not completed -->
     <el-tour
+      v-if="!tourCompleted"
       v-model="tourOpen"
       :z-index="3001"
       :mask="{ color: 'rgba(0, 0, 0, 0.5)', style: { zIndex: 3000 } }"
@@ -179,6 +180,7 @@
 
   // ===== Tour Guide 相关 ===== //
   const tourOpen = ref(false);
+  const tourCompleted = ref(localStorage.getItem(TOUR_COMPLETED_KEY) === 'true');
   const walletBalanceRef = ref<HTMLElement>();
   const recentConsumptionRef = ref<HTMLElement>();
   const dayButtonRefs = ref<Map<number, HTMLElement>>(new Map());
@@ -201,12 +203,15 @@
   // 检查用户是否已完成 Tour
   const checkTourCompleted = () => {
     const completed = localStorage.getItem(TOUR_COMPLETED_KEY);
-    return completed === 'true';
+    const isCompleted = completed === 'true';
+    tourCompleted.value = isCompleted;
+    return isCompleted;
   };
 
   // 标记 Tour 已完成
   const markTourCompleted = () => {
     localStorage.setItem(TOUR_COMPLETED_KEY, 'true');
+    tourCompleted.value = true;
   };
 
   // ===== 一卡通API函数区域 ===== //
