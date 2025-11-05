@@ -112,7 +112,7 @@
       v-model="tourOpen"
       :z-index="3001"
       :mask="{ color: 'rgba(0, 0, 0, 0.5)', style: { zIndex: 3000 } }"
-      :close-icon="false"
+      :close-icon="null"
     >
       <el-tour-step
         :target="walletBalanceRef"
