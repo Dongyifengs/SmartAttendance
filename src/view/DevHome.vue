@@ -107,7 +107,12 @@
     <class-container v-model="data"></class-container>
 
     <!-- Tour Guide -->
-    <el-tour v-model="tourOpen" :mask="{ color: 'rgba(0, 0, 0, 0.5)' }" :close-icon="false">
+    <el-tour
+      v-model="tourOpen"
+      :mask="{ color: 'rgba(0, 0, 0, 0.5)' }"
+      :close-icon="false"
+      @change="handleTourChange"
+    >
       <el-tour-step
         :target="walletBalanceRef"
         title="钱包余额"
@@ -225,12 +230,20 @@
     }
   });
 
-  // 监听弹窗打开，在打开后启动 Tour（如果是第一次且 Tour 尚未完成）
-  watch(showBillDialog, async (newVal) => {
-    if (newVal && !checkTourCompleted() && tourOpen.value) {
-      // 等待弹窗完全渲染后再更新 Tour
+  // 处理 Tour 步骤变化
+  const handleTourChange = async (current: number) => {
+    // 当进入第3步（索引为2）时，需要打开详情弹窗以显示按钮
+    if (current === 2) {
+      showBillDialog.value = true;
       await nextTick();
-      // Tour 组件会自动更新步骤目标位置
+    }
+  };
+
+  // 监听弹窗关闭，如果 Tour 还在进行且在按钮引导步骤中，则关闭 Tour
+  watch(showBillDialog, async (newVal) => {
+    if (!newVal && !checkTourCompleted() && tourOpen.value) {
+      // 用户在 Tour 进行中关闭了对话框，结束 Tour
+      tourOpen.value = false;
     }
   });
 
