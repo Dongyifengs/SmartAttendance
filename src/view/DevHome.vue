@@ -245,13 +245,22 @@
   // 处理 Tour 步骤变化
   const handleTourChange = async (current: number) => {
     currentTourStep.value = current;
-    // 当进入第3步（索引为2）时，需要打开详情弹窗以显示按钮
-    if (current === 2) {
-      showBillDialog.value = true;
-      // 等待对话框完全渲染并且按钮 refs 已设置
-      await nextTick();
-      // 额外延迟以确保 DOM 和 refs 完全就绪
-      await new Promise((resolve) => setTimeout(resolve, 300));
+    
+    // 步骤 0-1: 确保对话框关闭
+    if (current < 2) {
+      if (showBillDialog.value) {
+        showBillDialog.value = false;
+      }
+    }
+    // 步骤 2-5 (对应步骤3-6): 确保对话框打开
+    else if (current >= 2 && current <= 5) {
+      if (!showBillDialog.value) {
+        showBillDialog.value = true;
+        // 等待对话框完全渲染并且按钮 refs 已设置
+        await nextTick();
+        // 额外延迟以确保 DOM 和 refs 完全就绪
+        await new Promise((resolve) => setTimeout(resolve, 300));
+      }
     }
   };
 
