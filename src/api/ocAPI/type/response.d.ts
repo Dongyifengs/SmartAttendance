@@ -174,6 +174,7 @@ export interface OC_GetUserInfoResponse {
  * @property {string} name - 用户姓名
  * @property {null} photo - 照片（通常为 null）
  * @property {null} schoolNo - 学校编号（通常为 null）
+ * @property {null} school_name - 学校编号（通常为 null）
  * @property {string} shenfen - 身份
  * @property {number} status - 状态
  * @property {null} studentId - 学生ID（通常为 null）
@@ -186,6 +187,7 @@ export interface OC_GetUserInfoResponseInfo {
   name: string,
   photo: null,
   schoolNo: null,
+  school_name: null,
   shenfen: string,
   status: number,
   studentId: null,

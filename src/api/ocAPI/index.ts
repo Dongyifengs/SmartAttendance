@@ -107,6 +107,6 @@ export async function OC_GetPayQRCode(token: string): Promise<OC_GetPayQrcodeRes
     from: 4,
     token: token,
   };
-  const response = await OCAPI.post<OC_GetPayQrcodeResponse>('user/schoolcod', body);
+  const response = await OCAPI.post<OC_GetPayQrcodeResponse>('user/schoolcode', body);
   return response.data;
 }

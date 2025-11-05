@@ -52,15 +52,15 @@
           <span class="divider">|</span>
           <span class="info-text">[预留]空调余额:</span>
           <span class="divider">|</span>
-          <span class="info-text">[预留]个人付款码:</span>
+          <span class="info-text" @click="showPayDialog = true">个人付款码 </span>
           <span class="divider">|</span>
           <span
             ref="recentConsumptionRef"
             class="info-text"
             style="cursor: pointer"
             @click="showBillDialog = true"
-            >最新消费: {{ OC_BR }}</span
-          >
+            >最新消费: {{ OC_BR }}
+          </span>
           <span class="divider">|</span>
           <span class="info-text">[预留]用水预约:</span>
         </div>
@@ -102,6 +102,33 @@
         </el-table>
       </div>
       <div v-else style="text-align: center; color: #999">暂无账单数据</div>
+    </el-dialog>
+
+    <!-- 支付弹窗 -->
+    <el-dialog
+      v-model="showPayDialog"
+      title="支付二维码"
+      width="400px"
+      class="pay-dialog"
+      :close-on-click-modal="false"
+    >
+      <div style="text-align: center; margin-bottom: 16px">
+        <img :src="payQCBase" alt="支付二维码" style="width: 300px; height: 300px" />
+        <div style="margin-top: 8px; color: #666; font-size: 12px">
+          二维码 {{ refreshCountdown }} 秒后自动刷新
+        </div>
+      </div>
+      <div style="text-align: center; color: #999">
+        {{ userClass }} | {{ userName }} | {{ userId }}
+      </div>
+      <div style="text-align: center; color: #999; margin-bottom: 16px">
+        请使用校园一卡通App扫码支付
+      </div>
+      <div style="text-align: center">
+        <el-button type="primary" @click="refreshQRCode" :loading="refreshingQR">
+          {{ refreshingQR ? '刷新中...' : '立即刷新二维码' }}
+        </el-button>
+      </div>
     </el-dialog>
 
     <!-- 课程列表组件 -->
@@ -149,7 +176,13 @@
   import type { CourseList, SignListInfo } from '@/api/anlaxy/type/response';
   import router from '@/router';
   import { ElMessage } from 'element-plus';
-  import { OC_BillRetrieval, OC_GetBalance, OC_Login } from '@/api/ocAPI';
+  import {
+    OC_BillRetrieval,
+    OC_GetBalance,
+    OC_GetPayQRCode,
+    OC_GetUserInfo,
+    OC_Login,
+  } from '@/api/ocAPI';
   import type { OC_BillRetrievalList, OCLoginResponse } from '@/api/ocAPI/type/response';
 
   // ==================== 常量 & 配置 ====================
@@ -190,6 +223,9 @@
   const showBillDialog = ref(false);
   const billList = ref<OC_BillRetrievalList[]>([]);
   const currentDays = ref<number>(7);
+
+  // 支付弹窗
+  const showPayDialog = ref(false);
 
   const dayOptions = [
     { label: '1天', value: 1 },
@@ -374,6 +410,126 @@
     }
   };
 
+  // 获取用户信息
+  const userName = ref('用户名');
+  const userClass = ref('班级');
+  const userId = ref('学校');
+  const getUserInfoOC = async () => {
+    try {
+      const userInfo = getUserInfo_OC();
+      if (!userInfo?.data?.token) {
+        ElMessage.warning('请先登录一卡通以获取用户信息');
+        return;
+      }
+      const userKey = userInfo.data.token;
+      const res = OC_GetUserInfo(userKey);
+      console.log('获取用户信息返回：', res);
+      res.then((response) => {
+        if (response && response.code === 200) {
+          userName.value = response.data.name || '用户名';
+          userClass.value = response.data.dept_name || '班级';
+          userId.value = response.data.school_name || '学校';
+        } else {
+          ElMessage.error('获取用户信息失败');
+        }
+      });
+    } catch (error) {
+      console.log('[getUserInfoOC] 异常: ', error);
+      ElMessage.error('获取用户信息失败');
+    }
+  };
+
+  // 获取支付二维码
+  const payQCBase = ref('');
+  const refreshTimer = ref<number | null>(null);
+  const refreshCountdown = ref(10); // 倒计时显示
+  const refreshingQR = ref(false); // 刷新状态
+  const getPayQC = async (): Promise<void> => {
+    try {
+      const userInfo = getUserInfo_OC();
+      if (!userInfo?.data?.token) {
+        ElMessage.warning('请先登录一卡通以获取用户信息');
+        return;
+      }
+      const userKey = userInfo.data.token;
+      const response = await OC_GetPayQRCode(userKey);
+      console.log('获取支付二维码返回：', response);
+      payQCBase.value = response.data.code_info;
+    } catch (error) {
+      console.error('[getPayQC] 异常: ', error);
+      ElMessage.error('获取支付二维码失败');
+    }
+  };
+  // 手动刷新二维码
+  const refreshQRCode = async (): Promise<void> => {
+    if (refreshingQR.value) return;
+
+    refreshingQR.value = true;
+    try {
+      await getPayQC();
+      resetRefreshTimer(); // 重置自动刷新计时器
+      ElMessage.success('二维码已刷新');
+    } catch (error) {
+      console.error('[refreshQRCode] 刷新二维码失败:', error);
+      ElMessage.error('刷新二维码失败');
+    } finally {
+      refreshingQR.value = false;
+    }
+  };
+  // 重置自动刷新计时器
+  const resetRefreshTimer = (): void => {
+    // 清除现有计时器
+    if (refreshTimer.value !== null) {
+      clearInterval(refreshTimer.value);
+      refreshTimer.value = null;
+    }
+
+    // 重置倒计时
+    refreshCountdown.value = 10;
+
+    // 启动新的计时器
+    refreshTimer.value = window.setInterval(() => {
+      refreshCountdown.value--;
+
+      if (refreshCountdown.value <= 0) {
+        // 自动刷新二维码
+        getPayQC()
+          .then(() => {
+            console.log('二维码自动刷新完成');
+          })
+          .catch((error) => {
+            console.error('二维码自动刷新失败:', error);
+          });
+        // 重置倒计时
+        refreshCountdown.value = 10;
+      }
+    }, 1000);
+  };
+  // 启动二维码自动刷新
+  const startQRRefresh = (): void => {
+    resetRefreshTimer();
+  };
+  // 停止二维码自动刷新
+  const stopQRRefresh = (): void => {
+    if (refreshTimer.value !== null) {
+      clearInterval(refreshTimer.value);
+      refreshTimer.value = null;
+    }
+    refreshCountdown.value = 10;
+  };
+  // 监听支付弹窗显示/隐藏
+  watch(showPayDialog, (newVal) => {
+    if (newVal) {
+      // 弹窗打开时启动自动刷新
+      nextTick(() => {
+        startQRRefresh();
+      });
+    } else {
+      // 弹窗关闭时停止自动刷新
+      stopQRRefresh();
+    }
+  });
+
   // ==================== 长按逻辑 ====================
   const longPressTimer = ref<number | null>(null);
   const isLongPressing = ref(false);
@@ -442,6 +598,7 @@
 
   // 清理定时器
   onUnmounted(() => {
+    stopQRRefresh();
     if (longPressTimer.value !== null) {
       clearTimeout(longPressTimer.value);
       longPressTimer.value = null;
@@ -605,6 +762,8 @@
       await oc_Get_WalletBalance();
       await oc_Get_BillRetrieval(7);
       await fetchBill(7);
+      await getUserInfoOC();
+      await getPayQC();
 
       // 检查并打开 Tour（若未完成）
       await nextTick();
