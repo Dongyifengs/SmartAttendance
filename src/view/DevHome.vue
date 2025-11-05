@@ -305,7 +305,19 @@
     if (res.code == 400) {
       OC_BR.value = res.msg;
     } else if (res.data.all_count > 0) {
-      OC_BR.value = res.data.list[0].trade_amount / 100 + '元';
+      if (res.data.list[0].desc == "用水支出") {
+        OC_BR.value = res.data.list[0].trade_amount / 100 + '元🥤';
+      } else if (res.data.list[0].desc == "餐费支出") {
+        OC_BR.value = res.data.list[0].trade_amount / 100 + '元🍽️';
+      } else if (res.data.list[0].desc == "淋浴支出") {
+        OC_BR.value = res.data.list[0].trade_amount / 100 + '元🚿';
+      } else if (res.data.list[0].desc == "微信充值") {
+        OC_BR.value = res.data.list[0].trade_amount / 100 + '元💳';
+      } else if (res.data.list[0].desc == "商场购物") {
+        OC_BR.value = res.data.list[0].trade_amount / 100 + '元🛍️';
+      } else if (res.data.list[0].desc == "洗衣支出") {
+        OC_BR.value = res.data.list[0].trade_amount / 100 + '元🧼';
+      }
     } else {
       OC_BR.value = '近7天未消费';
     }
@@ -320,7 +332,7 @@
 
     // 每次切换时间范围重新加载账单
     const res = await OC_BillRetrieval(1, 100, days, userKey);
-    console.log('账单数据切换API返回：', res);
+    console.log(`账单${days}天数据切换API返回：`, res);
 
     if (res.data?.list?.length) {
       billList.value = res.data.list;
