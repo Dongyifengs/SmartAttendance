@@ -52,7 +52,7 @@
           <span class="divider">|</span>
           <span class="info-text">[预留]空调余额:</span>
           <span class="divider">|</span>
-          <span class="info-text" @click="showPayDialog = true">个人付款码 </span>
+          <span ref="qrCodePaymentFunction" class="info-text" @click="showPayDialog = true">个人付款码 </span>
           <span class="divider">|</span>
           <span
             ref="recentConsumptionRef"
@@ -125,7 +125,7 @@
         请使用校园一卡通App扫码支付
       </div>
       <div style="text-align: center">
-        <el-button type="primary" @click="refreshQRCode" :loading="refreshingQR">
+        <el-button type="primary" :loading="refreshingQR" @click="refreshQRCode">
           {{ refreshingQR ? '刷新中...' : '立即刷新二维码' }}
         </el-button>
       </div>
@@ -152,6 +152,13 @@
         :target="recentConsumptionRef"
         title="最近消费记录"
         description="默认显示最近7天的消费记录，点击之后会显示详细模式，可以自己选择时间范围"
+        :prev-button-props="{ children: '上一步' }"
+        :next-button-props="{ children: '下一步' }"
+      />
+      <el-tour-step
+        :target="qrCodePaymentFunction"
+        title="二维码支付功能"
+        description="点击显示一卡通二维码支付功能，支持自动刷新和手动刷新"
         :prev-button-props="{ children: '上一步' }"
         :next-button-props="{ children: '完成' }"
       />
@@ -188,13 +195,14 @@
   // ==================== 常量 & 配置 ====================
   const LONG_PRESS_DELAY = 800; // 长按触发延迟（毫秒）
   const LONG_PRESS_DEBOUNCE_DELAY = 100; // 长按防抖延迟（毫秒）
-  const TOUR_COMPLETED_KEY = 'SA-TOUR-COMPLETED'; // localStorage key for tour completion
+  const TOUR_COMPLETED_KEY = 'SA-TOUR-COMPLETED1'; // localStorage key for tour completion
 
   // ==================== Tour 相关 ====================
   const tourOpen = ref(false);
   const tourCompleted = ref(localStorage.getItem(TOUR_COMPLETED_KEY) === 'true');
   const walletBalanceRef = ref<HTMLElement | null>(null);
   const recentConsumptionRef = ref<HTMLElement | null>(null);
+  const qrCodePaymentFunction = ref<HTMLElement | null>(null);
 
   const checkTourCompleted = (): boolean => {
     const completed = localStorage.getItem(TOUR_COMPLETED_KEY);

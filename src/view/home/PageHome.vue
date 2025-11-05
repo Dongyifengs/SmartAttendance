@@ -50,7 +50,7 @@
   };
 
   const cleanUpTheGuidanceTest = () => {
-    localStorage.removeItem('SA-TOUR-COMPLETED');
+    localStorage.removeItem('SA-TOUR-COMPLETED1');
     ElMessage.success('引导文件已清理，下次进入相应页面将重新显示引导。');
   }
 
