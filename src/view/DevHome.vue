@@ -137,6 +137,15 @@
 
     const userKey = userInfo.data.token;
     const res = await OC_GetBalance(userKey);
+    console.log('钱包余额API返回：', res);
+
+    if (res.msg === '您的身份信息已失效,请重新从卡包进入') {
+      ElMessage.error('您的身份信息已失效,请重新登录');
+      localStorage.removeItem('SA-OC-USERINFO');
+      localStorage.removeItem('SA-OC-TIMESTAMP');
+      await router.push('/');
+    }
+
     OC_QBYS.value = res.data.wallet0_amount / 100 + ' 元';
   };
 
@@ -146,6 +155,7 @@
 
     const userKey = userInfo.data.token;
     const res = await OC_BillRetrieval(1, 1, 7, userKey);
+    console.log('最近消费记录API返回：', res);
     if (res.data.all_count > 0) {
       OC_BR.value = res.data.list[0].trade_amount / 100 + '元';
     } else {
@@ -174,6 +184,7 @@
 
     // 每次切换时间范围重新加载账单
     const res = await OC_BillRetrieval(1, 100, days, userKey);
+    console.log('账单数据切换API返回：', res);
 
     if (res.data?.list?.length) {
       billList.value = res.data.list;
