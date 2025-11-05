@@ -63,3 +63,18 @@ export interface OC_BillRetrievalRequestBody {
   token: string
 }
 // =============== [一卡通获取账单请求类型] =============== //
+
+// =============== [一卡通获取用户信息请求类型] =============== //
+/**
+ * 获取一卡通用户信息请求体类型
+ * @interface OC_GetUserInfoRequestBody
+ * @property {string} appid - 应用ID
+ * @property {number} from - 来源标识
+ * @property {string} token - 令牌
+ */
+export interface OC_GetUserInfoRequestBody {
+  appid: string;
+  from: number;
+  token: string;
+}
+// =============== [一卡通获取用户信息请求类型] =============== //

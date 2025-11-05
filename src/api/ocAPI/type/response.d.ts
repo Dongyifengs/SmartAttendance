@@ -148,3 +148,48 @@ export interface OC_BillRetrievalList {
   trade_time:   Date;
 }
 // =============== [一卡通获取账单返回类型] =============== //
+
+// =============== [一卡通获取用户信息返回类型] =============== //
+/**
+ * 一卡通获取用户信息返回体类型
+ * @interface OC_GetUserInfoResponse
+ * @property {number} code - 响应状态码
+ * @property {null} count - 计数（通常为 null）
+ * @property {OC_GetUserInfoResponseInfo} data - 用户信息数据
+ * @property {string} mag - 响应消息
+ */
+export interface OC_GetUserInfoResponse {
+  code: number,
+  count: null,
+  data: OC_GetUserInfoResponseInfo,
+  mag: string,
+}
+
+/**
+ * 一卡通获取用户信息返回体类型
+ * @interface OC_GetUserInfoResponseInfo
+ * @property {null} cardEndData - 卡结束数据（通常为 null）
+ * @property {string} dept_name - 部门名称
+ * @property {null} mobile - 手机号码（通常为 null）
+ * @property {string} name - 用户姓名
+ * @property {null} photo - 照片（通常为 null）
+ * @property {null} schoolNo - 学校编号（通常为 null）
+ * @property {string} shenfen - 身份
+ * @property {number} status - 状态
+ * @property {null} studentId - 学生ID（通常为 null）
+ * @property {string} work_no - 学号ID
+ */
+export interface OC_GetUserInfoResponseInfo {
+  cardEndData: null,
+  dept_name: string
+  mobile: null,
+  name: string,
+  photo: null,
+  schoolNo: null,
+  shenfen: string,
+  status: number,
+  studentId: null,
+  work_no: string
+
+}
+// =============== [一卡通获取用户信息返回类型] =============== //

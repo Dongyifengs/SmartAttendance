@@ -3,10 +3,12 @@ import type {
   OCLoginResponse,
   OC_GetBalanceData,
   OC_BillRetrievalResponse,
+  OC_GetUserInfoResponse,
 } from '@/api/ocAPI/type/response';
 import type {
   OC_BillRetrievalRequestBody,
   OC_GetBalanceRequestBody,
+  OC_GetUserInfoRequestBody,
   OC_LoginRequestsBody,
 } from '@/api/ocAPI/type/requests';
 
@@ -49,7 +51,19 @@ export async function OC_GetBalance(token: string): Promise<OC_GetBalanceData> {
   return response.data;
 }
 
-export async function OC_BillRetrieval(pageNum: number, pageSize: number, day_num: number, token: string
+/**
+ * 一卡通获取账单信息
+ * @param pageNum 几个
+ * @param pageSize 页面数
+ * @param day_num 几天
+ * @param token token
+ * @constructor
+ */
+export async function OC_BillRetrieval(
+  pageNum: number,
+  pageSize: number,
+  day_num: number,
+  token: string
 ): Promise<OC_BillRetrievalResponse> {
   const body: OC_BillRetrievalRequestBody = {
     appid: OCDEVICE_ID,
@@ -62,5 +76,20 @@ export async function OC_BillRetrieval(pageNum: number, pageSize: number, day_nu
     token: token,
   };
   const response = await OCAPI.post<OC_BillRetrievalResponse>('user/tradeinfolist', body);
-  return response.data
+  return response.data;
+}
+
+/**
+ * 获取用户信息
+ * @param token - 用户登录后获取的 token
+ * @return 用户信息响应数据
+ */
+export async function OC_GetUserInfo(token: string): Promise<OC_GetUserInfoResponse> {
+  const body: OC_GetUserInfoRequestBody = {
+    appid: OCDEVICE_ID,
+    from: 4,
+    token: token,
+  };
+  const response = await OCAPI.post<OC_GetUserInfoResponse>('user/getUserInfo', body);
+  return response.data;
 }
