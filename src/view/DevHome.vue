@@ -129,28 +129,28 @@
         :next-button-props="{ children: '下一步' }"
       />
       <el-tour-step
-        :target="getDayButtonRef(1)"
+        :target="dayButton1Target"
         title="1天账单"
         description="点击查看最近1天的消费账单"
         :prev-button-props="{ children: '上一步' }"
         :next-button-props="{ children: '下一步' }"
       />
       <el-tour-step
-        :target="getDayButtonRef(7)"
+        :target="dayButton7Target"
         title="7天账单"
         description="点击查看最近7天的消费账单"
         :prev-button-props="{ children: '上一步' }"
         :next-button-props="{ children: '下一步' }"
       />
       <el-tour-step
-        :target="getDayButtonRef(14)"
+        :target="dayButton14Target"
         title="14天账单"
         description="点击查看最近14天的消费账单"
         :prev-button-props="{ children: '上一步' }"
         :next-button-props="{ children: '下一步' }"
       />
       <el-tour-step
-        :target="getDayButtonRef(30)"
+        :target="dayButton30Target"
         title="1个月账单"
         description="点击查看最近1个月的消费账单"
         :prev-button-props="{ children: '上一步' }"
@@ -195,10 +195,11 @@
     }
   };
 
-  // 根据时间天数获取按钮 ref
-  const getDayButtonRef = (days: number): HTMLElement | undefined => {
-    return dayButtonRefs.value.get(days);
-  };
+  // 使用 computed 创建动态的按钮 ref，确保在对话框打开后能正确获取
+  const dayButton1Target = computed(() => dayButtonRefs.value.get(1));
+  const dayButton7Target = computed(() => dayButtonRefs.value.get(7));
+  const dayButton14Target = computed(() => dayButtonRefs.value.get(14));
+  const dayButton30Target = computed(() => dayButtonRefs.value.get(30));
 
   // 检查用户是否已完成 Tour
   const checkTourCompleted = () => {
