@@ -20,9 +20,10 @@
       </div>
       <div>
         <el-button @click="logOut">退出登录</el-button>
-        <el-button @click="logBakc">返回</el-button>
+        <el-button @click="logBack">返回</el-button>
       </div>
     </div>
+
     <!-- 用户信息卡片 - 紧凑版展示 -->
     <div v-if="userInfo" class="user-info-card">
       <div class="user-info-header">
@@ -132,6 +133,13 @@
 </template>
 
 <script lang="ts" setup>
+  /**
+   * 优化说明（摘要）:
+   * - 将相近逻辑分组（常量、tour、OC API、账单、长按、课程处理、生命周期）
+   * - 去重重复 watch，增强空值保护及异常处理
+   * - 所有异步调用统一 try/catch，失败时给予友好提示或记录日志
+   */
+
   import dayjs from 'dayjs';
   import type { ClassInfo } from '@/components/ClassCard.vue';
   import { computed, onMounted, onUnmounted, ref, watch, nextTick } from 'vue';
@@ -142,49 +150,46 @@
   import router from '@/router';
   import { ElMessage } from 'element-plus';
   import { OC_BillRetrieval, OC_GetBalance, OC_Login } from '@/api/ocAPI';
-  import type { OC_BillRetrievalList } from '@/api/ocAPI/type/response';
+  import type { OC_BillRetrievalList, OCLoginResponse } from '@/api/ocAPI/type/response';
 
-  // 常量定义
+  // ==================== 常量 & 配置 ====================
   const LONG_PRESS_DELAY = 800; // 长按触发延迟（毫秒）
   const LONG_PRESS_DEBOUNCE_DELAY = 100; // 长按防抖延迟（毫秒）
   const TOUR_COMPLETED_KEY = 'SA-TOUR-COMPLETED'; // localStorage key for tour completion
 
-  // ===== Tour Guide 相关 ===== //
+  // ==================== Tour 相关 ====================
   const tourOpen = ref(false);
   const tourCompleted = ref(localStorage.getItem(TOUR_COMPLETED_KEY) === 'true');
-  const walletBalanceRef = ref<HTMLElement>();
-  const recentConsumptionRef = ref<HTMLElement>();
+  const walletBalanceRef = ref<HTMLElement | null>(null);
+  const recentConsumptionRef = ref<HTMLElement | null>(null);
 
-  // 检查用户是否已完成 Tour
-  const checkTourCompleted = () => {
+  const checkTourCompleted = (): boolean => {
     const completed = localStorage.getItem(TOUR_COMPLETED_KEY);
     const isCompleted = completed === 'true';
     tourCompleted.value = isCompleted;
     return isCompleted;
   };
 
-  // 标记 Tour 已完成
   const markTourCompleted = () => {
     localStorage.setItem(TOUR_COMPLETED_KEY, 'true');
     tourCompleted.value = true;
   };
 
-  // 监听 Tour 关闭事件，保存完成状态
+  // 只需要一个 watch 来处理 tourOpen 关闭保存
   watch(tourOpen, (newVal) => {
     if (!newVal) {
       markTourCompleted();
     }
   });
 
-  // ===== 一卡通API函数区域 ===== //
+  // ==================== 一卡通相关（状态） ====================
+  const OC_QBYS = ref('加载中...'); // 一卡通余额显示
+  const OC_BR = ref('7日内没有消费'); // 最近消费显示
 
-  const OC_QBYS = ref('加载中...'); // 一卡通余额
-  const OC_BR = ref('7日内没有消费'); // 最近一次消费
-
-  // ======= 账单详情弹窗逻辑 ======= //
+  // 账单弹窗相关
   const showBillDialog = ref(false);
   const billList = ref<OC_BillRetrievalList[]>([]);
-  const currentDays = ref(7);
+  const currentDays = ref<number>(7);
 
   const dayOptions = [
     { label: '1天', value: 1 },
@@ -193,22 +198,19 @@
     { label: '1个月', value: 30 },
   ];
 
-  // 监听 Tour 关闭事件，保存完成状态
-  watch(tourOpen, (newVal) => {
-    if (!newVal) {
-      markTourCompleted();
-    }
-  });
-
-  // ===== 一卡通API函数区域 ===== //
-
-  // 获取一卡通信息
-  const getUserInfo_OC = () => {
+  // 本地读取一卡通用户信息（安全判空）
+  const getUserInfo_OC = (): OCLoginResponse | null => {
     const userInfoStr = localStorage.getItem('SA-OC-USERINFO');
-    return userInfoStr ? JSON.parse(userInfoStr) : null;
+    if (!userInfoStr) return null;
+    try {
+      return JSON.parse(userInfoStr);
+    } catch (e) {
+      console.error('[getUserInfo_OC] JSON.parse 失败', e);
+      return null;
+    }
   };
 
-  // 自动登录一卡通
+  // 自动登录一卡通（当 token 失效时使用）
   const autoLoginOC = async (): Promise<boolean> => {
     try {
       const ocAccountStr = localStorage.getItem('SA-OC-ACCOUNT');
@@ -216,7 +218,6 @@
         console.log('[一卡通自动登录] 未找到保存的账户信息');
         return false;
       }
-
       let ocAccount;
       try {
         ocAccount = JSON.parse(ocAccountStr);
@@ -224,138 +225,160 @@
         console.error('[一卡通自动登录] 账户信息解析失败：', parseError);
         return false;
       }
-
       if (!ocAccount.username || !ocAccount.password) {
         console.log('[一卡通自动登录] 账户信息不完整');
         return false;
       }
 
-      console.log('[一卡通自动登录] 检测到token已过期，开始自动登录...');
+      console.log('[一卡通自动登录] 开始自动登录...');
       const res = await OC_Login(ocAccount.username, ocAccount.password);
-      
-      if (res.code === 200) {
+      if (res && res.code === 200) {
         console.log('[一卡通自动登录] 自动登录成功');
-        
-        // 使用structuredClone创建副本并将backUrl和logoUrl的值设为空字符串
         const userInfoToSave = structuredClone(res);
         if (userInfoToSave.data) {
-          userInfoToSave.data.backUrl = "";
-          userInfoToSave.data.logoUrl = "";
+          userInfoToSave.data.backUrl = '';
+          userInfoToSave.data.logoUrl = '';
         }
-
         localStorage.setItem('SA-OC-USERINFO', JSON.stringify(userInfoToSave));
         localStorage.setItem('SA-OC-TIMESTAMP', new Date().getTime().toString());
         return true;
       } else {
-        console.log('[一卡通自动登录] 自动登录失败：' + res.msg);
+        console.warn('[一卡通自动登录] 登录失败：', res?.msg || res);
         return false;
       }
     } catch (error) {
-      console.error('[一卡通自动登录] 自动登录异常：', error);
+      console.error('[一卡通自动登录] 异常：', error);
       return false;
     }
   };
 
-  // 获取钱包余额
-  const oc_Get_WalletBalance = async () => {
-    const userInfo = getUserInfo_OC();
+  // 获取钱包余额（含 token 失效自动登录与重试）
+  const oc_Get_WalletBalance = async (): Promise<void> => {
+    try {
+      const userInfo = getUserInfo_OC();
+      if (!userInfo?.data?.token) {
+        OC_QBYS.value = '未登录';
+        return;
+      }
+      const userKey = userInfo.data.token;
+      const res = await OC_GetBalance(userKey);
+      console.log('钱包余额API返回：', res);
 
-    const userKey = userInfo.data.token;
-    const res = await OC_GetBalance(userKey);
-    console.log('钱包余额API返回：', res);
-
-    if (res.msg === '您的身份信息已失效,请重新从卡包进入') {
-      // 尝试自动登录
-      const loginSuccess = await autoLoginOC();
-      
-      if (loginSuccess) {
-        // 重新获取用户信息和余额
-        const newUserInfo = getUserInfo_OC();
-        if (newUserInfo) {
-          try {
-            const newRes = await OC_GetBalance(newUserInfo.data.token);
-            console.log('重新获取钱包余额API返回：', newRes);
-            OC_QBYS.value = newRes.data.wallet0_amount / 100 + ' 元';
-            return;
-          } catch (error) {
-            console.error('[一卡通自动登录] 重新获取余额失败：', error);
-            ElMessage.error('获取钱包余额失败，请重新登录');
+      // 特殊提示字符判断（后端返回 msg）
+      if (res?.msg === '您的身份信息已失效,请重新从卡包进入') {
+        const loginSuccess = await autoLoginOC();
+        if (loginSuccess) {
+          const newUserInfo = getUserInfo_OC();
+          if (newUserInfo?.data?.token) {
+            try {
+              const newRes = await OC_GetBalance(newUserInfo.data.token);
+              OC_QBYS.value = (newRes?.data?.wallet0_amount ?? 0) / 100 + ' 元';
+              return;
+            } catch (err) {
+              console.error('[一卡通自动登录] 重新获取余额失败：', err);
+              ElMessage.error('获取钱包余额失败，请重新登录');
+              // 清理并跳转回登录页面
+              localStorage.removeItem('SA-OC-USERINFO');
+              localStorage.removeItem('SA-OC-TIMESTAMP');
+              await router.push('/');
+              return;
+            }
           }
         }
+        ElMessage.error('您的身份信息已失效,请重新登录');
+        localStorage.removeItem('SA-OC-USERINFO');
+        localStorage.removeItem('SA-OC-TIMESTAMP');
+        await router.push('/');
+        return;
       }
-      
-      // 如果自动登录失败，则显示错误并跳转到登录页
-      ElMessage.error('您的身份信息已失效,请重新登录');
-      localStorage.removeItem('SA-OC-USERINFO');
-      localStorage.removeItem('SA-OC-TIMESTAMP');
-      await router.push('/');
-      return;
-    }
 
-    OC_QBYS.value = res.data.wallet0_amount / 100 + ' 元';
-  };
-
-  // 获取最近的消费记录
-  const oc_Get_BillRetrieval = async () => {
-    const userInfo = getUserInfo_OC();
-
-    const userKey = userInfo.data.token;
-    const res = await OC_BillRetrieval(1, 1, 7, userKey);
-    console.log('最近消费记录API返回：', res);
-    if (res.code == 400) {
-      OC_BR.value = res.msg;
-    } else if (res.data.all_count > 0) {
-      if (res.data.list[0].desc == "用水支出") {
-        OC_BR.value = res.data.list[0].trade_amount / 100 + '元🥤';
-      } else if (res.data.list[0].desc == "餐费支出") {
-        OC_BR.value = res.data.list[0].trade_amount / 100 + '元🍽️';
-      } else if (res.data.list[0].desc == "淋浴支出") {
-        OC_BR.value = res.data.list[0].trade_amount / 100 + '元🚿';
-      } else if (res.data.list[0].desc == "微信充值") {
-        OC_BR.value = res.data.list[0].trade_amount / 100 + '元💳';
-      } else if (res.data.list[0].desc == "商场购物") {
-        OC_BR.value = res.data.list[0].trade_amount / 100 + '元🛍️';
-      } else if (res.data.list[0].desc == "洗衣支出") {
-        OC_BR.value = res.data.list[0].trade_amount / 100 + '元🧼';
-      }
-    } else {
-      OC_BR.value = '近7天未消费';
+      OC_QBYS.value = (res?.data?.wallet0_amount ?? 0) / 100 + ' 元';
+    } catch (error) {
+      console.error('[oc_Get_WalletBalance] 异常：', error);
+      OC_QBYS.value = '获取失败';
     }
   };
 
-  // 拉取账单详情
-  const fetchBill = async (days: number) => {
+  // 获取最近消费记录（默认 7 天）
+  const oc_Get_BillRetrieval = async (days = 7): Promise<void> => {
+    try {
+      const userInfo = getUserInfo_OC();
+      if (!userInfo?.data?.token) {
+        OC_BR.value = '未登录';
+        return;
+      }
+      const userKey = userInfo.data.token;
+      const res = await OC_BillRetrieval(1, 1, days, userKey);
+      console.log('最近消费记录API返回：', res);
+
+      if (!res) {
+        OC_BR.value = '查询失败';
+        return;
+      }
+
+      if (res.code === 400) {
+        OC_BR.value = res.msg || '无权限';
+        return;
+      }
+
+      if (res.data?.all_count > 0 && Array.isArray(res.data.list)) {
+        const latest = res.data.list[0];
+        const amountText = (latest.trade_amount ?? 0) / 100;
+        // 根据 desc 简单映射图标
+        const desc = latest.desc || '';
+        if (desc.includes('用水')) {
+          OC_BR.value = `${amountText}元🥤`;
+        } else if (desc.includes('餐')) {
+          OC_BR.value = `${amountText}元🍽️`;
+        } else if (desc.includes('淋浴')) {
+          OC_BR.value = `${amountText}元🚿`;
+        } else if (desc.includes('微信充值')) {
+          OC_BR.value = `${amountText}元💳`;
+        } else if (desc.includes('商场')) {
+          OC_BR.value = `${amountText}元🛍️`;
+        } else if (desc.includes('洗衣')) {
+          OC_BR.value = `${amountText}元🧼`;
+        } else {
+          OC_BR.value = `${amountText}元`;
+        }
+      } else {
+        OC_BR.value = `近${days}天未消费`;
+      }
+    } catch (error) {
+      console.error('[oc_Get_BillRetrieval] 异常：', error);
+      OC_BR.value = '获取失败';
+    }
+  };
+
+  // 拉取指定天数的账单明细（弹窗内使用）
+  const fetchBill = async (days: number): Promise<void> => {
     currentDays.value = days;
-    const userInfo = getUserInfo_OC();
-    if (!userInfo) return;
-    const userKey = userInfo.data.token;
-
-    // 每次切换时间范围重新加载账单
-    const res = await OC_BillRetrieval(1, 100, days, userKey);
-    console.log(`账单${days}天数据切换API返回：`, res);
-
-    if (res.data?.list?.length) {
-      billList.value = res.data.list;
-    } else {
+    try {
+      const userInfo = getUserInfo_OC();
+      if (!userInfo?.data?.token) {
+        ElMessage.warning('请先登录一卡通以查看账单');
+        return;
+      }
+      const userKey = userInfo.data.token;
+      const res = await OC_BillRetrieval(1, 100, days, userKey);
+      console.log(`账单${days}天数据切换API返回：`, res);
+      if (res?.data?.list && res.data.list.length) {
+        billList.value = res.data.list;
+      } else {
+        billList.value = [];
+      }
+    } catch (error) {
+      console.error('[fetchBill] 异常：', error);
       billList.value = [];
+      ElMessage.error('获取账单信息失败');
     }
   };
 
-  // ===== 一卡通API函数区域 ===== //
+  // ==================== 长按逻辑 ====================
+  const longPressTimer = ref<number | null>(null);
+  const isLongPressing = ref(false);
 
-  // 用户信息对象（包含姓名、学号、token等）
-  const userInfo = getZHKQUserInfo();
-
-  // 当天课程数据（课程列表）
-  const data = ref<ClassInfo[]>([]);
-
-  // 页面加载状态（用于 v-loading）
-  const loading = ref(true);
-
-  // 当前日期字符串（格式：YYYY-MM-DD）
-  const todayString = dayjs().format('YYYY-MM-DD');
-
-  // 编译信息
+  // 构建 commit 链接
   const buildTimestamp = ref(import.meta.env.VITE_BUILD_TIMESTAMP || '开发环境');
   const gitHash = ref(import.meta.env.VITE_GIT_HASH || '开发中');
   const gitFullHash = ref(import.meta.env.VITE_GIT_FULL_HASH || '开发中');
@@ -364,20 +387,19 @@
     import.meta.env.VITE_GITHUB_REPO || 'https://github.com/Dongyifengs/SmartAttendance'
   );
 
-  // 长按相关状态
-  const longPressTimer = ref<number | null>(null);
-  const isLongPressing = ref(false);
-
-  // 获取 GitHub 提交链接
-  const getCommitUrl = () => {
+  const getCommitUrl = (): string => {
     if (gitFullHash.value && gitFullHash.value !== '开发中') {
       return `${githubRepo.value}/commit/${gitFullHash.value}`;
     }
     return '#';
   };
 
-  // 长按开始
-  const handleLongPressStart = () => {
+  const handleLongPressStart = (): void => {
+    // 防止重复设定定时器
+    if (longPressTimer.value !== null) {
+      clearTimeout(longPressTimer.value);
+      longPressTimer.value = null;
+    }
     isLongPressing.value = false;
     longPressTimer.value = window.setTimeout(() => {
       isLongPressing.value = true;
@@ -391,34 +413,32 @@
     }, LONG_PRESS_DELAY);
   };
 
-  // 长按结束或取消
-  const handleLongPressEnd = () => {
+  const handleLongPressEnd = (): void => {
     if (longPressTimer.value !== null) {
       clearTimeout(longPressTimer.value);
       longPressTimer.value = null;
     }
-    // 重置长按状态，延迟一点以防止误触点击事件
     setTimeout(() => {
       isLongPressing.value = false;
     }, LONG_PRESS_DEBOUNCE_DELAY);
   };
 
-  // 点击哈希值跳转到 GitHub
-  const handleHashClick = () => {
+  const handleHashClick = (): void => {
     const url = getCommitUrl();
-    if (url !== '#') {
+    if (url && url !== '#') {
       window.open(url, '_blank');
     }
   };
 
-  const logOut = () => {
+  // ==================== 路由 / 会话管理 ====================
+  const logOut = (): void => {
     localStorage.clear();
     router.push('/');
   };
 
-  const logBakc = () => {
-    router.push('/home')
-  }
+  const logBack = (): void => {
+    router.push('/home');
+  };
 
   // 清理定时器
   onUnmounted(() => {
@@ -428,28 +448,29 @@
     }
   });
 
-  /**
-   * 计算属性：清理设备 ID
-   * - 若 userInfo.value.client_id 含多个 ID，用逗号分隔取第一个
-   * - 去掉前缀 "uuid_"，使展示更干净
-   */
+  // ==================== 课程与签到处理 ====================
+  // 从 ZHKQ 获取的用户信息（包含 token）
+  const userInfo = getZHKQUserInfo();
+
+  // 课程数据
+  const data = ref<ClassInfo[]>([]);
+
+  // 页面 loading 状态
+  const loading = ref<boolean>(true);
+
+  // 今天日期字符串
+  const todayString = dayjs().format('YYYY-MM-DD');
+
+  // 设备 ID 清理（计算属性）
   const cleanDeviceId = computed(() => {
     if (!userInfo.value?.client_id) return '';
-    const clientId = userInfo.value.client_id;
-    const ids = clientId.split(','); // 处理重复情况
-    return ids[0].replace(/^uuid_/, ''); // 删除前缀 uuid_
+    const clientId = userInfo.value?.client_id;
+    const ids = clientId.split(',');
+    return ids[0].replace(/^uuid_/, '');
   });
 
   /**
    * 根据课程与签到信息计算课程状态
-   * @param {any} course - 当前课程信息对象
-   * @param {any} signData - 当前课程对应的签到记录
-   * @returns {"已签退" | "已签到" | "未签到" | "迟到" | "早退" | null}
-   *
-   * 逻辑说明：
-   * - 先判断是否缺勤 / 请假
-   * - 再根据签到时间与课程开始/结束时间判断是否迟到、早退
-   * - 若无签到记录，则根据当前时间判断是否迟到或未签到
    */
   const calculateStatus = (
     course: CourseList,
@@ -459,8 +480,8 @@
     const startTime = dayjs(`${course.lesson_date} ${course.begin_time}`);
     const endTime = dayjs(`${course.lesson_date} ${course.end_time}`);
 
-    const hasSignedIn = signData.u_begin_time && signData.u_begin_time !== '';
-    const hasSignedOut = signData.u_end_time && signData.u_end_time !== '';
+    const hasSignedIn = !!(signData.u_begin_time && signData.u_begin_time !== '');
+    const hasSignedOut = !!(signData.u_end_time && signData.u_end_time !== '');
 
     const signInTime = hasSignedIn ? dayjs(signData.u_begin_time) : null;
     const signOutTime = hasSignedOut ? dayjs(signData.u_end_time) : null;
@@ -499,11 +520,6 @@
 
   /**
    * 根据签到记录和课程状态进一步计算出特殊情况（旷课、请假等）
-   * @param {any} signData - 签到信息
-   * @param {"已签退" | "已签到" | "未签到" | "迟到" | "早退" | null} status - 上一步计算的状态
-   * @returns {"早退" | "迟到" | "已旷课" | "已请假" | null}
-   *
-   * 用于在课程卡片中展示“情况说明”字段
    */
   const calculateSituation = (
     signData: SignListInfo,
@@ -516,91 +532,87 @@
     return null;
   };
 
-  /**
-   * 生命周期钩子：组件挂载时执行
-   * 异步加载当前用户当天课程与签到数据
-   */
+  // ==================== 生命周期：挂载时加载数据 ====================
   onMounted(async () => {
-    if (userInfo) {
-      loading.value = true;
-      try {
-        // 获取当天的签到记录
-        const signInfo = (
-          await ZHKQ_GetDaySignList({
+    try {
+      if (userInfo) {
+        loading.value = true;
+        try {
+          // 获取当天签到记录
+          const signRes = await ZHKQ_GetDaySignList({
             date: todayString,
             userKey: userInfo.value!.token,
-          })
-        ).sign_record_list;
+          });
+          const signInfo = signRes?.sign_record_list ?? [];
 
-        // 获取当天的课程列表
-        const courseList = (
-          await ZHKQ_GetDayCourseList({
+          // 获取当天课程列表
+          const courseRes = await ZHKQ_GetDayCourseList({
             date: todayString,
             userKey: userInfo.value!.token,
-          })
-        ).sourcelist;
+          });
+          const courseList = courseRes?.sourcelist ?? [];
 
-        // 将签到记录以课程主键（pk_lesson）为 key 构建 Map 方便快速查找
-        const signMap = new Map(signInfo.map((e) => [e.pk_lesson, e]));
+          // 将签到记录以课程主键（pk_lesson）为 key 构建 Map
+          const signMap = new Map(signInfo.map((e: SignListInfo) => [e.pk_lesson, e]));
 
-        // 遍历课程列表并匹配签到数据
-        const courses = courseList
-          .map((e, index): ClassInfo | null => {
-            const signData = signMap.get(e.pk_anlaxy_lesson);
-            if (signData) {
-              const status = calculateStatus(e, signData);
-              return {
-                classIndex: index + 1,
-                className: e.lesson_name,
-                startTime: dayjs(`${e.lesson_date} ${e.begin_time}`),
-                endTime: dayjs(`${e.lesson_date} ${e.end_time}`),
-                signInTime: signData.u_begin_time ? dayjs(signData.u_begin_time) : null,
-                signOutTime: signData.u_end_time ? dayjs(signData.u_end_time) : null,
-                shouldSignInTime: dayjs(`${signData.lesson_date} ${signData.before_class_time}`),
-                shouldSignOutTime: dayjs(
-                  `${signData.lesson_date} ${signData.after_class_over_time}`
-                ),
-                classRoom: e.class_room_name,
-                teacher: {
-                  name: e.teacher_name,
-                  id: Number.parseInt(e.teacher_id),
-                },
-                situation: calculateSituation(signData, status),
-                computedStatus: status,
-                pk_anlaxy_syllabus_user: signData.pk_anlaxy_syllabus_user,
-                lessonDate: e.lesson_date,
-              };
-            }
-            return null;
-          })
-          .filter((e) => !!e);
+          // 遍历课程列表并匹配签到数据
+          const courses = courseList
+            .map((e: CourseList, index: number): ClassInfo | null => {
+              const signData = signMap.get(e.pk_anlaxy_lesson);
+              if (signData) {
+                const status = calculateStatus(e, signData);
+                return {
+                  classIndex: index + 1,
+                  className: e.lesson_name,
+                  startTime: dayjs(`${e.lesson_date} ${e.begin_time}`),
+                  endTime: dayjs(`${e.lesson_date} ${e.end_time}`),
+                  signInTime: signData.u_begin_time ? dayjs(signData.u_begin_time) : null,
+                  signOutTime: signData.u_end_time ? dayjs(signData.u_end_time) : null,
+                  shouldSignInTime: dayjs(`${signData.lesson_date} ${signData.before_class_time}`),
+                  shouldSignOutTime: dayjs(
+                    `${signData.lesson_date} ${signData.after_class_over_time}`
+                  ),
+                  classRoom: e.class_room_name,
+                  teacher: {
+                    name: e.teacher_name,
+                    id: Number.parseInt(e.teacher_id),
+                  },
+                  situation: calculateSituation(signData, status),
+                  computedStatus: status,
+                  pk_anlaxy_syllabus_user: signData.pk_anlaxy_syllabus_user,
+                  lessonDate: e.lesson_date,
+                } as ClassInfo;
+              }
+              return null;
+            })
+            .filter((e) => !!e) as ClassInfo[];
 
-        /**
-         * 课程排序逻辑：
-         * - 未完成课程（未签到/部分签到）排在前面
-         * - 已完成、请假、旷课的课程排在后面
-         */
-        data.value = courses.sort((a, b) => {
-          const getPriority = (course: ClassInfo) => {
-            if (course.situation === '已请假' || course.situation === '已旷课') return 3;
-            if (course.signInTime && course.signOutTime) return 2;
-            return 1;
-          };
-          return getPriority(a) - getPriority(b);
-        });
-      } finally {
-        // 无论成功或失败都结束加载状态
-        loading.value = false;
+          // 课程排序：未完成的排前面
+          data.value = courses.sort((a, b) => {
+            const getPriority = (course: ClassInfo) => {
+              if (course.situation === '已请假' || course.situation === '已旷课') return 3;
+              if (course.signInTime && course.signOutTime) return 2;
+              return 1;
+            };
+            return getPriority(a) - getPriority(b);
+          });
+        } finally {
+          loading.value = false;
+        }
       }
-    }
-    await oc_Get_WalletBalance();
-    await oc_Get_BillRetrieval();
-    await fetchBill(7);
 
-    // 检查是否需要显示 Tour
-    await nextTick();
-    if (!checkTourCompleted()) {
-      tourOpen.value = true;
+      // 一卡通：余额与最近消费（并拉取默认 7 天账单）
+      await oc_Get_WalletBalance();
+      await oc_Get_BillRetrieval(7);
+      await fetchBill(7);
+
+      // 检查并打开 Tour（若未完成）
+      await nextTick();
+      if (!checkTourCompleted()) {
+        tourOpen.value = true;
+      }
+    } catch (error) {
+      console.error('[onMounted] 初始化异常：', error);
     }
   });
 </script>
@@ -608,7 +620,7 @@
 <style scoped>
   /* =======================
    页面整体布局与动画效果
-======================= */
+  ======================= */
   .dev-home-container {
     padding: 12px;
     max-width: 1200px;
@@ -629,7 +641,7 @@
 
   /* =======================
    Header 样式
-======================= */
+  ======================= */
   .header {
     margin-bottom: 16px;
   }
@@ -689,7 +701,7 @@
 
   /* =======================
    用户信息卡片样式
-======================= */
+  ======================= */
   .user-info-card {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     border-radius: 16px;
@@ -751,7 +763,7 @@
 
   /* =======================
    响应式适配
-======================= */
+  ======================= */
   @media (max-width: 768px) {
     .dev-home-container {
       padding: 10px;
