@@ -77,7 +77,6 @@
         <el-button
           v-for="day in dayOptions"
           :key="day.value"
-          :ref="(el: any) => { if (el) setDayButtonRef(el, day.value) }"
           :type="day.value === currentDays ? 'primary' : 'default'"
           size="small"
           @click="fetchBill(day.value)"
@@ -113,7 +112,6 @@
       :z-index="3001"
       :mask="{ color: 'rgba(0, 0, 0, 0.5)', style: { zIndex: 3000 } }"
       :close-icon="false"
-      @change="handleTourChange"
     >
       <el-tour-step
         :target="walletBalanceRef"
@@ -125,34 +123,6 @@
         :target="recentConsumptionRef"
         title="最近消费记录"
         description="默认显示最近7天的消费记录，点击之后会显示详细模式，可以自己选择时间范围"
-        :prev-button-props="{ children: '上一步' }"
-        :next-button-props="{ children: '下一步' }"
-      />
-      <el-tour-step
-        :target="dayButton1Ref"
-        title="1天账单"
-        description="点击查看最近1天的消费账单"
-        :prev-button-props="{ children: '上一步' }"
-        :next-button-props="{ children: '下一步' }"
-      />
-      <el-tour-step
-        :target="dayButton7Ref"
-        title="7天账单"
-        description="点击查看最近7天的消费账单"
-        :prev-button-props="{ children: '上一步' }"
-        :next-button-props="{ children: '下一步' }"
-      />
-      <el-tour-step
-        :target="dayButton14Ref"
-        title="14天账单"
-        description="点击查看最近14天的消费账单"
-        :prev-button-props="{ children: '上一步' }"
-        :next-button-props="{ children: '下一步' }"
-      />
-      <el-tour-step
-        :target="dayButton30Ref"
-        title="1个月账单"
-        description="点击查看最近1个月的消费账单"
         :prev-button-props="{ children: '上一步' }"
         :next-button-props="{ children: '完成' }"
       />
@@ -183,25 +153,6 @@
   const tourCompleted = ref(localStorage.getItem(TOUR_COMPLETED_KEY) === 'true');
   const walletBalanceRef = ref<HTMLElement>();
   const recentConsumptionRef = ref<HTMLElement>();
-  
-  // 使用独立的 ref 存储每个按钮引用，避免 Map 响应式问题
-  const dayButton1Ref = ref<HTMLElement>();
-  const dayButton7Ref = ref<HTMLElement>();
-  const dayButton14Ref = ref<HTMLElement>();
-  const dayButton30Ref = ref<HTMLElement>();
-
-  // 设置按钮 ref 的辅助函数
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const setDayButtonRef = (el: any, value: number) => {
-    if (el) {
-      // ElementPlus button 组件，需要获取 $el
-      const element = el.$el || el;
-      if (value === 1) dayButton1Ref.value = element;
-      else if (value === 7) dayButton7Ref.value = element;
-      else if (value === 14) dayButton14Ref.value = element;
-      else if (value === 30) dayButton30Ref.value = element;
-    }
-  };
 
   // 检查用户是否已完成 Tour
   const checkTourCompleted = () => {
@@ -216,6 +167,13 @@
     localStorage.setItem(TOUR_COMPLETED_KEY, 'true');
     tourCompleted.value = true;
   };
+
+  // 监听 Tour 关闭事件，保存完成状态
+  watch(tourOpen, (newVal) => {
+    if (!newVal) {
+      markTourCompleted();
+    }
+  });
 
   // ===== 一卡通API函数区域 ===== //
 
@@ -241,45 +199,7 @@
     }
   });
 
-  // 当前 Tour 步骤索引
-  const currentTourStep = ref(0);
-
-  // 处理 Tour 步骤变化
-  const handleTourChange = async (current: number) => {
-    currentTourStep.value = current;
-    
-    // 步骤 0-1: 确保对话框关闭
-    if (current < 2) {
-      if (showBillDialog.value) {
-        showBillDialog.value = false;
-      }
-    }
-    // 步骤 2-5 (对应步骤3-6): 确保对话框打开
-    else if (current >= 2 && current <= 5) {
-      if (!showBillDialog.value) {
-        showBillDialog.value = true;
-        // 等待对话框完全渲染并且按钮 refs 已设置
-        await nextTick();
-        // 增加延迟时间，确保 ElementPlus 组件完全挂载和 refs 设置完成
-        await new Promise((resolve) => setTimeout(resolve, 500));
-      } else {
-        // 对话框已经打开，但仍需等待确保 refs 可用
-        await nextTick();
-        await new Promise((resolve) => setTimeout(resolve, 100));
-      }
-    }
-  };
-
-  // 监听弹窗关闭，如果 Tour 还在进行且在按钮引导步骤中（步骤3-6），则关闭 Tour
-  watch(showBillDialog, async (newVal) => {
-    if (!newVal && !checkTourCompleted() && tourOpen.value) {
-      // 检查是否在需要对话框的步骤中（步骤索引 2-5 对应步骤 3-6）
-      if (currentTourStep.value >= 2 && currentTourStep.value <= 5) {
-        // 用户在按钮引导步骤中关闭了对话框，结束 Tour
-        tourOpen.value = false;
-      }
-    }
-  });
+  // ===== 一卡通API函数区域 ===== //
 
   // 获取一卡通信息
   const getUserInfo_OC = () => {
