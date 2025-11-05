@@ -140,7 +140,7 @@
   import type { CourseList, SignListInfo } from '@/api/anlaxy/type/response';
   import router from '@/router';
   import { ElMessage } from 'element-plus';
-  import { OC_BillRetrieval, OC_GetBalance } from '@/api/ocAPI';
+  import { OC_BillRetrieval, OC_GetBalance, OC_Login } from '@/api/ocAPI';
   import type { OC_BillRetrievalList } from '@/api/ocAPI/type/response';
 
   // 常量定义
@@ -207,6 +207,47 @@
     return userInfoStr ? JSON.parse(userInfoStr) : null;
   };
 
+  // 自动登录一卡通
+  const autoLoginOC = async (): Promise<boolean> => {
+    try {
+      const ocAccountStr = localStorage.getItem('SA-OC-ACCOUNT');
+      if (!ocAccountStr) {
+        console.log('[一卡通自动登录] 未找到保存的账户信息');
+        return false;
+      }
+
+      const ocAccount = JSON.parse(ocAccountStr);
+      if (!ocAccount.username || !ocAccount.password) {
+        console.log('[一卡通自动登录] 账户信息不完整');
+        return false;
+      }
+
+      console.log('[一卡通自动登录] 检测到token已过期，开始自动登录...');
+      const res = await OC_Login(ocAccount.username, ocAccount.password);
+      
+      if (res.code === 200) {
+        console.log('[一卡通自动登录] 自动登录成功');
+        
+        // 创建副本并将backUrl和logoUrl的值设为空字符串
+        const userInfoToSave = JSON.parse(JSON.stringify(res));
+        if (userInfoToSave.data) {
+          userInfoToSave.data.backUrl = "";
+          userInfoToSave.data.logoUrl = "";
+        }
+
+        localStorage.setItem('SA-OC-USERINFO', JSON.stringify(userInfoToSave));
+        localStorage.setItem('SA-OC-TIMESTAMP', new Date().getTime().toString());
+        return true;
+      } else {
+        console.log('[一卡通自动登录] 自动登录失败：' + res.msg);
+        return false;
+      }
+    } catch (error) {
+      console.error('[一卡通自动登录] 自动登录异常：', error);
+      return false;
+    }
+  };
+
   // 获取钱包余额
   const oc_Get_WalletBalance = async () => {
     const userInfo = getUserInfo_OC();
@@ -216,10 +257,26 @@
     console.log('钱包余额API返回：', res);
 
     if (res.msg === '您的身份信息已失效,请重新从卡包进入') {
+      // 尝试自动登录
+      const loginSuccess = await autoLoginOC();
+      
+      if (loginSuccess) {
+        // 重新获取用户信息和余额
+        const newUserInfo = getUserInfo_OC();
+        if (newUserInfo) {
+          const newRes = await OC_GetBalance(newUserInfo.data.token);
+          console.log('重新获取钱包余额API返回：', newRes);
+          OC_QBYS.value = newRes.data.wallet0_amount / 100 + ' 元';
+          return;
+        }
+      }
+      
+      // 如果自动登录失败，则显示错误并跳转到登录页
       ElMessage.error('您的身份信息已失效,请重新登录');
       localStorage.removeItem('SA-OC-USERINFO');
       localStorage.removeItem('SA-OC-TIMESTAMP');
       await router.push('/');
+      return;
     }
 
     OC_QBYS.value = res.data.wallet0_amount / 100 + ' 元';
