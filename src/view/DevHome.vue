@@ -216,7 +216,14 @@
         return false;
       }
 
-      const ocAccount = JSON.parse(ocAccountStr);
+      let ocAccount;
+      try {
+        ocAccount = JSON.parse(ocAccountStr);
+      } catch (parseError) {
+        console.error('[一卡通自动登录] 账户信息解析失败：', parseError);
+        return false;
+      }
+
       if (!ocAccount.username || !ocAccount.password) {
         console.log('[一卡通自动登录] 账户信息不完整');
         return false;
@@ -228,8 +235,8 @@
       if (res.code === 200) {
         console.log('[一卡通自动登录] 自动登录成功');
         
-        // 创建副本并将backUrl和logoUrl的值设为空字符串
-        const userInfoToSave = JSON.parse(JSON.stringify(res));
+        // 使用structuredClone创建副本并将backUrl和logoUrl的值设为空字符串
+        const userInfoToSave = structuredClone(res);
         if (userInfoToSave.data) {
           userInfoToSave.data.backUrl = "";
           userInfoToSave.data.logoUrl = "";
@@ -264,10 +271,15 @@
         // 重新获取用户信息和余额
         const newUserInfo = getUserInfo_OC();
         if (newUserInfo) {
-          const newRes = await OC_GetBalance(newUserInfo.data.token);
-          console.log('重新获取钱包余额API返回：', newRes);
-          OC_QBYS.value = newRes.data.wallet0_amount / 100 + ' 元';
-          return;
+          try {
+            const newRes = await OC_GetBalance(newUserInfo.data.token);
+            console.log('重新获取钱包余额API返回：', newRes);
+            OC_QBYS.value = newRes.data.wallet0_amount / 100 + ' 元';
+            return;
+          } catch (error) {
+            console.error('[一卡通自动登录] 重新获取余额失败：', error);
+            ElMessage.error('获取钱包余额失败，请重新登录');
+          }
         }
       }
       
