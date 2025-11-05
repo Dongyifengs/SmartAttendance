@@ -129,28 +129,28 @@
         :next-button-props="{ children: '下一步' }"
       />
       <el-tour-step
-        :target="dayButton1Target"
+        :target="dayButton1Ref"
         title="1天账单"
         description="点击查看最近1天的消费账单"
         :prev-button-props="{ children: '上一步' }"
         :next-button-props="{ children: '下一步' }"
       />
       <el-tour-step
-        :target="dayButton7Target"
+        :target="dayButton7Ref"
         title="7天账单"
         description="点击查看最近7天的消费账单"
         :prev-button-props="{ children: '上一步' }"
         :next-button-props="{ children: '下一步' }"
       />
       <el-tour-step
-        :target="dayButton14Target"
+        :target="dayButton14Ref"
         title="14天账单"
         description="点击查看最近14天的消费账单"
         :prev-button-props="{ children: '上一步' }"
         :next-button-props="{ children: '下一步' }"
       />
       <el-tour-step
-        :target="dayButton30Target"
+        :target="dayButton30Ref"
         title="1个月账单"
         description="点击查看最近1个月的消费账单"
         :prev-button-props="{ children: '上一步' }"
@@ -183,7 +183,12 @@
   const tourCompleted = ref(localStorage.getItem(TOUR_COMPLETED_KEY) === 'true');
   const walletBalanceRef = ref<HTMLElement>();
   const recentConsumptionRef = ref<HTMLElement>();
-  const dayButtonRefs = ref<Map<number, HTMLElement>>(new Map());
+  
+  // 使用独立的 ref 存储每个按钮引用，避免 Map 响应式问题
+  const dayButton1Ref = ref<HTMLElement>();
+  const dayButton7Ref = ref<HTMLElement>();
+  const dayButton14Ref = ref<HTMLElement>();
+  const dayButton30Ref = ref<HTMLElement>();
 
   // 设置按钮 ref 的辅助函数
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -191,23 +196,12 @@
     if (el) {
       // ElementPlus button 组件，需要获取 $el
       const element = el.$el || el;
-      // 强制触发 Map 的更新
-      const newMap = new Map(dayButtonRefs.value);
-      newMap.set(value, element);
-      dayButtonRefs.value = newMap;
-    } else {
-      // 元素被卸载时，从 Map 中移除
-      const newMap = new Map(dayButtonRefs.value);
-      newMap.delete(value);
-      dayButtonRefs.value = newMap;
+      if (value === 1) dayButton1Ref.value = element;
+      else if (value === 7) dayButton7Ref.value = element;
+      else if (value === 14) dayButton14Ref.value = element;
+      else if (value === 30) dayButton30Ref.value = element;
     }
   };
-
-  // 使用 computed 创建动态的按钮 ref，确保在对话框打开后能正确获取
-  const dayButton1Target = computed(() => dayButtonRefs.value.get(1));
-  const dayButton7Target = computed(() => dayButtonRefs.value.get(7));
-  const dayButton14Target = computed(() => dayButtonRefs.value.get(14));
-  const dayButton30Target = computed(() => dayButtonRefs.value.get(30));
 
   // 检查用户是否已完成 Tour
   const checkTourCompleted = () => {
