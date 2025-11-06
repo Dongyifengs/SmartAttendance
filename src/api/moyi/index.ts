@@ -27,6 +27,6 @@ export async function MOYI_UploadInfo(
     data,
   };
 
-  const res = await MOYIAPI.post('/web/upload', body);
+  const res = await MOYIAPI.post('', body);
   return res.data;
 }
