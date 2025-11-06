@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 export const MOYIAPI = axios.create({
-  baseURL: 'http://moyijiangnan.cn:3007',
+  baseURL: '/MoYiAPI',
   headers: {
     'Content-Type': 'application/json',
   },
