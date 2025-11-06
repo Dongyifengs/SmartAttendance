@@ -1,5 +1,5 @@
 <template>
-  <div v-loading="loading" class="dev-home-container" element-loading-text="加载课程中...">
+  <div class="card">
     <div class="header header-info">
       <div class="hash">
         <span
@@ -50,7 +50,9 @@
         <div class="info-line">
           <span ref="walletBalanceRef" class="info-text">钱包余额: {{ OC_QBYS }}</span>
           <span class="divider">|</span>
-          <span ref="airConditioningBalanceRef" class="info-text" @click="showAirConditioned = true">空调余额: {{ OC_KTYE }} </span>
+          <span ref="airConditioningBalanceRef" class="info-text" @click="showAirConditioned = true"
+            >空调余额: {{ OC_KTYE }}
+          </span>
           <span class="divider">|</span>
           <span ref="qrCodePaymentFunction" class="info-text" @click="showPayDialog = true"
             >个人付款码
@@ -68,184 +70,180 @@
         </div>
       </div>
     </div>
+  </div>
 
-    <!-- 账单详情弹窗 -->
-    <el-dialog
-      v-model="showBillDialog"
-      title="账单详情"
-      width="400px"
-      class="bill-dialog"
-      :close-on-click-modal="false"
-    >
-      <div style="display: flex; justify-content: center; gap: 10px; margin-bottom: 16px">
-        <el-button
-          v-for="day in dayOptions"
-          :key="day.value"
-          :type="day.value === currentDays ? 'primary' : 'default'"
-          size="small"
-          @click="fetchBill(day.value)"
-        >
-          {{ day.label }}
-        </el-button>
+  <!-- 账单详情弹窗 -->
+  <el-dialog
+    v-model="showBillDialog"
+    title="账单详情"
+    width="400px"
+    class="bill-dialog"
+    :close-on-click-modal="false"
+  >
+    <div style="display: flex; justify-content: center; gap: 10px; margin-bottom: 16px">
+      <el-button
+        v-for="day in dayOptions"
+        :key="day.value"
+        :type="day.value === currentDays ? 'primary' : 'default'"
+        size="small"
+        @click="fetchBill(day.value)"
+      >
+        {{ day.label }}
+      </el-button>
+    </div>
+
+    <!-- 账单列表区域 -->
+    <div v-if="billList.length">
+      <el-table :data="billList" style="width: 100%" size="small">
+        <el-table-column prop="trade_time" label="时间" min-width="35%" align="center" />
+        <el-table-column prop="desc" label="说明" min-width="33%" align="center" />
+        <el-table-column
+          prop="trade_amount"
+          label="金额"
+          min-width="32%"
+          align="center"
+          :formatter="(row: OC_BillRetrievalList) => (row.trade_amount / 100).toFixed(2) + ' 元'"
+        />
+      </el-table>
+    </div>
+    <div v-else style="text-align: center; color: #999">暂无账单数据</div>
+  </el-dialog>
+
+  <!-- 支付弹窗 -->
+  <el-dialog
+    v-model="showPayDialog"
+    title="支付二维码"
+    width="400px"
+    class="pay-dialog"
+    :close-on-click-modal="false"
+  >
+    <div style="text-align: center; margin-bottom: 16px">
+      <img :src="payQCBase" alt="支付二维码" style="width: 300px; height: 300px" />
+      <div style="margin-top: 8px; color: #666; font-size: 12px">
+        二维码 {{ refreshCountdown }} 秒后自动刷新
       </div>
+    </div>
+    <div style="text-align: center; color: #999">
+      {{ userClass }} | {{ userName }} | {{ userId }}
+    </div>
+    <div style="text-align: center; color: #999; margin-bottom: 16px">
+      请使用校园一卡通App扫码支付
+    </div>
+    <div style="text-align: center">
+      <el-button type="primary" :loading="refreshingQR" @click="refreshQRCode">
+        {{ refreshingQR ? '刷新中...' : '立即刷新二维码' }}
+      </el-button>
+    </div>
+  </el-dialog>
 
-      <!-- 账单列表区域 -->
-      <div v-if="billList.length">
-        <el-table :data="billList" style="width: 100%" size="small">
-          <el-table-column prop="trade_time" label="时间" min-width="35%" align="center" />
-          <el-table-column prop="desc" label="说明" min-width="33%" align="center" />
-          <el-table-column
-            prop="trade_amount"
-            label="金额"
-            min-width="32%"
-            align="center"
-            :formatter="(row: OC_BillRetrievalList) => (row.trade_amount / 100).toFixed(2) + ' 元'"
-          />
-        </el-table>
+  <!-- 空调弹窗 -->
+  <el-dialog
+    v-model="showAirConditioned"
+    title="空调设置与缴费"
+    width="400px"
+    class="air-conditioned-dialog"
+    :close-on-click-modal="false"
+  >
+    <!-- 内容 -->
+    <div class="air-conditioned-content">
+      <el-form label-width="100px">
+        <el-form-item label="缴费单位">
+          <el-text>{{ selectedAreaName || '加载中...' }}</el-text>
+        </el-form-item>
+
+        <el-form-item label="楼栋号">
+          <el-select
+            v-model="selectedBuildingId"
+            placeholder="请选择楼栋号"
+            filterable
+            clearable
+            style="width: 100%"
+            @change="onBuildingChange"
+          >
+            <el-option
+              v-for="building in buildingList"
+              :key="building.build_id"
+              :label="building.build_name"
+              :value="building.build_id"
+            />
+          </el-select>
+        </el-form-item>
+
+        <el-form-item label="房间号">
+          <el-select
+            v-model="selectedRoomId"
+            placeholder="请先选择楼栋号"
+            filterable
+            clearable
+            :disabled="!selectedBuildingId"
+            style="width: 100%"
+            @change="onRoomChange"
+          >
+            <el-option
+              v-for="room in roomList"
+              :key="room.room_id"
+              :label="room.room_name"
+              :value="room.room_id"
+            />
+          </el-select>
+        </el-form-item>
+
+        <el-form-item label="空调余额">
+          <el-text v-if="acBalance" type="primary" size="large">{{ acBalance }}</el-text>
+          <el-text v-else>请先选择楼栋和房间</el-text>
+        </el-form-item>
+      </el-form>
+
+      <div style="text-align: center; margin-top: 20px">
+        <el-button type="primary" @click="saveACSettings">保存设置</el-button>
       </div>
-      <div v-else style="text-align: center; color: #999">暂无账单数据</div>
-    </el-dialog>
+    </div>
+  </el-dialog>
 
-    <!-- 支付弹窗 -->
-    <el-dialog
-      v-model="showPayDialog"
-      title="支付二维码"
-      width="400px"
-      class="pay-dialog"
-      :close-on-click-modal="false"
-    >
-      <div style="text-align: center; margin-bottom: 16px">
-        <img :src="payQCBase" alt="支付二维码" style="width: 300px; height: 300px" />
-        <div style="margin-top: 8px; color: #666; font-size: 12px">
-          二维码 {{ refreshCountdown }} 秒后自动刷新
-        </div>
-      </div>
-      <div style="text-align: center; color: #999">
-        {{ userClass }} | {{ userName }} | {{ userId }}
-      </div>
-      <div style="text-align: center; color: #999; margin-bottom: 16px">
-        请使用校园一卡通App扫码支付
-      </div>
-      <div style="text-align: center">
-        <el-button type="primary" :loading="refreshingQR" @click="refreshQRCode">
-          {{ refreshingQR ? '刷新中...' : '立即刷新二维码' }}
-        </el-button>
-      </div>
-    </el-dialog>
-
-    <!-- 空调弹窗 -->
-    <el-dialog
-      v-model="showAirConditioned"
-      title="空调设置与缴费"
-      width="400px"
-      class="air-conditioned-dialog"
-      :close-on-click-modal="false"
-    >
-      <!-- 内容 -->
-      <div class="air-conditioned-content">
-        <el-form label-width="100px">
-          <el-form-item label="缴费单位">
-            <el-text>{{ selectedAreaName || '加载中...' }}</el-text>
-          </el-form-item>
-          
-          <el-form-item label="楼栋号">
-            <el-select
-              v-model="selectedBuildingId"
-              placeholder="请选择楼栋号"
-              filterable
-              clearable
-              style="width: 100%"
-              @change="onBuildingChange"
-            >
-              <el-option
-                v-for="building in buildingList"
-                :key="building.build_id"
-                :label="building.build_name"
-                :value="building.build_id"
-              />
-            </el-select>
-          </el-form-item>
-
-          <el-form-item label="房间号">
-            <el-select
-              v-model="selectedRoomId"
-              placeholder="请先选择楼栋号"
-              filterable
-              clearable
-              :disabled="!selectedBuildingId"
-              style="width: 100%"
-              @change="onRoomChange"
-            >
-              <el-option
-                v-for="room in roomList"
-                :key="room.room_id"
-                :label="room.room_name"
-                :value="room.room_id"
-              />
-            </el-select>
-          </el-form-item>
-
-          <el-form-item label="空调余额">
-            <el-text v-if="acBalance" type="primary" size="large">{{ acBalance }}</el-text>
-            <el-text v-else>请先选择楼栋和房间</el-text>
-          </el-form-item>
-        </el-form>
-
-        <div style="text-align: center; margin-top: 20px">
-          <el-button type="primary" @click="saveACSettings">保存设置</el-button>
-        </div>
-      </div>
-    </el-dialog>
-
+  <!-- 加载课程转圈的地方 -->
+  <div v-loading="loading" class="dev-home-container" element-loading-text="加载课程中...">
     <!-- 课程列表组件 -->
     <class-container v-model="data"></class-container>
-
-    <!-- Tour Guide - Only render if not completed -->
-    <el-tour
-      v-if="!tourCompleted"
-      v-model="tourOpen"
-      :z-index="3001"
-      :mask="{ color: 'rgba(0, 0, 0, 0.5)', style: { zIndex: 3000 } }"
-    >
-      <el-tour-step
-        :target="walletBalanceRef"
-        title="钱包余额"
-        description="登录一卡通就能看见钱包的余额"
-        :next-button-props="{ children: '下一步' }"
-      />
-      <el-tour-step
-        :target="airConditioningBalanceRef"
-        title="空调余额"
-        description="点击可以查看和设置空调余额。选择楼栋号和房间号后，系统会自动查询空调余额并保存设置"
-        :prev-button-props="{ children: '上一步' }"
-        :next-button-props="{ children: '下一步' }"
-      />
-      <el-tour-step
-        :target="recentConsumptionRef"
-        title="最近消费记录"
-        description="默认显示最近7天的消费记录，点击之后会显示详细模式，可以自己选择时间范围"
-        :prev-button-props="{ children: '上一步' }"
-        :next-button-props="{ children: '下一步' }"
-      />
-      <el-tour-step
-        :target="qrCodePaymentFunction"
-        title="二维码支付功能"
-        description="点击显示一卡通二维码支付功能，支持自动刷新和手动刷新"
-        :prev-button-props="{ children: '上一步' }"
-        :next-button-props="{ children: '完成' }"
-      />
-    </el-tour>
   </div>
+
+  <!-- 导游 - 仅在未完成时渲染 -->
+  <el-tour
+    v-if="!tourCompleted"
+    v-model="tourOpen"
+    :z-index="3001"
+    :mask="{ color: 'rgba(0, 0, 0, 0.5)', style: { zIndex: 3000 } }"
+  >
+    <el-tour-step
+      :target="walletBalanceRef"
+      title="钱包余额"
+      description="登录一卡通就能看见钱包的余额"
+      :next-button-props="{ children: '下一步' }"
+    />
+    <el-tour-step
+      :target="airConditioningBalanceRef"
+      title="空调余额"
+      description="点击可以查看和设置空调余额。选择楼栋号和房间号后，系统会自动查询空调余额并保存设置"
+      :prev-button-props="{ children: '上一步' }"
+      :next-button-props="{ children: '下一步' }"
+    />
+    <el-tour-step
+      :target="recentConsumptionRef"
+      title="最近消费记录"
+      description="默认显示最近7天的消费记录，点击之后会显示详细模式，可以自己选择时间范围"
+      :prev-button-props="{ children: '上一步' }"
+      :next-button-props="{ children: '下一步' }"
+    />
+    <el-tour-step
+      :target="qrCodePaymentFunction"
+      title="二维码支付功能"
+      description="点击显示一卡通二维码支付功能，支持自动刷新和手动刷新"
+      :prev-button-props="{ children: '上一步' }"
+      :next-button-props="{ children: '完成' }"
+    />
+  </el-tour>
 </template>
 
 <script lang="ts" setup>
-  /**
-   * 优化说明（摘要）:
-   * - 将相近逻辑分组（常量、tour、OC API、账单、长按、课程处理、生命周期）
-   * - 去重重复 watch，增强空值保护及异常处理
-   * - 所有异步调用统一 try/catch，失败时给予友好提示或记录日志
-   */
-
   import dayjs from 'dayjs';
   import type { ClassInfo } from '@/components/ClassCard.vue';
   import { computed, onMounted, onUnmounted, ref, watch, nextTick } from 'vue';
@@ -266,8 +264,8 @@
     OC_GetRoomNumbers,
     OC_GetACBalance,
   } from '@/api/ocAPI';
-  import type { 
-    OC_BillRetrievalList, 
+  import type {
+    OC_BillRetrievalList,
     OCLoginResponse,
     OC_GetBuildingNoList,
     OC_GetRoomNoData,
@@ -713,7 +711,11 @@
         return;
       }
       const userKey = userInfo.data.token;
-      const response = await OC_GetACBalance(selectedBuildingId.value, selectedRoomId.value, userKey);
+      const response = await OC_GetACBalance(
+        selectedBuildingId.value,
+        selectedRoomId.value,
+        userKey
+      );
       console.log('获取空调余额返回：', response);
       if (response && response.code === 200 && response.data) {
         acBalance.value = response.data.balance;
@@ -752,14 +754,14 @@
       ElMessage.warning('请先选择楼栋和房间');
       return;
     }
-    
+
     const settings = {
       areaId: selectedAreaId.value,
       areaName: selectedAreaName.value,
       buildingId: selectedBuildingId.value,
       roomId: selectedRoomId.value,
     };
-    
+
     localStorage.setItem('SA-AC-SETTINGS', JSON.stringify(settings));
     ElMessage.success('空调设置已保存');
   };
@@ -774,12 +776,12 @@
         selectedAreaName.value = settings.areaName || '';
         selectedBuildingId.value = settings.buildingId || '';
         selectedRoomId.value = settings.roomId || '';
-        
+
         // 如果有保存的楼栋，加载对应的房间列表
         if (selectedBuildingId.value) {
           await loadRoomList(selectedBuildingId.value);
         }
-        
+
         // 如果楼栋和房间都有，加载余额
         if (validateACSettings()) {
           await loadACBalance();
@@ -1024,7 +1026,7 @@
       await fetchBill(7);
       await getUserInfoOC();
       await getPayQC();
-      
+
       // 初始化空调相关数据
       await loadPaymentUnits();
       await loadBuildingList();
@@ -1240,5 +1242,12 @@
     .air-conditioned-dialog {
       width: 95vw !important;
     }
+  }
+
+  .card {
+    padding: 12px;
+    max-width: 1200px;
+    margin: 0 auto;
+    animation: fadeIn 0.4s ease-in-out;
   }
 </style>
