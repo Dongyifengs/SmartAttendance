@@ -709,7 +709,7 @@
       const response = await OC_GetACBalance(selectedBuildingId.value, selectedRoomId.value, userKey);
       console.log('获取空调余额返回：', response);
       if (response && response.code === 200 && response.data) {
-        acBalance.value = response.data.displayMargin || (response.data.balance + ' 元');
+        acBalance.value = response.data.displayMargin || `${response.data.balance} 元`;
         // 更新顶部显示的空调余额
         OC_KTYE.value = acBalance.value;
       }
@@ -720,7 +720,7 @@
   };
 
   // 楼栋选择变化
-  const onBuildingChange = async (buildId: string | null) => {
+  const onBuildingChange = async (buildId: string) => {
     selectedRoomId.value = ''; // 清空房间选择
     roomList.value = []; // 清空房间列表
     acBalance.value = ''; // 清空余额
