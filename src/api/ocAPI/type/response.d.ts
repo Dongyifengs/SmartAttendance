@@ -304,20 +304,28 @@ export interface OC_GetBuildingNoList {
  * @interface OC_GetRoomNoResponse
  * @property {number} code - 响应状态码
  * @property {string} msg - 响应消息
- * @property {OC_GetRoomNoData} data - 房间号数据
+ * @property {OC_GetRoomNoResponseData} data - 房间号数据
  * @property {null} count - 计数（通常为 null）
  */
 export interface OC_GetRoomNoResponse {
   code: number,
   msg: string,
-  data: OC_GetRoomNoData,
+  data: OC_GetRoomNoResponseData,
   count: null
+}
+
+/**
+ * 一卡通获取房间号响应数据类型
+ * @interface OC_GetRoomNoResponseData
+ * @property {OC_GetRoomNoData[]} list - 房间号列表
+ */
+export interface OC_GetRoomNoResponseData {
+  list: OC_GetRoomNoData[]
 }
 
 /**
  * 一卡通获取房间号数据类型
  * @interface OC_GetRoomNoData
- * @property {OC_GetRoomNoData[]} list - 房间号列表
  * @property {string} room_id - 房间ID
  * @property {string} room_name - 房间名称
  * @property {null} source - 来源（通常为 null）
