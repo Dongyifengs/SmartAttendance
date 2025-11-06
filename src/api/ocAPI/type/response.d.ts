@@ -220,7 +220,15 @@ export interface OC_GetPayQrcodeData {
 }
 // =============== [一卡通获取支付二维码返回类型] =============== //
 
-// =============== [一卡通获取缴费单位请求类型] =============== //
+// =============== [一卡通获取缴费单位返回类型] =============== //
+/**
+ * 一卡通获取缴费单位返回体类型
+ * @interface OC_GetPaymentUnitsRequestBody
+ * @property {number} code - 响应状态码
+ * @property {string} msg - 响应消息
+ * @property {OC_GetPaymentUnitsData} data - 缴费单位数据
+ * @property {null} count - 计数（通常为 null）
+ */
 export interface OC_GetPaymentUnitsRequestBody {
   code: number,
   msg: string,
@@ -228,13 +236,64 @@ export interface OC_GetPaymentUnitsRequestBody {
   count: null
 }
 
+/**
+ * 一卡通获取缴费单位数据类型
+ * @interface OC_GetPaymentUnitsData
+ * @property {OC_GetPaymentUnitsList[]} list - 缴费单位列表
+ */
 export interface OC_GetPaymentUnitsData {
   list: OC_GetPaymentUnitsList[]
 }
 
+/**
+ * 一卡通获取缴费单位列表类型
+ * @interface OC_GetPaymentUnitsList
+ * @property {string} area_id - 区域ID
+ * @property {string} area_name - 区域名称
+ * @property {null} source - 来源（通常为 null）
+ */
 export interface OC_GetPaymentUnitsList {
   area_id: string,
   area_name: string,
   source: null
 }
-// =============== [一卡通获取缴费单位请求类型] =============== //
+// =============== [一卡通获取缴费单位返回类型] =============== //
+
+// =============== [一卡通获取楼栋号返回类型] =============== //
+/**
+ * 一卡通获取楼栋号返回体类型
+ * @interface OC_GetBuildingNoResponse
+ * @property {number} code - 响应状态码
+ * @property {null} count - 计数（通常为 null）
+ * @property {OC_GetBuildingNoData} data - 楼栋号数据
+ * @property {string} msg - 响应消息
+ */
+export interface OC_GetBuildingNoResponse {
+  code: number,
+  count: null,
+  data: OC_GetBuildingNoData,
+  msg: string
+}
+
+/**
+ * 一卡通获取楼栋号数据类型
+ * @interface OC_GetBuildingNoData
+ * @property {OC_GetBuildingNoList[]} list - 楼栋号列表
+ */
+export interface OC_GetBuildingNoData {
+  list: OC_GetBuildingNoList[]
+}
+
+/**
+ * 一卡通获取楼栋号列表类型
+ * @interface OC_GetBuildingNoList
+ * @property {string} build_id - 楼栋ID
+ * @property {string} build_name - 楼栋名称
+ * @property {null} source - 来源（通常为 null）
+ */
+export interface OC_GetBuildingNoList {
+  build_id: string,
+  build_name: string,
+  source: null
+}
+// =============== [一卡通获取楼栋号返回类型] =============== //

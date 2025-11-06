@@ -115,3 +115,27 @@ export interface OC_GetPayUnitRequestBody {
   token: string;
 }
 // =============== [一卡通获取缴费单位请求类型] =============== //
+
+// =============== [一卡通获取楼栋号请求类型] =============== //
+/**
+ * 获取一卡通楼栋号请求体类型
+ * @interface OC_GetBuildingNoRequestBody
+ * @property {string} appid - 应用ID
+ * @property {object} data - 数据对象
+ * @property {string} data.area_id - 区域ID
+ * @property {number} data.configId - 配置ID
+ * @property {string} data.payment_type - 支付类型
+ * @property {string} from - 来源标识
+ * @property {string} token - 令牌
+ */
+export interface OC_GetBuildingNoRequestBody {
+  appid: string;
+  data: {
+    area_id: string,
+    configId: number,
+    payment_type: string,
+  },
+  from: string,
+  token: string
+}
+// =============== [一卡通获取楼栋号请求类型] =============== //
