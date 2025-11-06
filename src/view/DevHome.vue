@@ -271,6 +271,7 @@
   const LONG_PRESS_DELAY = 800; // 长按触发延迟（毫秒）
   const LONG_PRESS_DEBOUNCE_DELAY = 100; // 长按防抖延迟（毫秒）
   const TOUR_COMPLETED_KEY = 'SA-TOUR-COMPLETED1'; // localStorage key for tour completion
+  const DEFAULT_AREA_ID = '1'; // 默认区域ID
 
   // ==================== Tour 相关 ====================
   const tourOpen = ref(false);
@@ -623,7 +624,7 @@
   const showAirConditioned = ref(false);
 
   // 空调相关状态
-  const selectedAreaId = ref('1'); // 区域ID，默认为1
+  const selectedAreaId = ref(DEFAULT_AREA_ID); // 区域ID
   const selectedAreaName = ref('');
   const selectedBuildingId = ref('');
   const selectedRoomId = ref('');
@@ -708,7 +709,7 @@
       const response = await OC_GetACBalance(selectedBuildingId.value, selectedRoomId.value, userKey);
       console.log('获取空调余额返回：', response);
       if (response && response.code === 200 && response.data) {
-        acBalance.value = response.data.displayMargin || response.data.balance + ' 元';
+        acBalance.value = response.data.displayMargin || (response.data.balance + ' 元');
         // 更新顶部显示的空调余额
         OC_KTYE.value = acBalance.value;
       }
@@ -719,7 +720,7 @@
   };
 
   // 楼栋选择变化
-  const onBuildingChange = async (buildId: string) => {
+  const onBuildingChange = async (buildId: string | null) => {
     selectedRoomId.value = ''; // 清空房间选择
     roomList.value = []; // 清空房间列表
     acBalance.value = ''; // 清空余额
@@ -730,14 +731,17 @@
 
   // 房间选择变化
   const onRoomChange = async () => {
-    if (selectedBuildingId.value && selectedRoomId.value) {
-      await loadACBalance();
-    }
+    await loadACBalance();
+  };
+
+  // 验证空调设置是否完整
+  const validateACSettings = (): boolean => {
+    return !!(selectedBuildingId.value && selectedRoomId.value);
   };
 
   // 保存空调设置到本地
   const saveACSettings = () => {
-    if (!selectedBuildingId.value || !selectedRoomId.value) {
+    if (!validateACSettings()) {
       ElMessage.warning('请先选择楼栋和房间');
       return;
     }
@@ -759,7 +763,7 @@
       const settingsStr = localStorage.getItem('SA-AC-SETTINGS');
       if (settingsStr) {
         const settings = JSON.parse(settingsStr);
-        selectedAreaId.value = settings.areaId || '1';
+        selectedAreaId.value = settings.areaId || DEFAULT_AREA_ID;
         selectedAreaName.value = settings.areaName || '';
         selectedBuildingId.value = settings.buildingId || '';
         selectedRoomId.value = settings.roomId || '';
@@ -770,7 +774,7 @@
         }
         
         // 如果楼栋和房间都有，加载余额
-        if (selectedBuildingId.value && selectedRoomId.value) {
+        if (validateACSettings()) {
           await loadACBalance();
         }
       }
