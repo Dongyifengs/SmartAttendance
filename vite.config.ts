@@ -137,6 +137,11 @@ export default defineConfig(({ mode }) => {
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/MoYiAPI/, ''),
         },
+        '/CallAPI': {
+          target: 'https://rollcall.anlaxy.com.cn/SerApi/v02',
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/CallAPI/, ''),
+        },
       },
     },
     base: './',
