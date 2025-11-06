@@ -167,3 +167,35 @@ export interface OC_GetRoomNoRequestBody {
   token: string
 }
 // =============== [一卡通获取房间号请求类型] =============== //
+
+// =============== [一卡通获取空调余额请求类型] =============== //
+/**
+ * 获取一卡通空调余额请求体类型
+ * @interface OC_GetAirConditionerBalanceRequestBody
+ * @property {string} appid - 应用ID
+ * @property {object} data - 数据对象
+ * @property {string} data.area_id - 区域ID
+ * @property {string} data.build_id - 楼栋ID
+ * @property {number} data.configId - 配置ID
+ * @property {string} data.item_id - 项目ID
+ * @property {string} data.payment_type - 支付类型
+ * @property {string} data.room_id - 房间ID
+ * @property {null} data.source - 来源
+ * @property {number} from - 来源标识
+ * @property {string} token - 令牌
+ */
+export interface OC_GetAirConditionerBalanceRequestBody {
+  appid: string;
+  data: {
+    area_id: string,
+    build_id: string,
+    configId: number,
+    item_id: string,
+    payment_type: string,
+    room_id: string,
+    source: null
+  },
+  from: number,
+  token: string
+}
+// =============== [一卡通获取空调余额请求类型] =============== //

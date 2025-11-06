@@ -8,9 +8,11 @@ import type {
   OC_GetPaymentUnitsRequestBody,
   OC_GetBuildingNoResponse,
   OC_GetRoomNoResponse,
+  OC_GetAirConditionerBalanceResponse,
 } from '@/api/ocAPI/type/response';
 import type {
   OC_BillRetrievalRequestBody,
+  OC_GetAirConditionerBalanceRequestBody,
   OC_GetBalanceRequestBody,
   OC_GetBuildingNoRequestBody,
   OC_GetPayQrcodeRequestBody,
@@ -179,5 +181,37 @@ export async function OC_GetRoomNumbers(
     token: token,
   };
   const response = await OCAPI.post<OC_GetRoomNoResponse>('elecWater/getRoomList', body);
+  return response.data;
+}
+
+/**
+ * 获取空调余额
+ * @param build_id - 楼栋ID
+ * @param room_id - 房间ID
+ * @param token - 用户登录后获取的 token
+ */
+export async function OC_GetACBalance(
+  build_id: string,
+  room_id: string,
+  token: string
+): Promise<OC_GetAirConditionerBalanceResponse> {
+  const body: OC_GetAirConditionerBalanceRequestBody = {
+    appid: OCDEVICE_ID,
+    data: {
+      area_id: '1',
+      build_id: build_id,
+      configId: 1,
+      item_id: '1',
+      payment_type: '2',
+      room_id: room_id,
+      source: null,
+    },
+    from: 4,
+    token: token,
+  };
+  const response = await OCAPI.post<OC_GetAirConditionerBalanceResponse>(
+    'api/elecWater/getBalance',
+    body
+  );
   return response.data;
 }

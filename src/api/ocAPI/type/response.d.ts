@@ -328,3 +328,31 @@ export interface OC_GetRoomNoData {
   source: null
 }
 // =============== [一卡通获取房间号返回类型] =============== //
+
+// =============== [一卡通获取空调余额返回类型] =============== //
+/**
+ * 一卡通获取空调余额返回体类型
+ * @interface OC_GetAirConditionerBalanceResponse
+ * @property {number} code - 响应状态码
+ * @property {string} msg - 响应消息
+ * @property {OC_GetAirConditionerBalanceData} data - 空调余额数据
+ * @property {null} count - 计数（通常为 null）
+ */
+export interface OC_GetAirConditionerBalanceResponse {
+  code: number,
+  msg: string,
+  data: OC_GetAirConditionerBalanceData,
+  count: null
+}
+
+/**
+ * 一卡通获取空调余额数据类型
+ * @interface OC_GetAirConditionerBalanceData
+ * @property {string} balance - 余额
+ * @property {string} displayMargin - 显示类型文本
+ */
+export interface OC_GetAirConditionerBalanceData {
+  balance: string,
+  displayMargin: string
+}
+// =============== [一卡通获取空调余额返回类型] =============== //
