@@ -143,12 +143,12 @@
     >
       <!-- 内容 -->
       <div class="air-conditioned-content">
-        <el-text class="mx-1" size="large">缴费单位：{{ OC_TEXT_KEYE_PayingUnit }}</el-text
+        <el-text class="mx-1" size="large">缴费单位：{{ OC_TEXT_KTYE_PayingUnit }}</el-text
         ><br />
-        <el-text class="mx-1" size="large">区域：{{ OC_TEXT_KEYE_PayingUnit }}</el-text
+        <el-text class="mx-1" size="large">区域：{{ OC_TEXT_KTYE_PayingUnit }}</el-text
         ><br />
-        <el-text class="mx-1" size="large">楼栋号：{{}}</el-text><br />
-        <el-text class="mx-1" size="large">房间号：{{}}</el-text><br />
+        <el-text class="mx-1" size="large">楼栋号：{{ OC_TEXT_KTYE_Building }}</el-text><br />
+        <el-text class="mx-1" size="large">房间号：{{ OC_TEXT_KTYE_Room }}</el-text><br />
       </div>
     </el-dialog>
 
@@ -570,7 +570,9 @@
   const showAirConditioned = ref(true);
 
   // 定义文本
-  const OC_TEXT_KEYE_PayingUnit = ref('未知单位');
+  const OC_TEXT_KTYE_PayingUnit = ref('未知单位');
+  const OC_TEXT_KTYE_Building = ref('未知楼栋');
+  const OC_TEXT_KTYE_Room = ref('未知房间');
   const OC_Get_PayingUnit = async () => {
     try {
       const userInfo = getUserInfo_OC();
@@ -582,7 +584,7 @@
       const response = OC_GetPaymentUnits(userKey);
       console.log('获取支付单位返回：', response);
       response.then((res) => {
-        OC_TEXT_KEYE_PayingUnit.value = res.data.list[0].area_name;
+        OC_TEXT_KTYE_PayingUnit.value = res.data.list[0].area_name;
       });
     } catch (error) {
       ElMessage.error('获取支付单位失败');
