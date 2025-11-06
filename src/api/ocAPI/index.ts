@@ -5,11 +5,13 @@ import type {
   OC_BillRetrievalResponse,
   OC_GetUserInfoResponse,
   OC_GetPayQrcodeResponse,
+  OC_GetPaymentUnitsRequestBody,
 } from '@/api/ocAPI/type/response';
 import type {
   OC_BillRetrievalRequestBody,
   OC_GetBalanceRequestBody,
   OC_GetPayQrcodeRequestBody,
+  OC_GetPayUnitRequestBody,
   OC_GetUserInfoRequestBody,
   OC_LoginRequestsBody,
 } from '@/api/ocAPI/type/requests';
@@ -108,5 +110,24 @@ export async function OC_GetPayQRCode(token: string): Promise<OC_GetPayQrcodeRes
     token: token,
   };
   const response = await OCAPI.post<OC_GetPayQrcodeResponse>('user/schoolcode', body);
+  return response.data;
+}
+
+/**
+ * 获取缴费单位
+ * @param token - 用户登录后获取的 token
+ * @return 缴费单位响应数据
+ */
+export async function OC_GetPaymentUnits(token: string): Promise<OC_GetPaymentUnitsRequestBody> {
+  const body: OC_GetPayUnitRequestBody = {
+    appid: OCDEVICE_ID,
+    data: {
+      configId: 1,
+      payment_type: "2"
+    },
+    from: 4,
+    token: token,
+  };
+  const response = await OCAPI.post<OC_GetPaymentUnitsRequestBody>('elecWater/getAreaList', body);
   return response.data;
 }

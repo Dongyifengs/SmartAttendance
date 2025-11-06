@@ -219,3 +219,22 @@ export interface OC_GetPayQrcodeData {
   code_info: string
 }
 // =============== [一卡通获取支付二维码返回类型] =============== //
+
+// =============== [一卡通获取缴费单位请求类型] =============== //
+export interface OC_GetPaymentUnitsRequestBody {
+  code: number,
+  msg: string,
+  data: OC_GetPaymentUnitsData,
+  count: null
+}
+
+export interface OC_GetPaymentUnitsData {
+  list: OC_GetPaymentUnitsList[]
+}
+
+export interface OC_GetPaymentUnitsList {
+  area_id: string,
+  area_name: string,
+  source: null
+}
+// =============== [一卡通获取缴费单位请求类型] =============== //
