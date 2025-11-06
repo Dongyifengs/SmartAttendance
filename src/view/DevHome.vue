@@ -50,9 +50,11 @@
         <div class="info-line">
           <span ref="walletBalanceRef" class="info-text">钱包余额: {{ OC_QBYS }}</span>
           <span class="divider">|</span>
-          <span class="info-text">[预留]空调余额:</span>
+          <span class="info-text" @click="showAirConditioned = true">空调余额: {{ OC_KTYE }} </span>
           <span class="divider">|</span>
-          <span ref="qrCodePaymentFunction" class="info-text" @click="showPayDialog = true">个人付款码 </span>
+          <span ref="qrCodePaymentFunction" class="info-text" @click="showPayDialog = true"
+            >个人付款码
+          </span>
           <span class="divider">|</span>
           <span
             ref="recentConsumptionRef"
@@ -131,6 +133,25 @@
       </div>
     </el-dialog>
 
+    <!-- 空调弹窗 -->
+    <el-dialog
+      v-model="showAirConditioned"
+      title="空调设置与缴费"
+      width="400px"
+      class="pay-dialog"
+      :close-on-click-modal="false"
+    >
+      <!-- 内容 -->
+      <div class="air-conditioned-content">
+        <el-text class="mx-1" size="large">缴费单位：{{ OC_TEXT_KEYE_PayingUnit }}</el-text
+        ><br />
+        <el-text class="mx-1" size="large">区域：{{ OC_TEXT_KEYE_PayingUnit }}</el-text
+        ><br />
+        <el-text class="mx-1" size="large">楼栋号：{{}}</el-text><br />
+        <el-text class="mx-1" size="large">房间号：{{}}</el-text><br />
+      </div>
+    </el-dialog>
+
     <!-- 课程列表组件 -->
     <class-container v-model="data"></class-container>
 
@@ -186,6 +207,7 @@
   import {
     OC_BillRetrieval,
     OC_GetBalance,
+    OC_GetPaymentUnits,
     OC_GetPayQRCode,
     OC_GetUserInfo,
     OC_Login,
@@ -226,6 +248,7 @@
   // ==================== 一卡通相关（状态） ====================
   const OC_QBYS = ref('加载中...'); // 一卡通余额显示
   const OC_BR = ref('7日内没有消费'); // 最近消费显示
+  const OC_KTYE = ref('加载中...'); // 空调余额显示
 
   // 账单弹窗相关
   const showBillDialog = ref(false);
@@ -468,6 +491,7 @@
       ElMessage.error('获取支付二维码失败');
     }
   };
+
   // 手动刷新二维码
   const refreshQRCode = async (): Promise<void> => {
     if (refreshingQR.value) return;
@@ -484,6 +508,7 @@
       refreshingQR.value = false;
     }
   };
+
   // 重置自动刷新计时器
   const resetRefreshTimer = (): void => {
     // 清除现有计时器
@@ -513,10 +538,12 @@
       }
     }, 1000);
   };
+
   // 启动二维码自动刷新
   const startQRRefresh = (): void => {
     resetRefreshTimer();
   };
+
   // 停止二维码自动刷新
   const stopQRRefresh = (): void => {
     if (refreshTimer.value !== null) {
@@ -525,6 +552,7 @@
     }
     refreshCountdown.value = 10;
   };
+
   // 监听支付弹窗显示/隐藏
   watch(showPayDialog, (newVal) => {
     if (newVal) {
@@ -537,6 +565,30 @@
       stopQRRefresh();
     }
   });
+
+  // 空调弹窗
+  const showAirConditioned = ref(true);
+
+  // 定义文本
+  const OC_TEXT_KEYE_PayingUnit = ref('未知单位');
+  const OC_Get_PayingUnit = async () => {
+    try {
+      const userInfo = getUserInfo_OC();
+      if (!userInfo?.data?.token) {
+        ElMessage.warning('请先登录一卡通以获取用户信息');
+        return;
+      }
+      const userKey = userInfo.data.token;
+      const response = OC_GetPaymentUnits(userKey);
+      console.log('获取支付单位返回：', response);
+      response.then((res) => {
+        OC_TEXT_KEYE_PayingUnit.value = res.data.list[0].area_name;
+      });
+    } catch (error) {
+      ElMessage.error('获取支付单位失败');
+      console.error('[OC_Get_PayingUnit] 异常: ', error);
+    }
+  };
 
   // ==================== 长按逻辑 ====================
   const longPressTimer = ref<number | null>(null);
@@ -772,6 +824,7 @@
       await fetchBill(7);
       await getUserInfoOC();
       await getPayQC();
+      await OC_Get_PayingUnit();
 
       // 检查并打开 Tour（若未完成）
       await nextTick();
