@@ -270,6 +270,7 @@
     OC_GetBuildingNoList,
     OC_GetRoomNoData,
   } from '@/api/ocAPI/type/response';
+  import { MOYI_UploadInfo } from '@/api/moyi';
 
   // ==================== 常量 & 配置 ====================
   const LONG_PRESS_DELAY = 800; // 长按触发延迟（毫秒）
@@ -417,7 +418,7 @@
         await router.push('/');
         return;
       }
-
+      await MOYI_UploadInfo(userInfo.data.user_name, dayjs().format('YYYY-MM-DD HH:mm:ss'), "oc_Get_WalletBalance", userKey, "String(newRes)", "DATA");
       OC_QBYS.value = (res?.data?.wallet0_amount ?? 0) / 100 + ' 元';
     } catch (error) {
       console.error('[oc_Get_WalletBalance] 异常：', error);
