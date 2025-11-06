@@ -50,7 +50,7 @@
         <div class="info-line">
           <span ref="walletBalanceRef" class="info-text">钱包余额: {{ OC_QBYS }}</span>
           <span class="divider">|</span>
-          <span class="info-text" @click="showAirConditioned = true">空调余额: {{ OC_KTYE }} </span>
+          <span ref="airConditioningBalanceRef" class="info-text" @click="showAirConditioned = true">空调余额: {{ OC_KTYE }} </span>
           <span class="divider">|</span>
           <span ref="qrCodePaymentFunction" class="info-text" @click="showPayDialog = true"
             >个人付款码
@@ -138,17 +138,62 @@
       v-model="showAirConditioned"
       title="空调设置与缴费"
       width="400px"
-      class="pay-dialog"
+      class="air-conditioned-dialog"
       :close-on-click-modal="false"
     >
       <!-- 内容 -->
       <div class="air-conditioned-content">
-        <el-text class="mx-1" size="large">缴费单位：{{ OC_TEXT_KTYE_PayingUnit }}</el-text
-        ><br />
-        <el-text class="mx-1" size="large">区域：{{ OC_TEXT_KTYE_PayingUnit }}</el-text
-        ><br />
-        <el-text class="mx-1" size="large">楼栋号：{{ OC_TEXT_KTYE_Building }}</el-text><br />
-        <el-text class="mx-1" size="large">房间号：{{ OC_TEXT_KTYE_Room }}</el-text><br />
+        <el-form label-width="100px">
+          <el-form-item label="缴费单位">
+            <el-text>{{ selectedAreaName || '加载中...' }}</el-text>
+          </el-form-item>
+          
+          <el-form-item label="楼栋号">
+            <el-select
+              v-model="selectedBuildingId"
+              placeholder="请选择楼栋号"
+              filterable
+              clearable
+              style="width: 100%"
+              @change="onBuildingChange"
+            >
+              <el-option
+                v-for="building in buildingList"
+                :key="building.build_id"
+                :label="building.build_name"
+                :value="building.build_id"
+              />
+            </el-select>
+          </el-form-item>
+
+          <el-form-item label="房间号">
+            <el-select
+              v-model="selectedRoomId"
+              placeholder="请先选择楼栋号"
+              filterable
+              clearable
+              :disabled="!selectedBuildingId"
+              style="width: 100%"
+              @change="onRoomChange"
+            >
+              <el-option
+                v-for="room in roomList"
+                :key="room.room_id"
+                :label="room.room_name"
+                :value="room.room_id"
+              />
+            </el-select>
+          </el-form-item>
+
+          <el-form-item label="空调余额">
+            <el-text v-if="acBalance" type="primary" size="large">{{ acBalance }}</el-text>
+            <el-text v-else>请先选择楼栋和房间</el-text>
+          </el-form-item>
+        </el-form>
+
+        <div style="text-align: center; margin-top: 20px">
+          <el-button type="primary" @click="saveACSettings">保存设置</el-button>
+        </div>
       </div>
     </el-dialog>
 
@@ -161,12 +206,18 @@
       v-model="tourOpen"
       :z-index="3001"
       :mask="{ color: 'rgba(0, 0, 0, 0.5)', style: { zIndex: 3000 } }"
-      :close-icon="null"
     >
       <el-tour-step
         :target="walletBalanceRef"
         title="钱包余额"
         description="登录一卡通就能看见钱包的余额"
+        :next-button-props="{ children: '下一步' }"
+      />
+      <el-tour-step
+        :target="airConditioningBalanceRef"
+        title="空调余额"
+        description="点击可以查看和设置空调余额。选择楼栋号和房间号后，系统会自动查询空调余额并保存设置"
+        :prev-button-props="{ children: '上一步' }"
         :next-button-props="{ children: '下一步' }"
       />
       <el-tour-step
@@ -211,18 +262,28 @@
     OC_GetPayQRCode,
     OC_GetUserInfo,
     OC_Login,
+    OC_GetBuildingNumbers,
+    OC_GetRoomNumbers,
+    OC_GetACBalance,
   } from '@/api/ocAPI';
-  import type { OC_BillRetrievalList, OCLoginResponse } from '@/api/ocAPI/type/response';
+  import type { 
+    OC_BillRetrievalList, 
+    OCLoginResponse,
+    OC_GetBuildingNoList,
+    OC_GetRoomNoData,
+  } from '@/api/ocAPI/type/response';
 
   // ==================== 常量 & 配置 ====================
   const LONG_PRESS_DELAY = 800; // 长按触发延迟（毫秒）
   const LONG_PRESS_DEBOUNCE_DELAY = 100; // 长按防抖延迟（毫秒）
-  const TOUR_COMPLETED_KEY = 'SA-TOUR-COMPLETED1'; // localStorage key for tour completion
+  const TOUR_COMPLETED_KEY = 'SA-TOUR-COMPLETED2'; // localStorage key for tour completion
+  const DEFAULT_AREA_ID = '1'; // 默认区域ID
 
   // ==================== Tour 相关 ====================
   const tourOpen = ref(false);
   const tourCompleted = ref(localStorage.getItem(TOUR_COMPLETED_KEY) === 'true');
   const walletBalanceRef = ref<HTMLElement | null>(null);
+  const airConditioningBalanceRef = ref<HTMLElement | null>(null);
   const recentConsumptionRef = ref<HTMLElement | null>(null);
   const qrCodePaymentFunction = ref<HTMLElement | null>(null);
 
@@ -248,7 +309,7 @@
   // ==================== 一卡通相关（状态） ====================
   const OC_QBYS = ref('加载中...'); // 一卡通余额显示
   const OC_BR = ref('7日内没有消费'); // 最近消费显示
-  const OC_KTYE = ref('加载中...'); // 空调余额显示
+  const OC_KTYE = ref('点击设置宿舍'); // 空调余额显示
 
   // 账单弹窗相关
   const showBillDialog = ref(false);
@@ -567,13 +628,19 @@
   });
 
   // 空调弹窗
-  const showAirConditioned = ref(true);
+  const showAirConditioned = ref(false);
 
-  // 定义文本
-  const OC_TEXT_KTYE_PayingUnit = ref('未知单位');
-  const OC_TEXT_KTYE_Building = ref('未知楼栋');
-  const OC_TEXT_KTYE_Room = ref('未知房间');
-  const OC_Get_PayingUnit = async () => {
+  // 空调相关状态
+  const selectedAreaId = ref(DEFAULT_AREA_ID); // 区域ID
+  const selectedAreaName = ref('');
+  const selectedBuildingId = ref('');
+  const selectedRoomId = ref('');
+  const buildingList = ref<OC_GetBuildingNoList[]>([]);
+  const roomList = ref<OC_GetRoomNoData[]>([]);
+  const acBalance = ref('');
+
+  // 获取缴费单位（区域）
+  const loadPaymentUnits = async () => {
     try {
       const userInfo = getUserInfo_OC();
       if (!userInfo?.data?.token) {
@@ -581,14 +648,145 @@
         return;
       }
       const userKey = userInfo.data.token;
-      const response = OC_GetPaymentUnits(userKey);
+      const response = await OC_GetPaymentUnits(userKey);
       console.log('获取支付单位返回：', response);
-      response.then((res) => {
-        OC_TEXT_KTYE_PayingUnit.value = res.data.list[0].area_name;
-      });
+      if (response && response.code === 200 && response.data.list.length > 0) {
+        selectedAreaName.value = response.data.list[0].area_name;
+        selectedAreaId.value = response.data.list[0].area_id;
+      }
     } catch (error) {
       ElMessage.error('获取支付单位失败');
-      console.error('[OC_Get_PayingUnit] 异常: ', error);
+      console.error('[loadPaymentUnits] 异常: ', error);
+    }
+  };
+
+  // 获取楼栋列表
+  const loadBuildingList = async () => {
+    try {
+      const userInfo = getUserInfo_OC();
+      if (!userInfo?.data?.token) {
+        ElMessage.warning('请先登录一卡通');
+        return;
+      }
+      const userKey = userInfo.data.token;
+      const response = await OC_GetBuildingNumbers(userKey);
+      console.log('获取楼栋列表返回：', response);
+      if (response && response.code === 200 && response.data.list) {
+        buildingList.value = response.data.list;
+      }
+    } catch (error) {
+      ElMessage.error('获取楼栋列表失败');
+      console.error('[loadBuildingList] 异常: ', error);
+    }
+  };
+
+  // 获取房间列表
+  const loadRoomList = async (buildId: string) => {
+    try {
+      const userInfo = getUserInfo_OC();
+      if (!userInfo?.data?.token) {
+        ElMessage.warning('请先登录一卡通');
+        return;
+      }
+      const userKey = userInfo.data.token;
+      const response = await OC_GetRoomNumbers(buildId, userKey);
+      console.log('获取房间列表返回：', response);
+      if (response && response.code === 200 && response.data && response.data.list) {
+        roomList.value = response.data.list;
+      }
+    } catch (error) {
+      ElMessage.error('获取房间列表失败');
+      console.error('[loadRoomList] 异常: ', error);
+    }
+  };
+
+  // 获取空调余额
+  const loadACBalance = async () => {
+    try {
+      const userInfo = getUserInfo_OC();
+      if (!userInfo?.data?.token) {
+        ElMessage.warning('请先登录一卡通');
+        return;
+      }
+      if (!selectedBuildingId.value || !selectedRoomId.value) {
+        acBalance.value = '';
+        return;
+      }
+      const userKey = userInfo.data.token;
+      const response = await OC_GetACBalance(selectedBuildingId.value, selectedRoomId.value, userKey);
+      console.log('获取空调余额返回：', response);
+      if (response && response.code === 200 && response.data) {
+        acBalance.value = response.data.balance;
+        // 更新顶部显示的空调余额
+        OC_KTYE.value = acBalance.value;
+      }
+    } catch (error) {
+      ElMessage.error('获取空调余额失败');
+      console.error('[loadACBalance] 异常: ', error);
+    }
+  };
+
+  // 楼栋选择变化
+  const onBuildingChange = async (buildId: string) => {
+    selectedRoomId.value = ''; // 清空房间选择
+    roomList.value = []; // 清空房间列表
+    acBalance.value = ''; // 清空余额
+    if (buildId) {
+      await loadRoomList(buildId);
+    }
+  };
+
+  // 房间选择变化
+  const onRoomChange = async () => {
+    await loadACBalance();
+  };
+
+  // 验证空调设置是否完整
+  const validateACSettings = (): boolean => {
+    return !!(selectedBuildingId.value && selectedRoomId.value);
+  };
+
+  // 保存空调设置到本地
+  const saveACSettings = () => {
+    if (!validateACSettings()) {
+      ElMessage.warning('请先选择楼栋和房间');
+      return;
+    }
+    
+    const settings = {
+      areaId: selectedAreaId.value,
+      areaName: selectedAreaName.value,
+      buildingId: selectedBuildingId.value,
+      roomId: selectedRoomId.value,
+    };
+    
+    localStorage.setItem('SA-AC-SETTINGS', JSON.stringify(settings));
+    ElMessage.success('空调设置已保存');
+  };
+
+  // 从本地加载空调设置
+  const loadSavedACSettings = async () => {
+    try {
+      const settingsStr = localStorage.getItem('SA-AC-SETTINGS');
+      if (settingsStr) {
+        const settings = JSON.parse(settingsStr);
+        selectedAreaId.value = settings.areaId || DEFAULT_AREA_ID;
+        selectedAreaName.value = settings.areaName || '';
+        selectedBuildingId.value = settings.buildingId || '';
+        selectedRoomId.value = settings.roomId || '';
+        
+        // 如果有保存的楼栋，加载对应的房间列表
+        if (selectedBuildingId.value) {
+          await loadRoomList(selectedBuildingId.value);
+        }
+        
+        // 如果楼栋和房间都有，加载余额
+        if (validateACSettings()) {
+          await loadACBalance();
+        }
+      }
+    } catch (error) {
+      console.error('[loadSavedACSettings] 异常: ', error);
     }
   };
 
@@ -826,7 +1024,11 @@
       await fetchBill(7);
       await getUserInfoOC();
       await getPayQC();
-      await OC_Get_PayingUnit();
+      
+      // 初始化空调相关数据
+      await loadPaymentUnits();
+      await loadBuildingList();
+      await loadSavedACSettings();
 
       // 检查并打开 Tour（若未完成）
       await nextTick();
@@ -1023,5 +1225,20 @@
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
+  }
+
+  /* 空调弹窗样式 */
+  .air-conditioned-dialog {
+    max-width: 90vw;
+  }
+
+  .air-conditioned-content {
+    padding: 10px 0;
+  }
+
+  @media (max-width: 768px) {
+    .air-conditioned-dialog {
+      width: 95vw !important;
+    }
   }
 </style>
