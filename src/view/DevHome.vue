@@ -50,7 +50,7 @@
         <div class="info-line">
           <span ref="walletBalanceRef" class="info-text">钱包余额: {{ OC_QBYS }}</span>
           <span class="divider">|</span>
-          <span class="info-text" @click="showAirConditioned = true">空调余额: {{ OC_KTYE }} </span>
+          <span ref="airConditioningBalanceRef" class="info-text" @click="showAirConditioned = true">空调余额: {{ OC_KTYE }} </span>
           <span class="divider">|</span>
           <span ref="qrCodePaymentFunction" class="info-text" @click="showPayDialog = true"
             >个人付款码
@@ -215,6 +215,13 @@
         :next-button-props="{ children: '下一步' }"
       />
       <el-tour-step
+        :target="airConditioningBalanceRef"
+        title="空调余额"
+        description="点击可以查看和设置空调余额。选择楼栋号和房间号后，系统会自动查询空调余额并保存设置"
+        :prev-button-props="{ children: '上一步' }"
+        :next-button-props="{ children: '下一步' }"
+      />
+      <el-tour-step
         :target="recentConsumptionRef"
         title="最近消费记录"
         description="默认显示最近7天的消费记录，点击之后会显示详细模式，可以自己选择时间范围"
@@ -270,13 +277,14 @@
   // ==================== 常量 & 配置 ====================
   const LONG_PRESS_DELAY = 800; // 长按触发延迟（毫秒）
   const LONG_PRESS_DEBOUNCE_DELAY = 100; // 长按防抖延迟（毫秒）
-  const TOUR_COMPLETED_KEY = 'SA-TOUR-COMPLETED1'; // localStorage key for tour completion
+  const TOUR_COMPLETED_KEY = 'SA-TOUR-COMPLETED2'; // localStorage key for tour completion
   const DEFAULT_AREA_ID = '1'; // 默认区域ID
 
   // ==================== Tour 相关 ====================
   const tourOpen = ref(false);
   const tourCompleted = ref(localStorage.getItem(TOUR_COMPLETED_KEY) === 'true');
   const walletBalanceRef = ref<HTMLElement | null>(null);
+  const airConditioningBalanceRef = ref<HTMLElement | null>(null);
   const recentConsumptionRef = ref<HTMLElement | null>(null);
   const qrCodePaymentFunction = ref<HTMLElement | null>(null);
 
