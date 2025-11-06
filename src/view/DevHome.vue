@@ -137,7 +137,7 @@
     <el-dialog
       v-model="showAirConditioned"
       title="空调设置与缴费"
-      width="450px"
+      width="400px"
       class="air-conditioned-dialog"
       :close-on-click-modal="false"
     >
@@ -206,7 +206,6 @@
       v-model="tourOpen"
       :z-index="3001"
       :mask="{ color: 'rgba(0, 0, 0, 0.5)', style: { zIndex: 3000 } }"
-      :close-icon="null"
     >
       <el-tour-step
         :target="walletBalanceRef"
@@ -310,7 +309,7 @@
   // ==================== 一卡通相关（状态） ====================
   const OC_QBYS = ref('加载中...'); // 一卡通余额显示
   const OC_BR = ref('7日内没有消费'); // 最近消费显示
-  const OC_KTYE = ref('加载中...'); // 空调余额显示
+  const OC_KTYE = ref('点击设置宿舍'); // 空调余额显示
 
   // 账单弹窗相关
   const showBillDialog = ref(false);
@@ -717,7 +716,7 @@
       const response = await OC_GetACBalance(selectedBuildingId.value, selectedRoomId.value, userKey);
       console.log('获取空调余额返回：', response);
       if (response && response.code === 200 && response.data) {
-        acBalance.value = response.data.displayMargin || `${response.data.balance} 元`;
+        acBalance.value = response.data.balance;
         // 更新顶部显示的空调余额
         OC_KTYE.value = acBalance.value;
       }

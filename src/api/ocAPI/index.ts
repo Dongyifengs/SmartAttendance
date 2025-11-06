@@ -210,7 +210,7 @@ export async function OC_GetACBalance(
     token: token,
   };
   const response = await OCAPI.post<OC_GetAirConditionerBalanceResponse>(
-    'api/elecWater/getBalance',
+    'elecWater/getBalance',
     body
   );
   return response.data;
