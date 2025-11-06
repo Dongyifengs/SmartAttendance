@@ -139,3 +139,31 @@ export interface OC_GetBuildingNoRequestBody {
   token: string
 }
 // =============== [一卡通获取楼栋号请求类型] =============== //
+
+// =============== [一卡通获取房间号请求类型] =============== //
+/**
+ * 获取一卡通房间号请求体类型
+ * @interface OC_GetRoomNoRequestBody
+ * @property {string} appid - 应用ID
+ * @property {object} data - 数据对象
+ * @property {string} data.area_id - 区域ID
+ * @property {string} data.build_id - 楼栋ID
+ * @property {number} data.configId - 配置ID
+ * @property {string} data.payment_type - 支付类型
+ * @property {null} data.source - 来源
+ * @property {string} from - 来源标识
+ * @property {string} token - 令牌
+ */
+export interface OC_GetRoomNoRequestBody {
+  appid: string;
+  data: {
+    area_id: string,
+    build_id: string,
+    configId: number,
+    payment_type: string,
+    source: null
+  },
+  from: string,
+  token: string
+}
+// =============== [一卡通获取房间号请求类型] =============== //

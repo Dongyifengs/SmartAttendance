@@ -7,6 +7,7 @@ import type {
   OC_GetPayQrcodeResponse,
   OC_GetPaymentUnitsRequestBody,
   OC_GetBuildingNoResponse,
+  OC_GetRoomNoResponse,
 } from '@/api/ocAPI/type/response';
 import type {
   OC_BillRetrievalRequestBody,
@@ -14,6 +15,7 @@ import type {
   OC_GetBuildingNoRequestBody,
   OC_GetPayQrcodeRequestBody,
   OC_GetPayUnitRequestBody,
+  OC_GetRoomNoRequestBody,
   OC_GetUserInfoRequestBody,
   OC_LoginRequestsBody,
 } from '@/api/ocAPI/type/requests';
@@ -151,5 +153,31 @@ export async function OC_GetBuildingNumbers(token: string): Promise<OC_GetBuildi
     token: token,
   };
   const response = await OCAPI.post<OC_GetBuildingNoResponse>('elecWater/getBuildList', body);
+  return response.data;
+}
+
+/**
+ * 获取房间号
+ * @param build_id - 楼栋ID
+ * @param token - 用户登录后获取的 token
+ * @return 房间号响应数据
+ */
+export async function OC_GetRoomNumbers(
+  build_id: string,
+  token: string
+): Promise<OC_GetRoomNoResponse> {
+  const body: OC_GetRoomNoRequestBody = {
+    appid: OCDEVICE_ID,
+    data: {
+      area_id: '1',
+      build_id: build_id,
+      configId: 1,
+      payment_type: '2',
+      source: null,
+    },
+    from: '4',
+    token: token,
+  };
+  const response = await OCAPI.post<OC_GetRoomNoResponse>('elecWater/getRoomList', body);
   return response.data;
 }

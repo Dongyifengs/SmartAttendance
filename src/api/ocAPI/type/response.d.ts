@@ -297,3 +297,34 @@ export interface OC_GetBuildingNoList {
   source: null
 }
 // =============== [一卡通获取楼栋号返回类型] =============== //
+
+// =============== [一卡通获取房间号返回类型] =============== //
+/**
+ * 一卡通获取房间号返回体类型
+ * @interface OC_GetRoomNoResponse
+ * @property {number} code - 响应状态码
+ * @property {string} msg - 响应消息
+ * @property {OC_GetRoomNoData} data - 房间号数据
+ * @property {null} count - 计数（通常为 null）
+ */
+export interface OC_GetRoomNoResponse {
+  code: number,
+  msg: string,
+  data: OC_GetRoomNoData,
+  count: null
+}
+
+/**
+ * 一卡通获取房间号数据类型
+ * @interface OC_GetRoomNoData
+ * @property {OC_GetRoomNoData[]} list - 房间号列表
+ * @property {string} room_id - 房间ID
+ * @property {string} room_name - 房间名称
+ * @property {null} source - 来源（通常为 null）
+ */
+export interface OC_GetRoomNoData {
+  room_id: string,
+  room_name: string,
+  source: null
+}
+// =============== [一卡通获取房间号返回类型] =============== //
