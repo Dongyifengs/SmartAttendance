@@ -249,7 +249,7 @@
 <script lang="ts" setup>
   import dayjs from 'dayjs';
   import type { ClassInfo } from '@/components/ClassCard.vue';
-  import { computed, onMounted, onUnmounted, ref, watch, nextTick } from 'vue';
+  import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
   import ClassContainer from '@/components/ClassContainer.vue';
   import { ZHKQ_GetDayCourseList, ZHKQ_GetDaySignList } from '@/api/anlaxy';
   import { getZHKQUserInfo } from '@/api/anlaxy/utils';
@@ -258,20 +258,20 @@
   import { ElMessage } from 'element-plus';
   import {
     OC_BillRetrieval,
+    OC_GetACBalance,
     OC_GetBalance,
+    OC_GetBuildingNumbers,
     OC_GetPaymentUnits,
     OC_GetPayQRCode,
+    OC_GetRoomNumbers,
     OC_GetUserInfo,
     OC_Login,
-    OC_GetBuildingNumbers,
-    OC_GetRoomNumbers,
-    OC_GetACBalance,
   } from '@/api/ocAPI';
   import type {
     OC_BillRetrievalList,
-    OCLoginResponse,
     OC_GetBuildingNoList,
     OC_GetRoomNoData,
+    OCLoginResponse,
   } from '@/api/ocAPI/type/response';
   import { MOYI_UploadInfo } from '@/api/moyi';
 
@@ -384,6 +384,7 @@
 
   // 获取钱包余额（含 token 失效自动登录与重试）
   const oc_Get_WalletBalance = async (): Promise<void> => {
+    console.log('[一卡通自动登录] 开始获取钱包余额...');
     try {
       const userInfo = getUserInfo_OC();
       if (!userInfo?.data?.token) {
@@ -395,7 +396,7 @@
       console.log('钱包余额API返回：', res);
 
       // 特殊提示字符判断（后端返回 msg）
-      if (res?.msg === '您的身份信息已失效,请重新从卡包进入') {
+      if (res.msg === '您的身份信息已失效,请重新从卡包进入') {
         const loginSuccess = await autoLoginOC();
         if (loginSuccess) {
           const newUserInfo = getUserInfo_OC();

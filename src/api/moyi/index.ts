@@ -1,11 +1,11 @@
-import axios from 'axios'
+import axios from 'axios';
 
 export const MOYIAPI = axios.create({
   baseURL: '/MoYiAPI',
   headers: {
     'Content-Type': 'application/json',
   },
-})
+});
 
 /**
  * 上传信息
