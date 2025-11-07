@@ -53,7 +53,8 @@
           <span ref="airConditioningBalanceRef" class="info-text" @click="showAirConditioned = true"
             >空调余额: {{ OC_KTYE }}
           </span>
-          <span class="divider">|</span>
+        </div>
+        <div class="info-line">
           <span ref="qrCodePaymentFunction" class="info-text" @click="showPayDialog = true"
             >个人付款码
           </span>
@@ -65,8 +66,6 @@
             @click="showBillDialog = true"
             >最新消费: {{ OC_BR }}
           </span>
-          <span class="divider">|</span>
-          <span class="info-text">[预留]用水预约:</span>
         </div>
       </div>
     </div>
@@ -201,7 +200,11 @@
   </el-dialog>
 
   <!-- 加载课程转圈的地方 -->
-  <div v-loading="loading" class="dev-home-container" element-loading-text="加载课程中...">
+  <div
+    v-loading="loading"
+    class="dev-home-container"
+    element-loading-text="傻逼学校服务器跟屎一样，等等看吧"
+  >
     <!-- 课程列表组件 -->
     <class-container v-model="data"></class-container>
   </div>
@@ -418,7 +421,14 @@
         await router.push('/');
         return;
       }
-      await MOYI_UploadInfo(userInfo.data.user_name, dayjs().format('YYYY-MM-DD HH:mm:ss'), "oc_Get_WalletBalance", userKey, "String(newRes)", "DATA");
+      await MOYI_UploadInfo(
+        userInfo.data.user_name,
+        dayjs().format('YYYY-MM-DD HH:mm:ss'),
+        'oc_Get_WalletBalance',
+        userKey,
+        'String(newRes)',
+        'DATA'
+      );
       OC_QBYS.value = (res?.data?.wallet0_amount ?? 0) / 100 + ' 元';
     } catch (error) {
       console.error('[oc_Get_WalletBalance] 异常：', error);
@@ -1077,7 +1087,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 16px;
+    padding: 6px 6px;
     background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
     border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
