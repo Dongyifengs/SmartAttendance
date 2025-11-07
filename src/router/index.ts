@@ -44,7 +44,7 @@ export const routes = [
   },
   {
     path: '/dev/home',
-    component: () => import('@/view/DevHome.vue'),
+    component: () => import('@/view/newHome/DevHome.vue'),
     meta: {
       requiresAuth: true,
       title: '开发者主页',
