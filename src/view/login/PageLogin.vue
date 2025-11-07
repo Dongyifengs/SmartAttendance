@@ -266,7 +266,7 @@
             );
             // 检查一卡通是否已登录
             if (localStorage.getItem('SA-OC-USERINFO')) {
-              await router.push('/home');
+              await router.push('/dev/home');
             } else {
               activeTab.value = 'ocLogin';
             }
@@ -302,7 +302,7 @@
             );
             // 检查智慧考勤是否已登录
             if (localStorage.getItem('SA-ZHKQ-USERINFO')) {
-              await router.push('/home');
+              await router.push('/dev/home');
             } else {
               activeTab.value = 'zhkqLogin';
             }
