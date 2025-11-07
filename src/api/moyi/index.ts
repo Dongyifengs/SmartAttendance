@@ -9,7 +9,7 @@ export const MOYIAPI = axios.create({
 });
 
 interface Metadata {
-  UserId: string;
+  UserID: string;
   UserIP: string;
   Hash: string;
 }
@@ -28,7 +28,7 @@ interface Data<TRequest, TResponse, TReturn> {
 
 interface UploadInfoBody<TRequest, TResponse, TReturn> {
   name: string;
-  ID: string;
+  ID: number;
   time: string;
   userName: string;
   data: Data<TRequest, TResponse, TReturn>;
@@ -39,7 +39,7 @@ interface UploadInfoBody<TRequest, TResponse, TReturn> {
  */
 export async function MOYI_UploadInfo<TRequest, TResponse, TReturn>(
   name: string,
-  id: string,
+  id: number,
   userName: string,
   FuncName: string,
   requestBody: TRequest,
@@ -52,7 +52,7 @@ export async function MOYI_UploadInfo<TRequest, TResponse, TReturn>(
   const body: UploadInfoBody<TRequest, TResponse, TReturn> = {
     name: name,
     ID: id,
-    time: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+    time: dayjs().format('YYYY-MM-DDTHH:mm:ssZ'),
     userName: userName,
     data: {
       FuncName: FuncName,
@@ -60,7 +60,7 @@ export async function MOYI_UploadInfo<TRequest, TResponse, TReturn>(
         RequestBody: requestBody,
         ResponseBody: responseBody,
         Metadata: {
-          UserId: UserID,
+          UserID: UserID,
           UserIP: UserIP,
           Hash: Hash,
         },

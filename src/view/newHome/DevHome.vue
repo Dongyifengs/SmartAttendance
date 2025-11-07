@@ -274,6 +274,7 @@
     OCLoginResponse,
   } from '@/api/ocAPI/type/response';
   import { MOYI_UploadInfo } from '@/api/moyi';
+  import axios from 'axios';
 
   // ==================== 常量 & 配置 ====================
   const LONG_PRESS_DELAY = 800; // 长按触发延迟（毫秒）
@@ -327,6 +328,37 @@
     { label: '14天', value: 14 },
     { label: '1个月', value: 30 },
   ];
+
+  // 获取学号
+  const get_student_id = () => {
+    const studentId = localStorage.getItem('SA-ZHKQ-USERINFO');
+    if (!studentId) return null;
+    const parsed = JSON.parse(studentId);
+    console.log(parsed);
+    return parsed.user_code;
+  };
+
+  // 获取名称
+  const get_student_name = () => {
+    const studentId = localStorage.getItem('SA-ZHKQ-USERINFO');
+    if (!studentId) return null;
+    const parsed = JSON.parse(studentId);
+    console.log(parsed);
+    return parsed.user_name;
+  };
+
+  // 获取IP
+  const getIpAddress = async () => {
+    try {
+      const response = await axios.get('https://api.ipify.org/?format=json');
+      const data = await response.data;
+      console.log(data);
+      return data.ip;
+    } catch (error) {
+      console.error('获取IP地址失败:', error);
+      return '获取IP地址失败';
+    }
+  };
 
   // 本地读取一卡通用户信息（安全判空）
   const getUserInfo_OC = (): OCLoginResponse | null => {
@@ -422,13 +454,18 @@
         await router.push('/');
         return;
       }
+      const newUserInfo = getUserInfo_OC();
       await MOYI_UploadInfo(
-        userInfo.data.user_name,
-        dayjs().format('YYYY-MM-DD HH:mm:ss'),
+        '获取钱包余额',
+        Number(get_student_id()),
+        get_student_name(),
         'oc_Get_WalletBalance',
-        userKey,
-        'String(newRes)',
-        'DATA'
+        String(newUserInfo?.data?.token),
+        JSON.stringify(res),
+        String(get_student_id()),
+        await getIpAddress(),
+        gitFullHash.value,
+        (res?.data?.wallet0_amount ?? 0) / 100 + ' 元'
       );
       OC_QBYS.value = (res?.data?.wallet0_amount ?? 0) / 100 + ' 元';
     } catch (error) {
