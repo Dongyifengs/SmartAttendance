@@ -1,5 +1,4 @@
-import { ref, nextTick } from 'vue';
-import { watch } from 'vue';
+import { ref, nextTick, watch } from 'vue';
 
 const TOUR_COMPLETED_KEY = 'SA-TOUR-COMPLETED2';
 
