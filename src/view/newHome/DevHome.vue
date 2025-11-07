@@ -32,23 +32,23 @@
       <div :class="styles.userInfoContent">
         <!-- 第一行：基础信息 -->
         <div :class="styles.infoLine">
-          <span :class="styles.infoText">姓名: {{ courseUserInfo.user_name }}</span>
+          <span :class="styles.infoText">👤 {{ courseUserInfo.user_name }}</span>
           <span :class="styles.divider">|</span>
-          <span :class="styles.infoText">{{ courseUserInfo.birthday || '未设置生日' }}</span>
+          <span :class="styles.infoText">🎂 {{ courseUserInfo.birthday || '未设置生日' }}</span>
           <span :class="styles.divider">|</span>
-          <span :class="styles.infoText">学号: {{ courseUserInfo.user_code }}</span>
+          <span :class="styles.infoText">🎓 {{ courseUserInfo.user_code }}</span>
         </div>
 
         <!-- 第二行：签到日期与设备ID -->
         <div :class="styles.infoLine">
-          <span :class="styles.infoText">签到日期: {{ todayString }}</span>
+          <span :class="styles.infoText">📅 {{ todayString }}</span>
           <span :class="styles.divider">|</span>
-          <span :class="styles.infoText">设备ID: {{ cleanDeviceId }}</span>
+          <span :class="styles.infoText">📱 {{ cleanDeviceId }}</span>
         </div>
 
         <!-- 第三行：钱包余额与空调余额 -->
         <div :class="styles.infoLine">
-          <span ref="walletBalanceRef" :class="styles.infoText">钱包余额: {{ OC_QBYS }}</span>
+          <span ref="walletBalanceRef" :class="styles.infoText">💰 {{ OC_QBYS }}</span>
           <span :class="styles.divider">|</span>
           <span
             ref="airConditioningBalanceRef"
@@ -56,7 +56,7 @@
             style="cursor: pointer"
             @click="showAirConditioned = true"
           >
-            空调余额: {{ OC_KTYE }}
+            ❄️ {{ OC_KTYE }}
           </span>
         </div>
         <div :class="styles.infoLine">
@@ -66,7 +66,7 @@
             style="cursor: pointer"
             @click="paymentDialogVisible = true"
           >
-            个人付款码
+            📲 个人付款码
           </span>
           <span :class="styles.divider">|</span>
           <span
@@ -75,7 +75,7 @@
             style="cursor: pointer"
             @click="showBillDialog = true"
           >
-            最新消费: {{ OC_BR }}
+            💳 {{ OC_BR }}
           </span>
         </div>
       </div>
@@ -385,23 +385,115 @@
 </script>
 
 <style scoped>
-  /* 弹窗样式优化 */
+  /* 弹窗样式优化 - 更现代化的设计 */
+  :deep(.el-dialog) {
+    border-radius: 16px;
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.15);
+  }
+
+  :deep(.el-dialog__header) {
+    padding: 20px 24px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 16px 16px 0 0;
+    margin: 0;
+  }
+
+  :deep(.el-dialog__title) {
+    color: white;
+    font-weight: 600;
+    font-size: 18px;
+  }
+
+  :deep(.el-dialog__headerbtn .el-dialog__close) {
+    color: white;
+    font-size: 20px;
+  }
+
+  :deep(.el-dialog__headerbtn .el-dialog__close:hover) {
+    color: rgba(255, 255, 255, 0.8);
+  }
+
   :deep(.el-dialog__body) {
-    padding: 12px;
+    padding: 24px;
+    background: #ffffff;
   }
 
   :deep(.el-table .cell) {
-    padding: 4px 0;
-    font-size: 13px;
+    padding: 8px 0;
+    font-size: 14px;
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
+  }
+
+  :deep(.el-table th) {
+    background-color: #f5f7fa;
+    font-weight: 600;
+    color: #606266;
+  }
+
+  :deep(.el-table tr:hover) {
+    background-color: #f5f7fa;
+  }
+
+  :deep(.el-button--primary) {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    border-radius: 8px;
+    padding: 10px 24px;
+    font-weight: 500;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    transition: all 0.3s ease;
+  }
+
+  :deep(.el-button--primary:hover) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+  }
+
+  :deep(.el-button--primary:active) {
+    transform: translateY(0);
+  }
+
+  :deep(.el-button--default) {
+    border-radius: 8px;
+    transition: all 0.3s ease;
+  }
+
+  :deep(.el-button--default:hover) {
+    transform: scale(1.05);
+  }
+
+  :deep(.el-select) {
+    border-radius: 8px;
+  }
+
+  :deep(.el-input__wrapper) {
+    border-radius: 8px;
+    transition: all 0.3s ease;
+  }
+
+  :deep(.el-input__wrapper:hover) {
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
   }
 
   @media (max-width: 768px) {
     :deep(.el-dialog) {
       width: 95vw !important;
       max-width: 95vw;
+      margin: 5vh auto;
+    }
+
+    :deep(.el-dialog__header) {
+      padding: 16px 20px;
+    }
+
+    :deep(.el-dialog__title) {
+      font-size: 16px;
+    }
+
+    :deep(.el-dialog__body) {
+      padding: 16px;
     }
   }
 </style>

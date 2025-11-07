@@ -1,14 +1,15 @@
 .container {
-  padding: 12px;
+  padding: 16px;
   max-width: 1200px;
   margin: 0 auto;
-  animation: fadeIn 0.4s ease-in-out;
+  animation: fadeIn 0.5s ease-in-out;
+  min-height: 100vh;
 }
 
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(-8px);
+    transform: translateY(-10px);
   }
   to {
     opacity: 1;
@@ -16,78 +17,114 @@
   }
 }
 
-/* Header 样式 */
+/* Header 样式 - 更现代化 */
 .header {
-  margin-bottom: 16px;
+  margin-bottom: 20px;
 }
 
 .headerInfo {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 6px;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  padding: 16px 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.headerInfo:hover {
+  box-shadow: 0 6px 30px rgba(102, 126, 234, 0.4);
+  transform: translateY(-2px);
 }
 
 .hash {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
   font-size: 14px;
-  color: #606266;
+  color: rgba(255, 255, 255, 0.95);
 }
 
 .buildTime {
   cursor: pointer;
   user-select: none;
-  padding: 4px 8px;
-  border-radius: 6px;
-  transition: all 0.2s ease;
+  padding: 8px 16px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  background-color: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(5px);
+  font-weight: 500;
 }
 
 .buildTime:hover {
-  background-color: rgba(0, 0, 0, 0.05);
+  background-color: rgba(255, 255, 255, 0.2);
+  transform: scale(1.02);
 }
 
 .buildTime:active {
-  background-color: rgba(0, 0, 0, 0.1);
+  background-color: rgba(255, 255, 255, 0.15);
+  transform: scale(0.98);
 }
 
 .hashLink {
-  color: #409eff;
+  color: #fff;
   text-decoration: none;
-  font-weight: 500;
-  padding: 4px 8px;
-  border-radius: 6px;
-  transition: all 0.2s ease;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
   cursor: pointer;
+  background-color: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .hashLink:hover {
-  background-color: #ecf5ff;
-  color: #66b1ff;
+  background-color: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: scale(1.05);
 }
 
 .hashLink:active {
-  background-color: #d9ecff;
+  background-color: rgba(255, 255, 255, 0.2);
+  transform: scale(0.98);
 }
 
-/* 用户信息卡片样式 */
+/* 用户信息卡片样式 - 更精致的设计 */
 .userInfoCard {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 16px;
-  padding: 6px 20px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  animation: slideDown 0.5s ease-out;
+  border-radius: 20px;
+  padding: 24px 28px;
+  box-shadow: 0 8px 32px rgba(102, 126, 234, 0.25);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: slideDown 0.6s ease-out;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+
+/* 添加背景装饰效果 */
+.userInfoCard::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+  pointer-events: none;
+  transition: all 0.6s ease;
+}
+
+.userInfoCard:hover::before {
+  transform: rotate(45deg);
 }
 
 @keyframes slideDown {
   from {
     opacity: 0;
-    transform: translateY(-12px);
+    transform: translateY(-20px);
   }
   to {
     opacity: 1;
@@ -96,72 +133,153 @@
 }
 
 .userInfoCard:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 48px rgba(102, 126, 234, 0.35);
+}
+
+.userInfoHeader {
+  position: relative;
+  z-index: 1;
 }
 
 .userInfoHeader h3 {
-  margin: 0 0 12px 0;
+  margin: 0 0 16px 0;
   color: white;
-  font-size: 18px;
-  font-weight: 600;
-  letter-spacing: 0.3px;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.userInfoHeader h3::before {
+  content: '👤';
+  font-size: 24px;
 }
 
 .userInfoContent {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
+  position: relative;
+  z-index: 1;
 }
 
 .infoLine {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 12px;
   color: white;
-  font-size: 14px;
+  font-size: 15px;
+  padding: 8px 12px;
+  background-color: rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(5px);
+}
+
+.infoLine:hover {
+  background-color: rgba(255, 255, 255, 0.12);
+  transform: translateX(4px);
 }
 
 .infoText {
-  font-weight: 400;
-  color: rgba(255, 255, 255, 0.95);
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.98);
+  cursor: default;
+  transition: all 0.2s ease;
+}
+
+.infoText[style*="cursor: pointer"] {
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.infoText[style*="cursor: pointer"]:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  transform: scale(1.05);
 }
 
 .divider {
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.4);
   font-weight: 300;
+  margin: 0 4px;
 }
 
 .devHomeContainer {
-  padding: 12px;
+  padding: 16px;
   max-width: 1200px;
   margin: 0 auto;
-  animation: fadeIn 0.4s ease-in-out;
+  animation: fadeIn 0.5s ease-in-out;
 }
 
 /* 响应式适配 */
 @media (max-width: 768px) {
   .container {
-    padding: 10px;
+    padding: 12px;
   }
 
-  .devHomeContainer {
-    padding: 10px;
-  }
-
-  .userInfoCard {
-    padding: 14px 16px;
+  .headerInfo {
+    padding: 12px 16px;
     border-radius: 14px;
   }
 
+  .hash {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .buildTime {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+
+  .hashLink {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+
+  .devHomeContainer {
+    padding: 12px;
+  }
+
+  .userInfoCard {
+    padding: 20px;
+    border-radius: 16px;
+  }
+
   .userInfoHeader h3 {
-    font-size: 16px;
-    margin-bottom: 10px;
+    font-size: 18px;
+    margin-bottom: 12px;
+  }
+
+  .userInfoHeader h3::before {
+    font-size: 20px;
   }
 
   .infoLine {
-    font-size: 13px;
-    gap: 6px;
+    font-size: 14px;
+    gap: 8px;
+    padding: 6px 10px;
   }
+}
+
+/* 添加更多动画效果 */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+.infoText[style*="cursor: pointer"]:active {
+  animation: pulse 0.3s ease;
 }
