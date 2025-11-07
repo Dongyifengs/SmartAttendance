@@ -1142,8 +1142,7 @@
   .user-info-card {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     border-radius: 16px;
-    padding: 16px 20px;
-    margin-bottom: 16px;
+    padding: 6px 20px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     animation: slideDown 0.5s ease-out;
