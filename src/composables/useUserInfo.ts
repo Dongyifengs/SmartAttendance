@@ -55,9 +55,20 @@ export function useUserInfo() {
    */
   async function getUserIp(): Promise<string> {
     try {
-      const response = await axios.get('/MoYiGetIP');
+      const response = await axios.get('https://myip.ipip.net/json');
       const data = response.data;
-      return `${data.ip} | ${data.addr}`;
+      console.log('[getUserIp] 获取到的IP数据:', data);
+      return (
+        data.data.ip +
+        ' | ' +
+        data.data.location[0] +
+        '-' +
+        data.data.location[1] +
+        '-' +
+        data.data.location[2] +
+        '-' +
+        data.data.location[4]
+      );
     } catch (error) {
       console.error('[getUserIp] 错误:', error);
       return '获取IP地址失败';
