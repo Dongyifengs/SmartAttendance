@@ -142,6 +142,11 @@ export default defineConfig(({ mode }) => {
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/CallAPI/, ''),
         },
+        '/MoYiGetIP': {
+          target: 'https://whois.pconline.com.cn/ipJson.jsp?ip=&json=true',
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/MoYiGetIP/, ''),
+        },
       },
     },
     base: './',

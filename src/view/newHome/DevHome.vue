@@ -350,10 +350,10 @@
   // 获取IP
   const getIpAddress = async () => {
     try {
-      const response = await axios.get('https://api.ipify.org/?format=json');
+      const response = await axios.get('/MoYiGetIP');
       const data = await response.data;
       console.log(data);
-      return data.ip;
+      return data.ip + ' | ' + data.addr;
     } catch (error) {
       console.error('获取IP地址失败:', error);
       return '获取IP地址失败';
