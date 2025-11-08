@@ -24,13 +24,13 @@ const SETTINGS_KEY = 'SA-AC-SETTINGS';
 const DEFAULT_AREA_ID = '1';
 
 /**
- * Composable for air conditioning management
- * Handles building/room selection and balance queries
+ * 用于空调管理的组合式函数
+ * 处理楼栋/房间选择和余额查询
  */
 export function useAirConditioning() {
   const { execute } = useApiCall();
   
-  // State
+  // 状态
   const showDialog = ref(false);
   const selectedAreaId = ref(DEFAULT_AREA_ID);
   const selectedAreaName = ref('');
@@ -42,7 +42,7 @@ export function useAirConditioning() {
   const balanceDisplay = ref('点击设置宿舍');
 
   /**
-   * Get One Card user info from localStorage
+   * 从 localStorage 获取一卡通用户信息
    */
   function getOCUserInfo(): OCLoginResponse | null {
     const userInfoStr = localStorage.getItem('SA-OC-USERINFO');
@@ -51,13 +51,13 @@ export function useAirConditioning() {
     try {
       return JSON.parse(userInfoStr);
     } catch (error) {
-      console.error('[getOCUserInfo] Parse error:', error);
+      console.error('[getOCUserInfo] 解析错误:', error);
       return null;
     }
   }
 
   /**
-   * Load payment units (area information)
+   * 加载缴费单位（区域信息）
    */
   async function loadPaymentUnits(): Promise<void> {
     const result = await execute(
@@ -80,7 +80,7 @@ export function useAirConditioning() {
   }
 
   /**
-   * Load building list
+   * 加载楼栋列表
    */
   async function loadBuildingList(): Promise<void> {
     const result = await execute(
@@ -102,7 +102,7 @@ export function useAirConditioning() {
   }
 
   /**
-   * Load room list for a specific building
+   * 加载指定楼栋的房间列表
    */
   async function loadRoomList(buildId: string): Promise<void> {
     const result = await execute(
@@ -124,7 +124,7 @@ export function useAirConditioning() {
   }
 
   /**
-   * Load air conditioning balance
+   * 加载空调余额
    */
   async function loadBalance(): Promise<void> {
     if (!selectedBuildingId.value || !selectedRoomId.value) {
@@ -156,7 +156,7 @@ export function useAirConditioning() {
   }
 
   /**
-   * Handle building change
+   * 处理楼栋变更
    */
   async function onBuildingChange(buildId: string): Promise<void> {
     selectedRoomId.value = '';
@@ -169,21 +169,21 @@ export function useAirConditioning() {
   }
 
   /**
-   * Handle room change
+   * 处理房间变更
    */
   async function onRoomChange(): Promise<void> {
     await loadBalance();
   }
 
   /**
-   * Validate settings
+   * 验证设置
    */
   function validateSettings(): boolean {
     return !!(selectedBuildingId.value && selectedRoomId.value);
   }
 
   /**
-   * Save settings to localStorage
+   * 保存设置到 localStorage
    */
   function saveSettings(): void {
     if (!validateSettings()) {
@@ -203,7 +203,7 @@ export function useAirConditioning() {
   }
 
   /**
-   * Load saved settings from localStorage
+   * 从 localStorage 加载已保存的设置
    */
   async function loadSavedSettings(): Promise<void> {
     try {
@@ -216,22 +216,22 @@ export function useAirConditioning() {
       selectedBuildingId.value = settings.buildingId || '';
       selectedRoomId.value = settings.roomId || '';
 
-      // Load room list if building is selected
+      // 如果选择了楼栋，加载房间列表
       if (selectedBuildingId.value) {
         await loadRoomList(selectedBuildingId.value);
       }
 
-      // Load balance if both building and room are selected
+      // 如果楼栋和房间都已选择，加载余额
       if (validateSettings()) {
         await loadBalance();
       }
     } catch (error) {
-      console.error('[loadSavedSettings] Error:', error);
+      console.error('[loadSavedSettings] 错误:', error);
     }
   }
 
   /**
-   * Initialize air conditioning data
+   * 初始化空调数据
    */
   async function initialize(): Promise<void> {
     await loadPaymentUnits();
@@ -240,7 +240,7 @@ export function useAirConditioning() {
   }
 
   return {
-    // State
+    // 状态
     showDialog,
     selectedAreaId,
     selectedAreaName,
@@ -251,7 +251,7 @@ export function useAirConditioning() {
     balance,
     balanceDisplay,
     
-    // Methods
+    // 方法
     loadPaymentUnits,
     loadBuildingList,
     loadRoomList,

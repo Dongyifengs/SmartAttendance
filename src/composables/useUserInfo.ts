@@ -9,17 +9,17 @@ interface CachedUserInfo {
 }
 
 const CACHE_KEY = 'SA-CACHED-USER-INFO';
-const CACHE_DURATION = 1000 * 60 * 60; // 1 hour
+const CACHE_DURATION = 1000 * 60 * 60; // 1 小时
 
 /**
- * Composable for managing user info with local caching
- * Reduces redundant API calls and localStorage reads
+ * 用于管理用户信息的组合式函数，带有本地缓存功能
+ * 减少冗余的 API 调用和 localStorage 读取
  */
 export function useUserInfo() {
   const cachedInfo = ref<CachedUserInfo | null>(null);
 
   /**
-   * Get student ID from localStorage
+   * 从 localStorage 获取学号
    */
   function getStudentId(): string | null {
     const userInfoStr = localStorage.getItem('SA-ZHKQ-USERINFO');
@@ -29,13 +29,13 @@ export function useUserInfo() {
       const parsed = JSON.parse(userInfoStr);
       return parsed.user_code || null;
     } catch (error) {
-      console.error('[getStudentId] Parse error:', error);
+      console.error('[getStudentId] 解析错误:', error);
       return null;
     }
   }
 
   /**
-   * Get student name from localStorage
+   * 从 localStorage 获取学生姓名
    */
   function getStudentName(): string | null {
     const userInfoStr = localStorage.getItem('SA-ZHKQ-USERINFO');
@@ -45,13 +45,13 @@ export function useUserInfo() {
       const parsed = JSON.parse(userInfoStr);
       return parsed.user_name || null;
     } catch (error) {
-      console.error('[getStudentName] Parse error:', error);
+      console.error('[getStudentName] 解析错误:', error);
       return null;
     }
   }
 
   /**
-   * Get user IP address
+   * 获取用户 IP 地址
    */
   async function getUserIp(): Promise<string> {
     try {
@@ -59,39 +59,39 @@ export function useUserInfo() {
       const data = response.data;
       return `${data.ip} | ${data.addr}`;
     } catch (error) {
-      console.error('[getUserIp] Error:', error);
+      console.error('[getUserIp] 错误:', error);
       return '获取IP地址失败';
     }
   }
 
   /**
-   * Load cached user info or fetch fresh data
+   * 加载缓存的用户信息或获取新数据
    */
   async function loadUserInfo(): Promise<CachedUserInfo | null> {
-    // Check if we have valid cached data
+    // 检查是否有有效的缓存数据
     const cachedStr = localStorage.getItem(CACHE_KEY);
     if (cachedStr) {
       try {
         const cached = JSON.parse(cachedStr) as CachedUserInfo;
         const now = Date.now();
         
-        // If cache is still valid, use it
+        // 如果缓存仍然有效，使用它
         if (now - cached.timestamp < CACHE_DURATION) {
           cachedInfo.value = cached;
           return cached;
         }
       } catch (error) {
-        console.error('[loadUserInfo] Cache parse error:', error);
+        console.error('[loadUserInfo] 缓存解析错误:', error);
       }
     }
 
-    // Fetch fresh data
+    // 获取新数据
     const studentId = getStudentId();
     const studentName = getStudentName();
     const userIp = await getUserIp();
 
     if (!studentId || !studentName) {
-      console.warn('[loadUserInfo] Missing student ID or name');
+      console.warn('[loadUserInfo] 缺少学号或姓名');
       return null;
     }
 
@@ -102,7 +102,7 @@ export function useUserInfo() {
       timestamp: Date.now(),
     };
 
-    // Save to cache
+    // 保存到缓存
     localStorage.setItem(CACHE_KEY, JSON.stringify(freshInfo));
     cachedInfo.value = freshInfo;
 
@@ -110,7 +110,7 @@ export function useUserInfo() {
   }
 
   /**
-   * Get cached user info (returns immediately, may return stale data)
+   * 获取缓存的用户信息（立即返回，可能返回过期数据）
    */
   function getCachedUserInfo(): CachedUserInfo | null {
     if (cachedInfo.value) {
@@ -123,7 +123,7 @@ export function useUserInfo() {
         cachedInfo.value = JSON.parse(cachedStr) as CachedUserInfo;
         return cachedInfo.value;
       } catch (error) {
-        console.error('[getCachedUserInfo] Parse error:', error);
+        console.error('[getCachedUserInfo] 解析错误:', error);
       }
     }
 
@@ -131,7 +131,7 @@ export function useUserInfo() {
   }
 
   /**
-   * Clear user info cache
+   * 清除用户信息缓存
    */
   function clearCache(): void {
     localStorage.removeItem(CACHE_KEY);

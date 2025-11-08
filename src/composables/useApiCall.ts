@@ -2,19 +2,19 @@ import { ElMessage } from 'element-plus';
 import { ref } from 'vue';
 
 /**
- * Unified API call hook with error handling
- * Simplifies try-catch blocks and provides consistent error handling
+ * 统一的 API 调用钩子，具有错误处理功能
+ * 简化 try-catch 块并提供一致的错误处理
  */
 export function useApiCall() {
   const loading = ref(false);
   const error = ref<Error | null>(null);
 
   /**
-   * Execute an API call with unified error handling
-   * @param apiFunction - The async function to execute
-   * @param errorMessage - Custom error message to display
-   * @param showSuccessMessage - Whether to show success message
-   * @param successMessage - Custom success message
+   * 执行带有统一错误处理的 API 调用
+   * @param apiFunction - 要执行的异步函数
+   * @param errorMessage - 自定义错误消息
+   * @param showSuccessMessage - 是否显示成功消息
+   * @param successMessage - 自定义成功消息
    */
   async function execute<T>(
     apiFunction: () => Promise<T>,
@@ -38,7 +38,7 @@ export function useApiCall() {
       return result;
     } catch (err) {
       error.value = err as Error;
-      console.error('[useApiCall] Error:', err);
+      console.error('[useApiCall] 错误:', err);
       
       if (!options?.silent) {
         ElMessage.error(options?.errorMessage || '操作失败，请稍后重试');

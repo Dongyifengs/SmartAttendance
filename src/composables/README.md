@@ -1,13 +1,13 @@
-# Composables
+# Composables 组合式函数
 
-This directory contains reusable Vue 3 composables for the SmartAttendance application.
+本目录包含 SmartAttendance 应用程序的可复用 Vue 3 组合式函数。
 
-## Available Composables
+## 可用的组合式函数
 
 ### useApiCall
-Unified API call hook with error handling. Simplifies try-catch blocks and provides consistent error handling.
+统一的 API 调用钩子，具有错误处理功能。简化 try-catch 块并提供一致的错误处理。
 
-**Usage:**
+**用法：**
 ```typescript
 const { loading, error, execute } = useApiCall();
 
@@ -22,104 +22,104 @@ const result = await execute(
 ```
 
 ### useUserInfo
-Composable for managing user info with local caching. Reduces redundant API calls and localStorage reads.
+用于管理用户信息的组合式函数，带有本地缓存功能。减少冗余的 API 调用和 localStorage 读取。
 
-**Features:**
-- Caches student ID, name, and IP address
-- Automatically refreshes cache after 1 hour
-- Provides helper methods for getting individual user properties
+**特性：**
+- 缓存学号、姓名和 IP 地址
+- 1 小时后自动刷新缓存
+- 提供获取单个用户属性的辅助方法
 
-**Usage:**
+**用法：**
 ```typescript
 const { loadUserInfo, getCachedUserInfo, getStudentId, getStudentName } = useUserInfo();
 
-// Load and cache user info on page load
+// 在页面加载时加载并缓存用户信息
 await loadUserInfo();
 
-// Get cached info without re-fetching
+// 获取缓存信息而不重新获取
 const cachedInfo = getCachedUserInfo();
 ```
 
 ### useOneCard
-Composable for One Card (一卡通) operations. Handles wallet balance, bill retrieval, and user info.
+用于一卡通操作的组合式函数。处理钱包余额、账单检索和用户信息。
 
-**Features:**
-- Auto-login when token expires
-- Wallet balance fetching
-- Bill retrieval and management
-- User information fetching
+**特性：**
+- 令牌过期时自动登录
+- 获取钱包余额
+- 账单检索和管理
+- 获取用户信息
 
-**Usage:**
+**用法：**
 ```typescript
 const oneCard = useOneCard();
 
-// Fetch wallet balance
+// 获取钱包余额
 await oneCard.fetchWalletBalance(gitHash);
 
-// Fetch recent consumption
+// 获取最近消费记录
 await oneCard.fetchRecentConsumption(7);
 
-// Fetch bill list
+// 获取账单列表
 await oneCard.fetchBillList(7);
 ```
 
 ### usePaymentQR
-Composable for payment QR code management. Handles QR code generation, auto-refresh, and manual refresh.
+用于支付二维码管理的组合式函数。处理二维码生成、自动刷新和手动刷新。
 
-**Features:**
-- Auto-refresh QR code every 10 seconds
-- Manual refresh capability
-- Automatic timer management
+**特性：**
+- 每 10 秒自动刷新二维码
+- 手动刷新功能
+- 自动计时器管理
 
-**Usage:**
+**用法：**
 ```typescript
 const paymentQR = usePaymentQR();
 
-// Initialize and fetch QR code
+// 初始化并获取二维码
 await paymentQR.initialize();
 
-// Manual refresh
+// 手动刷新
 await paymentQR.manualRefresh();
 
-// Dialog visibility controls auto-refresh
+// 对话框可见性控制自动刷新
 paymentQR.showDialog.value = true;
 ```
 
 ### useAirConditioning
-Composable for air conditioning management. Handles building/room selection and balance queries.
+用于空调管理的组合式函数。处理楼栋/房间选择和余额查询。
 
-**Features:**
-- Building and room list fetching
-- Balance querying
-- Settings persistence in localStorage
+**特性：**
+- 获取楼栋和房间列表
+- 余额查询
+- 设置持久化存储到 localStorage
 
-**Usage:**
+**用法：**
 ```typescript
 const airConditioning = useAirConditioning();
 
-// Initialize
+// 初始化
 await airConditioning.initialize();
 
-// Handle building change
+// 处理楼栋变更
 await airConditioning.onBuildingChange(buildingId);
 
-// Save settings
+// 保存设置
 airConditioning.saveSettings();
 ```
 
-## Benefits
+## 优势
 
-1. **Code Reusability**: Logic can be shared across components
-2. **Separation of Concerns**: Business logic separated from UI logic
-3. **Testability**: Composables can be tested independently
-4. **Type Safety**: Full TypeScript support with proper type definitions
-5. **Performance**: Built-in caching and optimization
-6. **Maintainability**: Easier to update and maintain isolated logic
+1. **代码可复用性**：逻辑可以在组件之间共享
+2. **关注点分离**：业务逻辑与 UI 逻辑分离
+3. **可测试性**：组合式函数可以独立测试
+4. **类型安全**：完整的 TypeScript 支持和适当的类型定义
+5. **性能**：内置缓存和优化
+6. **可维护性**：更容易更新和维护隔离的逻辑
 
-## Best Practices
+## 最佳实践
 
-1. Always use composables in the `setup()` function or `<script setup>`
-2. Leverage TypeScript for type safety
-3. Handle errors gracefully using `useApiCall` where appropriate
-4. Cache data when possible to reduce unnecessary API calls
-5. Clean up timers and subscriptions in `onUnmounted` hook
+1. 始终在 `setup()` 函数或 `<script setup>` 中使用组合式函数
+2. 利用 TypeScript 实现类型安全
+3. 在适当的地方使用 `useApiCall` 优雅地处理错误
+4. 尽可能缓存数据以减少不必要的 API 调用
+5. 在 `onUnmounted` 钩子中清理计时器和订阅

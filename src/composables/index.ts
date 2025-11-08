@@ -1,6 +1,6 @@
 /**
- * Composables Index
- * Export all composables from a single entry point
+ * 组合式函数索引
+ * 从单一入口点导出所有组合式函数
  */
 
 export { useApiCall } from './useApiCall';

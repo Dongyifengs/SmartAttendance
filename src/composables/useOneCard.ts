@@ -15,13 +15,13 @@ import { MOYI_UploadInfo } from '@/api/moyi';
 import { useApiCall } from './useApiCall';
 
 /**
- * Composable for One Card (一卡通) operations
- * Handles wallet balance, bill retrieval, and user info
+ * 用于一卡通操作的组合式函数
+ * 处理钱包余额、账单检索和用户信息
  */
 export function useOneCard() {
   const { execute } = useApiCall();
   
-  // State
+  // 状态
   const walletBalance = ref('加载中...');
   const recentConsumption = ref('7日内没有消费');
   const billList = ref<OC_BillRetrievalList[]>([]);
@@ -31,7 +31,7 @@ export function useOneCard() {
   const userId = ref('学校');
 
   /**
-   * Get One Card user info from localStorage
+   * 从 localStorage 获取一卡通用户信息
    */
   function getOCUserInfo(): OCLoginResponse | null {
     const userInfoStr = localStorage.getItem('SA-OC-USERINFO');
@@ -40,33 +40,33 @@ export function useOneCard() {
     try {
       return JSON.parse(userInfoStr);
     } catch (error) {
-      console.error('[getOCUserInfo] Parse error:', error);
+      console.error('[getOCUserInfo] 解析错误:', error);
       return null;
     }
   }
 
   /**
-   * Auto login to One Card when token is invalid
+   * 当令牌无效时自动登录一卡通
    */
   async function autoLogin(): Promise<boolean> {
     const accountStr = localStorage.getItem('SA-OC-ACCOUNT');
     if (!accountStr) {
-      console.log('[autoLogin] No saved account info');
+      console.log('[autoLogin] 未找到保存的账户信息');
       return false;
     }
 
     try {
       const account = JSON.parse(accountStr);
       if (!account.username || !account.password) {
-        console.log('[autoLogin] Incomplete account info');
+        console.log('[autoLogin] 账户信息不完整');
         return false;
       }
 
-      console.log('[autoLogin] Starting auto login...');
+      console.log('[autoLogin] 开始自动登录...');
       const res = await OC_Login(account.username, account.password);
       
       if (res?.code === 200) {
-        console.log('[autoLogin] Auto login successful');
+        console.log('[autoLogin] 自动登录成功');
         const userInfoToSave = structuredClone(res);
         if (userInfoToSave.data) {
           userInfoToSave.data.backUrl = '';
@@ -77,16 +77,16 @@ export function useOneCard() {
         return true;
       }
       
-      console.warn('[autoLogin] Login failed:', res?.msg);
+      console.warn('[autoLogin] 登录失败:', res?.msg);
       return false;
     } catch (error) {
-      console.error('[autoLogin] Error:', error);
+      console.error('[autoLogin] 错误:', error);
       return false;
     }
   }
 
   /**
-   * Get wallet balance with auto-login retry
+   * 获取钱包余额，支持自动登录重试
    */
   async function fetchWalletBalance(gitHash?: string): Promise<void> {
     const result = await execute(
@@ -99,7 +99,7 @@ export function useOneCard() {
 
         const res = await OC_GetBalance(userInfo.data.token);
         
-        // Handle token expiration
+        // 处理令牌过期
         if (res.msg === '您的身份信息已失效,请重新从卡包进入') {
           const loginSuccess = await autoLogin();
           if (loginSuccess) {
@@ -126,7 +126,7 @@ export function useOneCard() {
       const balanceAmount = (result.data.wallet0_amount / 100).toFixed(2);
       walletBalance.value = `${balanceAmount} 元`;
       
-      // Log to MOYI API if gitHash is provided
+      // 如果提供了 gitHash，则记录到 MOYI API
       if (gitHash) {
         const userInfo = getOCUserInfo();
         try {
@@ -139,7 +139,7 @@ export function useOneCard() {
             `${balanceAmount} 元`
           );
         } catch (error) {
-          console.error('[fetchWalletBalance] MOYI_UploadInfo error:', error);
+          console.error('[fetchWalletBalance] MOYI_UploadInfo 错误:', error);
         }
       }
     } else {
@@ -148,7 +148,7 @@ export function useOneCard() {
   }
 
   /**
-   * Get recent consumption records
+   * 获取最近消费记录
    */
   async function fetchRecentConsumption(days = 7): Promise<void> {
     const result = await execute(
@@ -179,7 +179,7 @@ export function useOneCard() {
       const amount = (latest.trade_amount ?? 0) / 100;
       const desc = latest.desc || '';
       
-      // Map description to emoji
+      // 将描述映射到表情符号
       const emojiMap: Record<string, string> = {
         '用水': '🥤',
         '餐': '🍽️',
@@ -197,7 +197,7 @@ export function useOneCard() {
   }
 
   /**
-   * Fetch detailed bill list
+   * 获取详细账单列表
    */
   async function fetchBillList(days: number): Promise<void> {
     currentDays.value = days;
@@ -219,7 +219,7 @@ export function useOneCard() {
   }
 
   /**
-   * Fetch user information
+   * 获取用户信息
    */
   async function fetchUserInfo(): Promise<void> {
     const result = await execute(
@@ -243,7 +243,7 @@ export function useOneCard() {
   }
 
   return {
-    // State
+    // 状态
     walletBalance,
     recentConsumption,
     billList,
@@ -252,7 +252,7 @@ export function useOneCard() {
     userClass,
     userId,
     
-    // Methods
+    // 方法
     getOCUserInfo,
     autoLogin,
     fetchWalletBalance,

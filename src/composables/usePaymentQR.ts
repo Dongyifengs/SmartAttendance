@@ -5,13 +5,13 @@ import type { OCLoginResponse } from '@/api/ocAPI/type/response';
 import { useApiCall } from './useApiCall';
 
 /**
- * Composable for payment QR code management
- * Handles QR code generation, auto-refresh, and manual refresh
+ * 用于支付二维码管理的组合式函数
+ * 处理二维码生成、自动刷新和手动刷新
  */
 export function usePaymentQR() {
   const { execute } = useApiCall();
   
-  // State
+  // 状态
   const showDialog = ref(false);
   const qrCodeBase64 = ref('');
   const refreshCountdown = ref(10);
@@ -19,7 +19,7 @@ export function usePaymentQR() {
   const refreshTimer = ref<number | null>(null);
 
   /**
-   * Get One Card user info from localStorage
+   * 从 localStorage 获取一卡通用户信息
    */
   function getOCUserInfo(): OCLoginResponse | null {
     const userInfoStr = localStorage.getItem('SA-OC-USERINFO');
@@ -28,13 +28,13 @@ export function usePaymentQR() {
     try {
       return JSON.parse(userInfoStr);
     } catch (error) {
-      console.error('[getOCUserInfo] Parse error:', error);
+      console.error('[getOCUserInfo] 解析错误:', error);
       return null;
     }
   }
 
   /**
-   * Fetch payment QR code
+   * 获取支付二维码
    */
   async function fetchQRCode(): Promise<void> {
     const result = await execute(
@@ -56,47 +56,47 @@ export function usePaymentQR() {
   }
 
   /**
-   * Reset and start auto-refresh timer
+   * 重置并启动自动刷新计时器
    */
   function resetRefreshTimer(): void {
-    // Clear existing timer
+    // 清除现有计时器
     if (refreshTimer.value !== null) {
       clearInterval(refreshTimer.value);
       refreshTimer.value = null;
     }
 
-    // Reset countdown
+    // 重置倒计时
     refreshCountdown.value = 10;
 
-    // Start new timer
+    // 启动新计时器
     refreshTimer.value = window.setInterval(() => {
       refreshCountdown.value--;
 
       if (refreshCountdown.value <= 0) {
-        // Auto refresh QR code
+        // 自动刷新二维码
         fetchQRCode()
           .then(() => {
-            console.log('[usePaymentQR] Auto refresh completed');
+            console.log('[usePaymentQR] 自动刷新完成');
           })
           .catch((error) => {
-            console.error('[usePaymentQR] Auto refresh failed:', error);
+            console.error('[usePaymentQR] 自动刷新失败:', error);
           });
         
-        // Reset countdown
+        // 重置倒计时
         refreshCountdown.value = 10;
       }
     }, 1000);
   }
 
   /**
-   * Start auto-refresh
+   * 启动自动刷新
    */
   function startAutoRefresh(): void {
     resetRefreshTimer();
   }
 
   /**
-   * Stop auto-refresh
+   * 停止自动刷新
    */
   function stopAutoRefresh(): void {
     if (refreshTimer.value !== null) {
@@ -107,7 +107,7 @@ export function usePaymentQR() {
   }
 
   /**
-   * Manual refresh QR code
+   * 手动刷新二维码
    */
   async function manualRefresh(): Promise<void> {
     if (refreshing.value) return;
@@ -118,7 +118,7 @@ export function usePaymentQR() {
       resetRefreshTimer();
       ElMessage.success('二维码已刷新');
     } catch (error) {
-      console.error('[manualRefresh] Error:', error);
+      console.error('[manualRefresh] 错误:', error);
       ElMessage.error('刷新二维码失败');
     } finally {
       refreshing.value = false;
@@ -126,14 +126,14 @@ export function usePaymentQR() {
   }
 
   /**
-   * Initialize QR code (fetch and start auto-refresh)
+   * 初始化二维码（获取并启动自动刷新）
    */
   async function initialize(): Promise<void> {
     await fetchQRCode();
   }
 
   /**
-   * Watch dialog visibility to control auto-refresh
+   * 监听对话框可见性以控制自动刷新
    */
   watch(showDialog, (newVal) => {
     if (newVal) {
@@ -146,13 +146,13 @@ export function usePaymentQR() {
   });
 
   return {
-    // State
+    // 状态
     showDialog,
     qrCodeBase64,
     refreshCountdown,
     refreshing,
     
-    // Methods
+    // 方法
     fetchQRCode,
     manualRefresh,
     initialize,
