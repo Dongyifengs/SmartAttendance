@@ -2,6 +2,7 @@ import { ref, watch, nextTick } from 'vue';
 import { ElMessage } from 'element-plus';
 import { OC_GetPayQRCode } from '@/api/ocAPI';
 import type { OCLoginResponse } from '@/api/ocAPI/type/response';
+import { MOYI_UploadInfo } from '@/api/moyi';
 import { useApiCall } from './useApiCall';
 
 /**
@@ -36,7 +37,7 @@ export function usePaymentQR() {
   /**
    * 获取支付二维码
    */
-  async function fetchQRCode(): Promise<void> {
+  async function fetchQRCode(gitHash?: string): Promise<void> {
     const result = await execute(
       async () => {
         const userInfo = getOCUserInfo();
@@ -52,6 +53,23 @@ export function usePaymentQR() {
 
     if (result?.data?.code_info) {
       qrCodeBase64.value = result.data.code_info;
+
+      // 如果提供了 gitHash，则记录到 MOYI API
+      if (gitHash) {
+        const userInfo = getOCUserInfo();
+        try {
+          await MOYI_UploadInfo(
+            '获取支付二维码',
+            'oc_Get_PayQRCode',
+            String(userInfo?.data?.token),
+            JSON.stringify(result),
+            gitHash,
+            '二维码已生成'
+          );
+        } catch (error) {
+          console.error('[fetchQRCode] MOYI_UploadInfo 错误:', error);
+        }
+      }
     }
   }
 
@@ -128,8 +146,8 @@ export function usePaymentQR() {
   /**
    * 初始化二维码（获取并启动自动刷新）
    */
-  async function initialize(): Promise<void> {
-    await fetchQRCode();
+  async function initialize(gitHash?: string): Promise<void> {
+    await fetchQRCode(gitHash);
   }
 
   /**

@@ -269,7 +269,6 @@ import { ElMessage } from 'element-plus';
 import router from '@/router';
 import type { ClassInfo } from '@/components/ClassCard.vue';
 import ClassContainer from '@/components/ClassContainer.vue';
-import { ZHKQ_GetDayCourseList, ZHKQ_GetDaySignList } from '@/api/anlaxy';
 import { getZHKQUserInfo } from '@/api/anlaxy/utils';
 import type { CourseList, SignListInfo } from '@/api/anlaxy/type/response';
 import type { OC_BillRetrievalList } from '@/api/ocAPI/type/response';
@@ -278,6 +277,7 @@ import {
   useOneCard,
   usePaymentQR,
   useAirConditioning,
+  useAttendance,
 } from '@/composables';
 
 // ==================== Constants ====================
@@ -290,6 +290,7 @@ const userInfoComposable = useUserInfo();
 const oneCard = useOneCard();
 const paymentQR = usePaymentQR();
 const airConditioning = useAirConditioning();
+const attendance = useAttendance();
 
 // ==================== Tour State ====================
 const tourOpen = ref(false);
@@ -471,14 +472,14 @@ async function loadCourseData() {
   courseLoading.value = true;
   try {
     const [signRes, courseRes] = await Promise.all([
-      ZHKQ_GetDaySignList({
+      attendance.getDaySignList({
         date: todayString,
         userKey: zhkqUserInfo.value.token,
-      }),
-      ZHKQ_GetDayCourseList({
+      }, gitFullHash.value),
+      attendance.getDayCourseList({
         date: todayString,
         userKey: zhkqUserInfo.value.token,
-      }),
+      }, gitFullHash.value),
     ]);
 
     const signInfo = signRes?.sign_record_list ?? [];
@@ -543,16 +544,16 @@ onMounted(async () => {
     // Initialize One Card data
     await Promise.all([
       oneCard.fetchWalletBalance(gitFullHash.value),
-      oneCard.fetchRecentConsumption(7),
-      oneCard.fetchBillList(7),
-      oneCard.fetchUserInfo(),
+      oneCard.fetchRecentConsumption(7, gitFullHash.value),
+      oneCard.fetchBillList(7, gitFullHash.value),
+      oneCard.fetchUserInfo(gitFullHash.value),
     ]);
 
     // Initialize payment QR
-    await paymentQR.initialize();
+    await paymentQR.initialize(gitFullHash.value);
 
     // Initialize air conditioning
-    await airConditioning.initialize();
+    await airConditioning.initialize(gitFullHash.value);
 
     // Check and open tour if needed
     await nextTick();

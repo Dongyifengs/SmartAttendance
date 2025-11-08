@@ -107,6 +107,32 @@ await airConditioning.onBuildingChange(buildingId);
 airConditioning.saveSettings();
 ```
 
+### useAttendance
+用于签到签退操作的组合式函数。处理课程签到、签退和记录查询，并自动记录操作日志。
+
+**特性：**
+- 课程签到/签退操作
+- 获取签到记录列表
+- 获取课程列表
+- 自动记录操作日志到 MOYI API
+
+**用法：**
+```typescript
+const attendance = useAttendance();
+
+// 执行签到
+await attendance.signIn(signInParams, gitHash);
+
+// 执行签退
+await attendance.signOut(signOutParams, gitHash);
+
+// 获取签到记录
+const signList = await attendance.getDaySignList({ date, userKey }, gitHash);
+
+// 获取课程列表
+const courseList = await attendance.getDayCourseList({ date, userKey }, gitHash);
+```
+
 ## 优势
 
 1. **代码可复用性**：逻辑可以在组件之间共享
@@ -115,6 +141,7 @@ airConditioning.saveSettings();
 4. **类型安全**：完整的 TypeScript 支持和适当的类型定义
 5. **性能**：内置缓存和优化
 6. **可维护性**：更容易更新和维护隔离的逻辑
+7. **操作日志**：自动记录关键操作到 MOYI API
 
 ## 最佳实践
 
@@ -123,3 +150,4 @@ airConditioning.saveSettings();
 3. 在适当的地方使用 `useApiCall` 优雅地处理错误
 4. 尽可能缓存数据以减少不必要的 API 调用
 5. 在 `onUnmounted` 钩子中清理计时器和订阅
+6. 为关键操作传递 gitHash 参数以启用日志记录

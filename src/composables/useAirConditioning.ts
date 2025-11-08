@@ -11,6 +11,7 @@ import type {
   OC_GetBuildingNoList,
   OC_GetRoomNoData,
 } from '@/api/ocAPI/type/response';
+import { MOYI_UploadInfo } from '@/api/moyi';
 import { useApiCall } from './useApiCall';
 
 interface ACSettings {
@@ -126,7 +127,7 @@ export function useAirConditioning() {
   /**
    * 加载空调余额
    */
-  async function loadBalance(): Promise<void> {
+  async function loadBalance(gitHash?: string): Promise<void> {
     if (!selectedBuildingId.value || !selectedRoomId.value) {
       balance.value = '';
       return;
@@ -152,6 +153,23 @@ export function useAirConditioning() {
     if (result?.code === 200 && result.data?.balance) {
       balance.value = result.data.balance;
       balanceDisplay.value = result.data.balance;
+
+      // 如果提供了 gitHash，则记录到 MOYI API
+      if (gitHash) {
+        const userInfo = getOCUserInfo();
+        try {
+          await MOYI_UploadInfo(
+            '获取空调余额',
+            'oc_Get_ACBalance',
+            String(userInfo?.data?.token),
+            JSON.stringify(result),
+            gitHash,
+            `楼栋${selectedBuildingId.value} 房间${selectedRoomId.value}: ${balance.value}`
+          );
+        } catch (error) {
+          console.error('[loadBalance] MOYI_UploadInfo 错误:', error);
+        }
+      }
     }
   }
 
@@ -205,7 +223,7 @@ export function useAirConditioning() {
   /**
    * 从 localStorage 加载已保存的设置
    */
-  async function loadSavedSettings(): Promise<void> {
+  async function loadSavedSettings(gitHash?: string): Promise<void> {
     try {
       const settingsStr = localStorage.getItem(SETTINGS_KEY);
       if (!settingsStr) return;
@@ -223,7 +241,7 @@ export function useAirConditioning() {
 
       // 如果楼栋和房间都已选择，加载余额
       if (validateSettings()) {
-        await loadBalance();
+        await loadBalance(gitHash);
       }
     } catch (error) {
       console.error('[loadSavedSettings] 错误:', error);
@@ -233,10 +251,10 @@ export function useAirConditioning() {
   /**
    * 初始化空调数据
    */
-  async function initialize(): Promise<void> {
+  async function initialize(gitHash?: string): Promise<void> {
     await loadPaymentUnits();
     await loadBuildingList();
-    await loadSavedSettings();
+    await loadSavedSettings(gitHash);
   }
 
   return {

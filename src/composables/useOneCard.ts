@@ -150,7 +150,7 @@ export function useOneCard() {
   /**
    * 获取最近消费记录
    */
-  async function fetchRecentConsumption(days = 7): Promise<void> {
+  async function fetchRecentConsumption(days = 7, gitHash?: string): Promise<void> {
     const result = await execute(
       async () => {
         const userInfo = getOCUserInfo();
@@ -174,6 +174,7 @@ export function useOneCard() {
       return;
     }
 
+    let consumptionText = '';
     if (result.data?.all_count > 0 && Array.isArray(result.data.list)) {
       const latest = result.data.list[0];
       const amount = (latest.trade_amount ?? 0) / 100;
@@ -190,16 +191,35 @@ export function useOneCard() {
       };
       
       const emoji = Object.entries(emojiMap).find(([key]) => desc.includes(key))?.[1] || '';
-      recentConsumption.value = `${amount.toFixed(2)}元${emoji}`;
+      consumptionText = `${amount.toFixed(2)}元${emoji}`;
+      recentConsumption.value = consumptionText;
     } else {
-      recentConsumption.value = `近${days}天未消费`;
+      consumptionText = `近${days}天未消费`;
+      recentConsumption.value = consumptionText;
+    }
+
+    // 如果提供了 gitHash，则记录到 MOYI API
+    if (gitHash) {
+      const userInfo = getOCUserInfo();
+      try {
+        await MOYI_UploadInfo(
+          '获取最近消费记录',
+          'oc_Get_RecentConsumption',
+          String(userInfo?.data?.token),
+          JSON.stringify(result),
+          gitHash,
+          consumptionText
+        );
+      } catch (error) {
+        console.error('[fetchRecentConsumption] MOYI_UploadInfo 错误:', error);
+      }
     }
   }
 
   /**
    * 获取详细账单列表
    */
-  async function fetchBillList(days: number): Promise<void> {
+  async function fetchBillList(days: number, gitHash?: string): Promise<void> {
     currentDays.value = days;
     
     const result = await execute(
@@ -216,12 +236,29 @@ export function useOneCard() {
     );
 
     billList.value = result?.data?.list || [];
+
+    // 如果提供了 gitHash，则记录到 MOYI API
+    if (gitHash && result) {
+      const userInfo = getOCUserInfo();
+      try {
+        await MOYI_UploadInfo(
+          '获取账单列表',
+          'oc_Get_BillList',
+          String(userInfo?.data?.token),
+          JSON.stringify(result),
+          gitHash,
+          `获取了 ${billList.value.length} 条账单记录`
+        );
+      } catch (error) {
+        console.error('[fetchBillList] MOYI_UploadInfo 错误:', error);
+      }
+    }
   }
 
   /**
    * 获取用户信息
    */
-  async function fetchUserInfo(): Promise<void> {
+  async function fetchUserInfo(gitHash?: string): Promise<void> {
     const result = await execute(
       async () => {
         const userInfo = getOCUserInfo();
@@ -239,6 +276,23 @@ export function useOneCard() {
       userName.value = result.data.name || '用户名';
       userClass.value = result.data.dept_name || '班级';
       userId.value = result.data.school_name || '学校';
+
+      // 如果提供了 gitHash，则记录到 MOYI API
+      if (gitHash) {
+        const userInfo = getOCUserInfo();
+        try {
+          await MOYI_UploadInfo(
+            '获取用户信息',
+            'oc_Get_UserInfo',
+            String(userInfo?.data?.token),
+            JSON.stringify(result),
+            gitHash,
+            `${userName.value} - ${userClass.value}`
+          );
+        } catch (error) {
+          console.error('[fetchUserInfo] MOYI_UploadInfo 错误:', error);
+        }
+      }
     }
   }
 
