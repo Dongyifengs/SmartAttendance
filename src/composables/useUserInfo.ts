@@ -24,7 +24,7 @@ export function useUserInfo() {
   function getStudentId(): string | null {
     const userInfoStr = localStorage.getItem('SA-ZHKQ-USERINFO');
     if (!userInfoStr) return null;
-    
+
     try {
       const parsed = JSON.parse(userInfoStr);
       return parsed.user_code || null;
@@ -40,7 +40,7 @@ export function useUserInfo() {
   function getStudentName(): string | null {
     const userInfoStr = localStorage.getItem('SA-ZHKQ-USERINFO');
     if (!userInfoStr) return null;
-    
+
     try {
       const parsed = JSON.parse(userInfoStr);
       return parsed.user_name || null;
@@ -85,7 +85,7 @@ export function useUserInfo() {
       try {
         const cached = JSON.parse(cachedStr) as CachedUserInfo;
         const now = Date.now();
-        
+
         // 如果缓存仍然有效，使用它
         if (now - cached.timestamp < CACHE_DURATION) {
           cachedInfo.value = cached;
