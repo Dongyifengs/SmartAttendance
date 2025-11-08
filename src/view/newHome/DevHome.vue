@@ -273,10 +273,12 @@ import { ZHKQ_GetDayCourseList, ZHKQ_GetDaySignList } from '@/api/anlaxy';
 import { getZHKQUserInfo } from '@/api/anlaxy/utils';
 import type { CourseList, SignListInfo } from '@/api/anlaxy/type/response';
 import type { OC_BillRetrievalList } from '@/api/ocAPI/type/response';
-import { useUserInfo } from '@/composables/useUserInfo';
-import { useOneCard } from '@/composables/useOneCard';
-import { usePaymentQR } from '@/composables/usePaymentQR';
-import { useAirConditioning } from '@/composables/useAirConditioning';
+import {
+  useUserInfo,
+  useOneCard,
+  usePaymentQR,
+  useAirConditioning,
+} from '@/composables';
 
 // ==================== Constants ====================
 const LONG_PRESS_DELAY = 800;
@@ -540,7 +542,7 @@ onMounted(async () => {
 
     // Initialize One Card data
     await Promise.all([
-      oneCard.fetchWalletBalance(),
+      oneCard.fetchWalletBalance(gitFullHash.value),
       oneCard.fetchRecentConsumption(7),
       oneCard.fetchBillList(7),
       oneCard.fetchUserInfo(),

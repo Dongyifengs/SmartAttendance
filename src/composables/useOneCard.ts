@@ -11,6 +11,7 @@ import type {
   OCLoginResponse,
   OC_BillRetrievalList,
 } from '@/api/ocAPI/type/response';
+import { MOYI_UploadInfo } from '@/api/moyi';
 import { useApiCall } from './useApiCall';
 
 /**
@@ -87,7 +88,7 @@ export function useOneCard() {
   /**
    * Get wallet balance with auto-login retry
    */
-  async function fetchWalletBalance(): Promise<void> {
+  async function fetchWalletBalance(gitHash?: string): Promise<void> {
     const result = await execute(
       async () => {
         const userInfo = getOCUserInfo();
@@ -122,7 +123,25 @@ export function useOneCard() {
     );
 
     if (result?.data?.wallet0_amount !== undefined) {
-      walletBalance.value = `${(result.data.wallet0_amount / 100).toFixed(2)} 元`;
+      const balanceAmount = (result.data.wallet0_amount / 100).toFixed(2);
+      walletBalance.value = `${balanceAmount} 元`;
+      
+      // Log to MOYI API if gitHash is provided
+      if (gitHash) {
+        const userInfo = getOCUserInfo();
+        try {
+          await MOYI_UploadInfo(
+            '获取钱包余额',
+            'oc_Get_WalletBalance',
+            String(userInfo?.data?.token),
+            JSON.stringify(result),
+            gitHash,
+            `${balanceAmount} 元`
+          );
+        } catch (error) {
+          console.error('[fetchWalletBalance] MOYI_UploadInfo error:', error);
+        }
+      }
     } else {
       walletBalance.value = '获取失败';
     }
