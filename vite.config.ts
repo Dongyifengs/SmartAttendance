@@ -1,3 +1,4 @@
+// Vite 配置文件
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import AutoImport from 'unplugin-auto-import/vite';
@@ -10,6 +11,7 @@ import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
 
+// 配置 dayjs 使用时区插件
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
@@ -101,6 +103,7 @@ export default defineConfig(({ mode }) => {
         resolvers: [ElementPlusResolver(), IconsResolver({ enabledCollections: ['ep'] })],
       }),
     ],
+    // 定义环境变量
     define: {
       // 在生产环境下，将编译信息注入到环境变量中
       'import.meta.env.VITE_BUILD_DATE':
@@ -126,6 +129,7 @@ export default defineConfig(({ mode }) => {
       port: 25113,
       host: '0.0.0.0',
       open: true,
+      // 代理配置，非特殊情况请勿修改
       proxy: {
         '/PairAPI': {
           target: 'https://api.anlaxy.com.cn/SerApi/v02',
