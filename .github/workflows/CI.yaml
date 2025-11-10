@@ -23,7 +23,7 @@ jobs:
         with:
           node-version: 22
 
-      # 步骤 3: 获取最新的提交信息
+      # 步骤 3: 获取最新提交信息
       - name: 获取提交信息
         id: commit_info
         run: |
