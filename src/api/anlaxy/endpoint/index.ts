@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // RollCallAPI Endpoint
 export const RollCallAPI = axios.create({
-  baseURL: '/CallAPI',
+  baseURL: 'https://rollcall.anlaxy.com.cn/SerApi/v02',
   headers: {
     'Content-Type': 'application/x-www-form-urlencoded',
   },

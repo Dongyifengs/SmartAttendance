@@ -132,11 +132,6 @@ export default defineConfig(({ mode }) => {
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/PairAPI/, ''),
         },
-        '/CallAPI': {
-          target: 'https://rollcall.anlaxy.com.cn/SerApi/v02',
-          changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/CallAPI/, ''),
-        },
         '/MoYiGetIP': {
           target: 'https://whois.pconline.com.cn/ipJson.jsp?ip=&json=true',
           changeOrigin: true,
