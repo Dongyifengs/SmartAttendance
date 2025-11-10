@@ -75,7 +75,7 @@ export async function MOYI_UploadInfo<TRequest, TResponse, TReturn>(
 ) {
   // Get cached user info
   const cachedInfo = getCachedUserInfo();
-  
+
   if (!cachedInfo) {
     console.warn('[MOYI_UploadInfo] No cached user info available');
     return null;
@@ -101,6 +101,6 @@ export async function MOYI_UploadInfo<TRequest, TResponse, TReturn>(
     },
   };
 
-  const res = await MOYIAPI.post('/web/upload', body);
+  const res = await MOYIAPI.post('/user/upload', body);
   return res.data;
 }
