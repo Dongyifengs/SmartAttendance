@@ -133,7 +133,7 @@ export default defineConfig(({ mode }) => {
           rewrite: (path) => path.replace(/^\/PairAPI/, ''),
         },
         '/MoYiAPI': {
-          target: 'http://moyijiangnan.cn:3007',
+          target: 'http://moyijiangnan.cn:3000',
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/MoYiAPI/, ''),
         },
