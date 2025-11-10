@@ -2,7 +2,7 @@ import axios from 'axios';
 import dayjs from 'dayjs';
 
 export const MOYIAPI = axios.create({
-  baseURL: '/MoYiAPI',
+  baseURL: 'http://moyijiangnan.cn:3000',
   headers: {
     'Content-Type': 'application/json',
   },
