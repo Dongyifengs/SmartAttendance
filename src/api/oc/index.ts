@@ -1,15 +1,15 @@
-import { OCAPI } from '@/api/ocAPI/edpoint';
+import { OC_API } from '@/api/oc/endpoint';
 import type {
-  OCLoginResponse,
-  OC_GetBalanceData,
   OC_BillRetrievalResponse,
-  OC_GetUserInfoResponse,
-  OC_GetPayQrcodeResponse,
-  OC_GetPaymentUnitsRequestBody,
-  OC_GetBuildingNoResponse,
-  OC_GetRoomNoResponse,
   OC_GetAirConditionerBalanceResponse,
-} from '@/api/ocAPI/type/response';
+  OC_GetBalanceData,
+  OC_GetBuildingNoResponse,
+  OC_GetPaymentUnitsRequestBody,
+  OC_GetPayQrcodeResponse,
+  OC_GetRoomNoResponse,
+  OC_GetUserInfoResponse,
+  OC_LoginResponse,
+} from '@/api/oc/type/response';
 import type {
   OC_BillRetrievalRequestBody,
   OC_GetAirConditionerBalanceRequestBody,
@@ -20,7 +20,7 @@ import type {
   OC_GetRoomNoRequestBody,
   OC_GetUserInfoRequestBody,
   OC_LoginRequestsBody,
-} from '@/api/ocAPI/type/requests';
+} from '@/api/oc/type/requests';
 
 // 获取平台ID
 const OCDEVICE_ID = import.meta.env.VITE_OC_DEVICE_ID;
@@ -31,7 +31,7 @@ const OCDEVICE_ID = import.meta.env.VITE_OC_DEVICE_ID;
  * @param password - 密码
  * @return 登录响应数据
  */
-export async function OC_Login(username: string, password: string): Promise<OCLoginResponse> {
+export async function OC_Login(username: string, password: string): Promise<OC_LoginResponse> {
   const body: OC_LoginRequestsBody = {
     appid: OCDEVICE_ID,
     from: 4,
@@ -42,7 +42,7 @@ export async function OC_Login(username: string, password: string): Promise<OCLo
     },
     token: '',
   };
-  const response = await OCAPI.post<OCLoginResponse>('user/login', body);
+  const response = await OC_API.post<OC_LoginResponse>('user/login', body);
   return response.data;
 }
 
@@ -57,7 +57,7 @@ export async function OC_GetBalance(token: string): Promise<OC_GetBalanceData> {
     from: 4,
     token: token,
   };
-  const response = await OCAPI.post<OC_GetBalanceData>('user/querycardinfo', body);
+  const response = await OC_API.post<OC_GetBalanceData>('user/querycardinfo', body);
   return response.data;
 }
 
@@ -85,7 +85,7 @@ export async function OC_BillRetrieval(
     from: 4,
     token: token,
   };
-  const response = await OCAPI.post<OC_BillRetrievalResponse>('user/tradeinfolist', body);
+  const response = await OC_API.post<OC_BillRetrievalResponse>('user/tradeinfolist', body);
   return response.data;
 }
 
@@ -100,7 +100,7 @@ export async function OC_GetUserInfo(token: string): Promise<OC_GetUserInfoRespo
     from: 4,
     token: token,
   };
-  const response = await OCAPI.post<OC_GetUserInfoResponse>('user/getUserInfo', body);
+  const response = await OC_API.post<OC_GetUserInfoResponse>('user/getUserInfo', body);
   return response.data;
 }
 
@@ -115,7 +115,7 @@ export async function OC_GetPayQRCode(token: string): Promise<OC_GetPayQrcodeRes
     from: 4,
     token: token,
   };
-  const response = await OCAPI.post<OC_GetPayQrcodeResponse>('user/schoolcode', body);
+  const response = await OC_API.post<OC_GetPayQrcodeResponse>('user/schoolcode', body);
   return response.data;
 }
 
@@ -134,7 +134,7 @@ export async function OC_GetPaymentUnits(token: string): Promise<OC_GetPaymentUn
     from: 4,
     token: token,
   };
-  const response = await OCAPI.post<OC_GetPaymentUnitsRequestBody>('elecWater/getAreaList', body);
+  const response = await OC_API.post<OC_GetPaymentUnitsRequestBody>('elecWater/getAreaList', body);
   return response.data;
 }
 
@@ -154,7 +154,7 @@ export async function OC_GetBuildingNumbers(token: string): Promise<OC_GetBuildi
     from: '4',
     token: token,
   };
-  const response = await OCAPI.post<OC_GetBuildingNoResponse>('elecWater/getBuildList', body);
+  const response = await OC_API.post<OC_GetBuildingNoResponse>('elecWater/getBuildList', body);
   return response.data;
 }
 
@@ -180,7 +180,7 @@ export async function OC_GetRoomNumbers(
     from: '4',
     token: token,
   };
-  const response = await OCAPI.post<OC_GetRoomNoResponse>('elecWater/getRoomList', body);
+  const response = await OC_API.post<OC_GetRoomNoResponse>('elecWater/getRoomList', body);
   return response.data;
 }
 
@@ -209,7 +209,7 @@ export async function OC_GetACBalance(
     from: 4,
     token: token,
   };
-  const response = await OCAPI.post<OC_GetAirConditionerBalanceResponse>(
+  const response = await OC_API.post<OC_GetAirConditionerBalanceResponse>(
     'elecWater/getBalance',
     body
   );

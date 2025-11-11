@@ -1,7 +1,7 @@
-import { ref, watch, nextTick } from 'vue';
+import { nextTick, ref, watch } from 'vue';
 import { ElMessage } from 'element-plus';
-import { OC_GetPayQRCode } from '@/api/ocAPI';
-import type { OCLoginResponse } from '@/api/ocAPI/type/response';
+import { OC_GetPayQRCode } from '@/api/oc';
+import type { OC_LoginResponse } from '@/api/oc/type/response';
 import { MOYI_UploadInfo } from '@/api/moyi';
 import { useApiCall } from './useApiCall';
 
@@ -11,7 +11,7 @@ import { useApiCall } from './useApiCall';
  */
 export function usePaymentQR() {
   const { execute } = useApiCall();
-  
+
   // 状态
   const showDialog = ref(false);
   const qrCodeBase64 = ref('');
@@ -22,10 +22,10 @@ export function usePaymentQR() {
   /**
    * 从 localStorage 获取一卡通用户信息
    */
-  function getOCUserInfo(): OCLoginResponse | null {
+  function getOCUserInfo(): OC_LoginResponse | null {
     const userInfoStr = localStorage.getItem('SA-OC-USERINFO');
     if (!userInfoStr) return null;
-    
+
     try {
       return JSON.parse(userInfoStr);
     } catch (error) {
@@ -99,7 +99,7 @@ export function usePaymentQR() {
           .catch((error) => {
             console.error('[usePaymentQR] 自动刷新失败:', error);
           });
-        
+
         // 重置倒计时
         refreshCountdown.value = 10;
       }
@@ -155,7 +155,7 @@ export function usePaymentQR() {
    */
   watch(showDialog, (newVal) => {
     if (newVal) {
-      nextTick(() => {
+      nextTick().then(() => {
         startAutoRefresh();
       });
     } else {
@@ -169,7 +169,7 @@ export function usePaymentQR() {
     qrCodeBase64,
     refreshCountdown,
     refreshing,
-    
+
     // 方法
     fetchQRCode,
     manualRefresh,

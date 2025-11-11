@@ -1,16 +1,21 @@
-import { ZHKQ_SignIn, ZHKQ_SignOut, ZHKQ_GetDaySignList, ZHKQ_GetDayCourseList } from '@/api/anlaxy';
+import {
+  ZHKQ_GetDayCourseList,
+  ZHKQ_GetDaySignList,
+  ZHKQ_SignIn,
+  ZHKQ_SignOut,
+} from '@/api/anlaxy';
 import type {
+  GetCourseListParam,
+  GetSignListParam,
   SignInParam,
   SignOutParam,
-  GetSignListParam,
-  GetCourseListParam,
 } from '@/api/anlaxy/type/requests';
 import type {
-  SignInResponse,
-  SignOutResponse,
-  SignListInfo,
-  CourseList,
   BoolString,
+  CourseList,
+  SignInResponse,
+  SignListInfo,
+  SignOutResponse,
 } from '@/api/anlaxy/type/response';
 import { MOYI_UploadInfo } from '@/api/moyi';
 

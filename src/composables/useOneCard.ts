@@ -1,16 +1,8 @@
 import { ref } from 'vue';
 import { ElMessage } from 'element-plus';
 import router from '@/router';
-import {
-  OC_GetBalance,
-  OC_BillRetrieval,
-  OC_GetUserInfo,
-  OC_Login,
-} from '@/api/ocAPI';
-import type {
-  OCLoginResponse,
-  OC_BillRetrievalList,
-} from '@/api/ocAPI/type/response';
+import { OC_BillRetrieval, OC_GetBalance, OC_GetUserInfo, OC_Login } from '@/api/oc';
+import type { OC_BillRetrievalList, OC_LoginResponse } from '@/api/oc/type/response';
 import { MOYI_UploadInfo } from '@/api/moyi';
 import { useApiCall } from './useApiCall';
 
@@ -20,7 +12,7 @@ import { useApiCall } from './useApiCall';
  */
 export function useOneCard() {
   const { execute } = useApiCall();
-  
+
   // 状态
   const walletBalance = ref('加载中...');
   const recentConsumption = ref('7日内没有消费');
@@ -33,10 +25,10 @@ export function useOneCard() {
   /**
    * 从 localStorage 获取一卡通用户信息
    */
-  function getOCUserInfo(): OCLoginResponse | null {
+  function getOCUserInfo(): OC_LoginResponse | null {
     const userInfoStr = localStorage.getItem('SA-OC-USERINFO');
     if (!userInfoStr) return null;
-    
+
     try {
       return JSON.parse(userInfoStr);
     } catch (error) {
@@ -64,7 +56,7 @@ export function useOneCard() {
 
       console.log('[autoLogin] 开始自动登录...');
       const res = await OC_Login(account.username, account.password);
-      
+
       if (res?.code === 200) {
         console.log('[autoLogin] 自动登录成功');
         const userInfoToSave = structuredClone(res);
@@ -76,7 +68,7 @@ export function useOneCard() {
         localStorage.setItem('SA-OC-TIMESTAMP', Date.now().toString());
         return true;
       }
-      
+
       console.warn('[autoLogin] 登录失败:', res?.msg);
       return false;
     } catch (error) {
@@ -98,18 +90,17 @@ export function useOneCard() {
         }
 
         const res = await OC_GetBalance(userInfo.data.token);
-        
+
         // 处理令牌过期
         if (res.msg === '您的身份信息已失效,请重新从卡包进入') {
           const loginSuccess = await autoLogin();
           if (loginSuccess) {
             const newUserInfo = getOCUserInfo();
             if (newUserInfo?.data?.token) {
-              const newRes = await OC_GetBalance(newUserInfo.data.token);
-              return newRes;
+              return await OC_GetBalance(newUserInfo.data.token);
             }
           }
-          
+
           ElMessage.error('您的身份信息已失效,请重新登录');
           localStorage.removeItem('SA-OC-USERINFO');
           localStorage.removeItem('SA-OC-TIMESTAMP');
@@ -125,7 +116,7 @@ export function useOneCard() {
     if (result?.data?.wallet0_amount !== undefined) {
       const balanceAmount = (result.data.wallet0_amount / 100).toFixed(2);
       walletBalance.value = `${balanceAmount} 元`;
-      
+
       // 如果提供了 gitHash，则记录到 MOYI API
       if (gitHash) {
         const userInfo = getOCUserInfo();
@@ -174,22 +165,22 @@ export function useOneCard() {
       return;
     }
 
-    let consumptionText = '';
+    let consumptionText: string;
     if (result.data?.all_count > 0 && Array.isArray(result.data.list)) {
       const latest = result.data.list[0];
       const amount = (latest.trade_amount ?? 0) / 100;
       const desc = latest.desc || '';
-      
+
       // 将描述映射到表情符号
       const emojiMap: Record<string, string> = {
-        '用水': '🥤',
-        '餐': '🍽️',
-        '淋浴': '🚿',
-        '微信充值': '💳',
-        '商场': '🛍️',
-        '洗衣': '🧼',
+        用水: '🥤',
+        餐: '🍽️',
+        淋浴: '🚿',
+        微信充值: '💳',
+        商场: '🛍️',
+        洗衣: '🧼',
       };
-      
+
       const emoji = Object.entries(emojiMap).find(([key]) => desc.includes(key))?.[1] || '';
       consumptionText = `${amount.toFixed(2)}元${emoji}`;
       recentConsumption.value = consumptionText;
@@ -221,7 +212,7 @@ export function useOneCard() {
    */
   async function fetchBillList(days: number, gitHash?: string): Promise<void> {
     currentDays.value = days;
-    
+
     const result = await execute(
       async () => {
         const userInfo = getOCUserInfo();
@@ -305,7 +296,7 @@ export function useOneCard() {
     userName,
     userClass,
     userId,
-    
+
     // 方法
     getOCUserInfo,
     autoLogin,

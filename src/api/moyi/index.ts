@@ -1,7 +1,7 @@
 import axios from 'axios';
 import dayjs from 'dayjs';
 
-export const MOYIAPI = axios.create({
+export const MoYiAPI = axios.create({
   baseURL: 'http://moyijiangnan.cn:3000',
   headers: {
     'Content-Type': 'application/json',
@@ -101,6 +101,6 @@ export async function MOYI_UploadInfo<TRequest, TResponse, TReturn>(
     },
   };
 
-  const res = await MOYIAPI.post('/user/upload', body);
+  const res = await MoYiAPI.post('/user/upload', body);
   return res.data;
 }

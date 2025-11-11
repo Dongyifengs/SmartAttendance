@@ -12,9 +12,7 @@ export function useApiCall() {
   /**
    * 执行带有统一错误处理的 API 调用
    * @param apiFunction - 要执行的异步函数
-   * @param errorMessage - 自定义错误消息
-   * @param showSuccessMessage - 是否显示成功消息
-   * @param successMessage - 自定义成功消息
+   * @param options - 设置选项
    */
   async function execute<T>(
     apiFunction: () => Promise<T>,
@@ -30,20 +28,20 @@ export function useApiCall() {
 
     try {
       const result = await apiFunction();
-      
+
       if (options?.showSuccessMessage && options?.successMessage) {
         ElMessage.success(options.successMessage);
       }
-      
+
       return result;
     } catch (err) {
       error.value = err as Error;
       console.error('[useApiCall] 错误:', err);
-      
+
       if (!options?.silent) {
         ElMessage.error(options?.errorMessage || '操作失败，请稍后重试');
       }
-      
+
       return null;
     } finally {
       loading.value = false;
