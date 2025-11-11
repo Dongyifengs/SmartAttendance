@@ -2,16 +2,16 @@ import { generateInterfaceParams } from '@/api/anlaxy/utils';
 import { PairAPI, RollCallAPI } from '@/api/anlaxy/endpoint';
 // 响应体
 import type {
-  CourseList,
-  SignListInfo,
-  SignInResponse,
-  SignOutResponse,
-  UserInfo,
-  ClassInfo,
-  GroupInfo,
-  CourseStatusInfo,
   AttendanceInfo,
   BoolString,
+  ClassInfo,
+  CourseList,
+  CourseStatusInfo,
+  GroupInfo,
+  SignInResponse,
+  SignListInfo,
+  SignOutResponse,
+  UserInfo,
 } from './type/response.d';
 // 请求体
 import type {

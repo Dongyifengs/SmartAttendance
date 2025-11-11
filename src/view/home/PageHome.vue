@@ -10,9 +10,13 @@
         <el-button class="custom_btn" @click="logoutTest">测试退出</el-button>
         <h5>测试按钮</h5>
         <el-button class="custom_btn" @click="classListTest">课程表测试 [开发者模式]</el-button>
-        <el-button class="custom_btn" @click="AttendanceListTest">考勤查询测试 [开发者模式]</el-button>
+        <el-button class="custom_btn" @click="AttendanceListTest"
+          >考勤查询测试 [开发者模式]</el-button
+        >
         <el-button class="custom_btn" @click="LeaveListTest">请假页面测试 [开发者模式]</el-button>
-        <el-button class="custom_btn" @click="cleanUpTheGuidanceTest">清理引导文件 [开发者模式]</el-button>
+        <el-button class="custom_btn" @click="cleanUpTheGuidanceTest"
+          >清理引导文件 [开发者模式]</el-button
+        >
       </div>
     </div>
   </div>
@@ -52,7 +56,7 @@
   const cleanUpTheGuidanceTest = () => {
     localStorage.removeItem('SA-TOUR-COMPLETED2');
     ElMessage.success('引导文件已清理，下次进入相应页面将重新显示引导。');
-  }
+  };
 
   const DevHomeTest = () => {
     router.push('/dev/home');
@@ -72,13 +76,13 @@
     const maxTime = Math.max(...times);
 
     // 格式化输出
-    return dayjs(maxTime).format("HH:mm:ss.SSS");
+    return dayjs(maxTime).format('HH:mm:ss.SSS');
   };
 </script>
 
 <style scoped>
-@import "style/index.css";
-::v-deep(.el-button+.el-button) {
-  margin-left: 0;
-}
+  @import 'style/index.css';
+  ::v-deep(.el-button + .el-button) {
+    margin-left: 0;
+  }
 </style>

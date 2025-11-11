@@ -3,7 +3,7 @@
 // =============== [一卡通登录返回类型] =============== //
 /**
  * 一卡通登录响应数据类型
- * @interface OCLoginResponseData
+ * @interface OC_LoginResponseData
  * @property {string} token - 登录令牌
  * @property {string} user_name - 用户名
  * @property {string} work_no - 工号
@@ -38,7 +38,7 @@
  * @property {string} logoLocalUrl - 本地Logo URL
  * @property {string | null} yzqxBindFlag - 绑定标志
  */
-export interface OCLoginResponseData {
+export interface OC_LoginResponseData {
   token: string;
   user_name: string;
   work_no: string;
@@ -76,20 +76,19 @@ export interface OCLoginResponseData {
 
 /**
  * 完整的登录响应类型
- * @interface OCLoginResponse
+ * @interface OC_LoginResponse
  * @property {number} code - 响应状态码
  * @property {string} msg - 响应消息
- * @property {OCLoginResponseData} data - 登录数据对象
+ * @property {OC_LoginResponseData} data - 登录数据对象
  * @property {string | null} count - 计数（通常为 null）
  */
-export interface OCLoginResponse {
+export interface OC_LoginResponse {
   code: number;
   msg: string;
   data: OCLoginResponseData;
   count: string | null;
 }
 // =============== [一卡通登录返回类型] =============== //
-
 
 // =============== [一卡通余额返回类型] =============== //
 /**
@@ -117,35 +116,35 @@ export interface OC_GetBalanceData {
  */
 export interface OC_GetBalanceInfo {
   card_status: number;
-  wallet2_amount: number
-  amount: number
-  wallet1_amount: number
-  wallet0_amount: number
-  card_type: number
+  wallet2_amount: number;
+  amount: number;
+  wallet1_amount: number;
+  wallet0_amount: number;
+  card_type: number;
 }
 // =============== [一卡通余额返回类型] =============== //
 
 // =============== [一卡通获取账单返回类型] =============== //
 export interface OC_BillRetrievalResponse {
-  code: number,
-  data: OC_BillRetrievalInfo,
-  msg: string
+  code: number;
+  data: OC_BillRetrievalInfo;
+  msg: string;
 }
 
 export interface OC_BillRetrievalInfo {
-  all_count: number,
-  list: OC_BillRetrievalList[]
+  all_count: number;
+  list: OC_BillRetrievalList[];
 }
 
 export interface OC_BillRetrievalList {
-  acc_code:     number;
-  createTime:   Date;
-  desc:         string;
-  is_recharge:  number;
-  pay_way:      number;
+  acc_code: number;
+  createTime: Date;
+  desc: string;
+  is_recharge: number;
+  pay_way: number;
   trade_amount: number;
-  trade_no:     string;
-  trade_time:   Date;
+  trade_no: string;
+  trade_time: Date;
 }
 // =============== [一卡通获取账单返回类型] =============== //
 
@@ -159,10 +158,10 @@ export interface OC_BillRetrievalList {
  * @property {string} mag - 响应消息
  */
 export interface OC_GetUserInfoResponse {
-  code: number,
-  count: null,
-  data: OC_GetUserInfoResponseInfo,
-  mag: string,
+  code: number;
+  count: null;
+  data: OC_GetUserInfoResponseInfo;
+  mag: string;
 }
 
 /**
@@ -181,18 +180,17 @@ export interface OC_GetUserInfoResponse {
  * @property {string} work_no - 学号ID
  */
 export interface OC_GetUserInfoResponseInfo {
-  cardEndData: null,
-  dept_name: string
-  mobile: null,
-  name: string,
-  photo: null,
-  schoolNo: null,
-  school_name: null,
-  shenfen: string,
-  status: number,
-  studentId: null,
-  work_no: string
-
+  cardEndData: null;
+  dept_name: string;
+  mobile: null;
+  name: string;
+  photo: null;
+  schoolNo: null;
+  school_name: null;
+  shenfen: string;
+  status: number;
+  studentId: null;
+  work_no: string;
 }
 // =============== [一卡通获取用户信息返回类型] =============== //
 
@@ -205,9 +203,9 @@ export interface OC_GetUserInfoResponseInfo {
  * @property {string} msg - 响应消息
  */
 export interface OC_GetPayQrcodeResponse {
-  code: number,
-  data: OC_GetPayQrcodeData,
-  msg: string
+  code: number;
+  data: OC_GetPayQrcodeData;
+  msg: string;
 }
 
 /**
@@ -216,7 +214,7 @@ export interface OC_GetPayQrcodeResponse {
  * @property {string} code_info - 二维码信息
  */
 export interface OC_GetPayQrcodeData {
-  code_info: string
+  code_info: string;
 }
 // =============== [一卡通获取支付二维码返回类型] =============== //
 
@@ -230,10 +228,10 @@ export interface OC_GetPayQrcodeData {
  * @property {null} count - 计数（通常为 null）
  */
 export interface OC_GetPaymentUnitsRequestBody {
-  code: number,
-  msg: string,
-  data: OC_GetPaymentUnitsData,
-  count: null
+  code: number;
+  msg: string;
+  data: OC_GetPaymentUnitsData;
+  count: null;
 }
 
 /**
@@ -242,7 +240,7 @@ export interface OC_GetPaymentUnitsRequestBody {
  * @property {OC_GetPaymentUnitsList[]} list - 缴费单位列表
  */
 export interface OC_GetPaymentUnitsData {
-  list: OC_GetPaymentUnitsList[]
+  list: OC_GetPaymentUnitsList[];
 }
 
 /**
@@ -253,9 +251,9 @@ export interface OC_GetPaymentUnitsData {
  * @property {null} source - 来源（通常为 null）
  */
 export interface OC_GetPaymentUnitsList {
-  area_id: string,
-  area_name: string,
-  source: null
+  area_id: string;
+  area_name: string;
+  source: null;
 }
 // =============== [一卡通获取缴费单位返回类型] =============== //
 
@@ -269,10 +267,10 @@ export interface OC_GetPaymentUnitsList {
  * @property {string} msg - 响应消息
  */
 export interface OC_GetBuildingNoResponse {
-  code: number,
-  count: null,
-  data: OC_GetBuildingNoData,
-  msg: string
+  code: number;
+  count: null;
+  data: OC_GetBuildingNoData;
+  msg: string;
 }
 
 /**
@@ -281,7 +279,7 @@ export interface OC_GetBuildingNoResponse {
  * @property {OC_GetBuildingNoList[]} list - 楼栋号列表
  */
 export interface OC_GetBuildingNoData {
-  list: OC_GetBuildingNoList[]
+  list: OC_GetBuildingNoList[];
 }
 
 /**
@@ -292,9 +290,9 @@ export interface OC_GetBuildingNoData {
  * @property {null} source - 来源（通常为 null）
  */
 export interface OC_GetBuildingNoList {
-  build_id: string,
-  build_name: string,
-  source: null
+  build_id: string;
+  build_name: string;
+  source: null;
 }
 // =============== [一卡通获取楼栋号返回类型] =============== //
 
@@ -308,10 +306,10 @@ export interface OC_GetBuildingNoList {
  * @property {null} count - 计数（通常为 null）
  */
 export interface OC_GetRoomNoResponse {
-  code: number,
-  msg: string,
-  data: OC_GetRoomNoResponseData,
-  count: null
+  code: number;
+  msg: string;
+  data: OC_GetRoomNoResponseData;
+  count: null;
 }
 
 /**
@@ -320,7 +318,7 @@ export interface OC_GetRoomNoResponse {
  * @property {OC_GetRoomNoData[]} list - 房间号列表
  */
 export interface OC_GetRoomNoResponseData {
-  list: OC_GetRoomNoData[]
+  list: OC_GetRoomNoData[];
 }
 
 /**
@@ -331,9 +329,9 @@ export interface OC_GetRoomNoResponseData {
  * @property {null} source - 来源（通常为 null）
  */
 export interface OC_GetRoomNoData {
-  room_id: string,
-  room_name: string,
-  source: null
+  room_id: string;
+  room_name: string;
+  source: null;
 }
 // =============== [一卡通获取房间号返回类型] =============== //
 
@@ -347,10 +345,10 @@ export interface OC_GetRoomNoData {
  * @property {null} count - 计数（通常为 null）
  */
 export interface OC_GetAirConditionerBalanceResponse {
-  code: number,
-  msg: string,
-  data: OC_GetAirConditionerBalanceData,
-  count: null
+  code: number;
+  msg: string;
+  data: OC_GetAirConditionerBalanceData;
+  count: null;
 }
 
 /**
@@ -360,7 +358,7 @@ export interface OC_GetAirConditionerBalanceResponse {
  * @property {string} displayMargin - 显示类型文本
  */
 export interface OC_GetAirConditionerBalanceData {
-  balance: string,
-  displayMargin: string
+  balance: string;
+  displayMargin: string;
 }
 // =============== [一卡通获取空调余额返回类型] =============== //

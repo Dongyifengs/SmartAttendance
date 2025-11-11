@@ -24,7 +24,6 @@ export interface OC_LoginRequestsBody {
 }
 // =============== [一卡通登录请求类型] =============== //
 
-
 // =============== [一卡通获取钱包余额请求类型] =============== //
 /**
  * 获取一卡通余额请求体类型
@@ -53,14 +52,14 @@ export interface OC_GetBalanceRequestBody {
  * @property { string } token 用户token
  */
 export interface OC_BillRetrievalRequestBody {
-  appid: string,
+  appid: string;
   data: {
-    day_num: number,
-    pageNum: number,
-    pageSize: number
-  },
-  from: number,
-  token: string
+    day_num: number;
+    pageNum: number;
+    pageSize: number;
+  };
+  from: number;
+  token: string;
 }
 // =============== [一卡通获取账单请求类型] =============== //
 
@@ -110,7 +109,7 @@ export interface OC_GetPayUnitRequestBody {
   data: {
     configId: number;
     payment_type: string;
-  },
+  };
   from: number;
   token: string;
 }
@@ -131,12 +130,12 @@ export interface OC_GetPayUnitRequestBody {
 export interface OC_GetBuildingNoRequestBody {
   appid: string;
   data: {
-    area_id: string,
-    configId: number,
-    payment_type: string,
-  },
-  from: string,
-  token: string
+    area_id: string;
+    configId: number;
+    payment_type: string;
+  };
+  from: string;
+  token: string;
 }
 // =============== [一卡通获取楼栋号请求类型] =============== //
 
@@ -157,14 +156,14 @@ export interface OC_GetBuildingNoRequestBody {
 export interface OC_GetRoomNoRequestBody {
   appid: string;
   data: {
-    area_id: string,
-    build_id: string,
-    configId: number,
-    payment_type: string,
-    source: null
-  },
-  from: string,
-  token: string
+    area_id: string;
+    build_id: string;
+    configId: number;
+    payment_type: string;
+    source: null;
+  };
+  from: string;
+  token: string;
 }
 // =============== [一卡通获取房间号请求类型] =============== //
 
@@ -187,15 +186,15 @@ export interface OC_GetRoomNoRequestBody {
 export interface OC_GetAirConditionerBalanceRequestBody {
   appid: string;
   data: {
-    area_id: string,
-    build_id: string,
-    configId: number,
-    item_id: string,
-    payment_type: string,
-    room_id: string,
-    source: null
-  },
-  from: number,
-  token: string
+    area_id: string;
+    build_id: string;
+    configId: number;
+    item_id: string;
+    payment_type: string;
+    room_id: string;
+    source: null;
+  };
+  from: number;
+  token: string;
 }
 // =============== [一卡通获取空调余额请求类型] =============== //

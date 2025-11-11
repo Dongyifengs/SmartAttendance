@@ -5,31 +5,33 @@
 ## 可用的组合式函数
 
 ### useApiCall
+
 统一的 API 调用钩子，具有错误处理功能。简化 try-catch 块并提供一致的错误处理。
 
 **用法：**
+
 ```typescript
 const { loading, error, execute } = useApiCall();
 
-const result = await execute(
-  async () => await someApiCall(),
-  {
-    errorMessage: '操作失败',
-    showSuccessMessage: true,
-    successMessage: '操作成功',
-  }
-);
+const result = await execute(async () => await someApiCall(), {
+  errorMessage: '操作失败',
+  showSuccessMessage: true,
+  successMessage: '操作成功',
+});
 ```
 
 ### useUserInfo
+
 用于管理用户信息的组合式函数，带有本地缓存功能。减少冗余的 API 调用和 localStorage 读取。
 
 **特性：**
+
 - 缓存学号、姓名和 IP 地址
 - 1 小时后自动刷新缓存
 - 提供获取单个用户属性的辅助方法
 
 **用法：**
+
 ```typescript
 const { loadUserInfo, getCachedUserInfo, getStudentId, getStudentName } = useUserInfo();
 
@@ -41,15 +43,18 @@ const cachedInfo = getCachedUserInfo();
 ```
 
 ### useOneCard
+
 用于一卡通操作的组合式函数。处理钱包余额、账单检索和用户信息。
 
 **特性：**
+
 - 令牌过期时自动登录
 - 获取钱包余额
 - 账单检索和管理
 - 获取用户信息
 
 **用法：**
+
 ```typescript
 const oneCard = useOneCard();
 
@@ -64,14 +69,17 @@ await oneCard.fetchBillList(7);
 ```
 
 ### usePaymentQR
+
 用于支付二维码管理的组合式函数。处理二维码生成、自动刷新和手动刷新。
 
 **特性：**
+
 - 每 10 秒自动刷新二维码
 - 手动刷新功能
 - 自动计时器管理
 
 **用法：**
+
 ```typescript
 const paymentQR = usePaymentQR();
 
@@ -86,14 +94,17 @@ paymentQR.showDialog.value = true;
 ```
 
 ### useAirConditioning
+
 用于空调管理的组合式函数。处理楼栋/房间选择和余额查询。
 
 **特性：**
+
 - 获取楼栋和房间列表
 - 余额查询
 - 设置持久化存储到 localStorage
 
 **用法：**
+
 ```typescript
 const airConditioning = useAirConditioning();
 
@@ -108,15 +119,18 @@ airConditioning.saveSettings();
 ```
 
 ### useAttendance
+
 用于签到签退操作的组合式函数。处理课程签到、签退和记录查询，并自动记录操作日志。
 
 **特性：**
+
 - 课程签到/签退操作
 - 获取签到记录列表
 - 获取课程列表
 - 自动记录操作日志到 MOYI API
 
 **用法：**
+
 ```typescript
 const attendance = useAttendance();
 

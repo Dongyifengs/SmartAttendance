@@ -1,16 +1,16 @@
 import { ref } from 'vue';
 import { ElMessage } from 'element-plus';
 import {
-  OC_GetPaymentUnits,
-  OC_GetBuildingNumbers,
-  OC_GetRoomNumbers,
   OC_GetACBalance,
-} from '@/api/ocAPI';
+  OC_GetBuildingNumbers,
+  OC_GetPaymentUnits,
+  OC_GetRoomNumbers,
+} from '@/api/oc';
 import type {
-  OCLoginResponse,
   OC_GetBuildingNoList,
   OC_GetRoomNoData,
-} from '@/api/ocAPI/type/response';
+  OC_LoginResponse,
+} from '@/api/oc/type/response';
 import { MOYI_UploadInfo } from '@/api/moyi';
 import { useApiCall } from './useApiCall';
 
@@ -30,7 +30,7 @@ const DEFAULT_AREA_ID = '1';
  */
 export function useAirConditioning() {
   const { execute } = useApiCall();
-  
+
   // 状态
   const showDialog = ref(false);
   const selectedAreaId = ref(DEFAULT_AREA_ID);
@@ -45,10 +45,10 @@ export function useAirConditioning() {
   /**
    * 从 localStorage 获取一卡通用户信息
    */
-  function getOCUserInfo(): OCLoginResponse | null {
+  function getOCUserInfo(): OC_LoginResponse | null {
     const userInfoStr = localStorage.getItem('SA-OC-USERINFO');
     if (!userInfoStr) return null;
-    
+
     try {
       return JSON.parse(userInfoStr);
     } catch (error) {
@@ -180,7 +180,7 @@ export function useAirConditioning() {
     selectedRoomId.value = '';
     roomList.value = [];
     balance.value = '';
-    
+
     if (buildId) {
       await loadRoomList(buildId);
     }
@@ -268,7 +268,7 @@ export function useAirConditioning() {
     roomList,
     balance,
     balanceDisplay,
-    
+
     // 方法
     loadPaymentUnits,
     loadBuildingList,
