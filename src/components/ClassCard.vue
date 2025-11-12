@@ -29,9 +29,11 @@
   import { Clock, Location, User, CircleClose, CircleCheck } from '@element-plus/icons-vue';
   import { ref, computed, watch } from 'vue';
   import dayjs from 'dayjs';
+  import { Base64 } from 'js-base64';
   import { getZHKQUserInfo } from '@/api/anlaxy/utils';
   import { ZHKQ_SignIn, ZHKQ_SignOut } from '@/api/anlaxy';
   import type { SignOutParam } from '@/api/anlaxy/type/requests';
+  import { MOYI_UploadInfo } from '@/api/moyi';
 
   const info = defineModel<ClassInfo>({ required: true });
   const selectedSignInTime = ref<string>('');
@@ -166,6 +168,21 @@
 
       // 检查响应状态
       if (response.state === '1') {
+        // 上传签到信息到 MOYI 服务器
+        try {
+          await MOYI_UploadInfo(
+            '签到',
+            'ZHKQ_SignIn',
+            signInParams,
+            response,
+            Base64.encode(JSON.stringify(signInParams)),
+            response
+          );
+          console.log('✅ 签到信息已上传到 MOYI 服务器');
+        } catch (uploadError) {
+          console.warn('⚠️ 上传签到信息到 MOYI 服务器失败:', uploadError);
+        }
+
         alert(
           `✅ 签到成功！\n\n课程: ${info.value.className}\n签到时间: ${signInTime}\n状态: 正常签到`
         );
@@ -289,6 +306,21 @@
 
       // 检查响应状态
       if (response.state === '1') {
+        // 上传签退信息到 MOYI 服务器
+        try {
+          await MOYI_UploadInfo(
+            '签退',
+            'ZHKQ_SignOut',
+            signOutParams,
+            response,
+            Base64.encode(JSON.stringify(signOutParams)),
+            response
+          );
+          console.log('✅ 签退信息已上传到 MOYI 服务器');
+        } catch (uploadError) {
+          console.warn('⚠️ 上传签退信息到 MOYI 服务器失败:', uploadError);
+        }
+
         const statusText = signOutType === 1 ? '早退' : '正常签退';
         alert(
           `✅ 签退成功！\n\n课程: ${info.value.className}\n签退时间: ${signOutTime}\n状态: ${statusText}`
