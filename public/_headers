@@ -1,51 +1,51 @@
-# Security and Performance Headers for Production Deployment
-# This file is used by Netlify, Vercel, and other static hosting platforms
-# For other servers (nginx, apache), see DEPLOYMENT.md for configuration examples
+# 生产环境部署的安全和性能头
+# 此文件由 Netlify、Vercel 和其他静态托管平台使用
+# 对于其他服务器（nginx、apache），请参阅 DEPLOYMENT.md 中的配置示例
 
 /*
-  # Security Headers
+  # 安全头
   X-Frame-Options: SAMEORIGIN
   X-Content-Type-Options: nosniff
   X-XSS-Protection: 1; mode=block
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: geolocation=(), microphone=(), camera=()
   
-  # Content Security Policy (adjust as needed for your domains)
+  # 内容安全策略（根据需要调整域名）
   Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://api.etslink.net https://rollcall.anlaxy.com.cn https://api.anlaxy.com.cn https://whois.pconline.com.cn; frame-ancestors 'self'
   
-  # HSTS (HTTPS only - uncomment when using HTTPS)
+  # HSTS（仅 HTTPS - 使用 HTTPS 时取消注释）
   # Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
   
-  # COOP Header
+  # COOP 头
   Cross-Origin-Opener-Policy: same-origin-allow-popups
   
-  # Cache Control for HTML (no cache, always revalidate)
+  # HTML 的缓存控制（不缓存，始终重新验证）
   Cache-Control: no-cache, no-store, must-revalidate
 
-# Static Assets - Long-term caching (1 year)
+# 静态资源 - 长期缓存（1年）
 /assets/*
   Cache-Control: public, max-age=31536000, immutable
 
-# JavaScript files
+# JavaScript 文件
 /assets/js/*
   Cache-Control: public, max-age=31536000, immutable
   Content-Type: application/javascript; charset=utf-8
 
-# CSS files
+# CSS 文件
 /assets/css/*
   Cache-Control: public, max-age=31536000, immutable
   Content-Type: text/css; charset=utf-8
 
-# Images
+# 图片
 /assets/images/*
   Cache-Control: public, max-age=31536000, immutable
 
-# Fonts
+# 字体
 /assets/fonts/*
   Cache-Control: public, max-age=31536000, immutable
   Access-Control-Allow-Origin: *
 
-# SVG and other static files in root
+# 根目录中的 SVG 和其他静态文件
 /*.svg
   Cache-Control: public, max-age=2592000
   Content-Type: image/svg+xml; charset=utf-8
@@ -53,6 +53,6 @@
 /*.ico
   Cache-Control: public, max-age=2592000
 
-# Service Worker (if added in future)
+# Service Worker（如果将来添加）
 /sw.js
   Cache-Control: no-cache, no-store, must-revalidate

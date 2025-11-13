@@ -1,4 +1,4 @@
-# HTTP/2 升级指南 (HTTP/2 Migration Guide)
+# HTTP/2 升级指南
 
 ## 📋 概述
 
@@ -43,7 +43,7 @@
 
 ## 🔧 服务器配置
 
-### Nginx 配置 (推荐)
+### Nginx 配置（推荐）
 
 #### 1. 确认 Nginx 版本
 ```bash
@@ -54,7 +54,7 @@ nginx -v
 #### 2. 完整配置示例
 ```nginx
 server {
-    # 启用 HTTP/2 (在 listen 指令中添加 http2)
+    # 启用 HTTP/2（在 listen 指令中添加 http2）
     listen 443 ssl http2;
     listen [::]:443 ssl http2;
     
@@ -62,7 +62,7 @@ server {
     root /path/to/dist;
     index index.html;
     
-    # SSL 证书配置 (HTTP/2 必需)
+    # SSL 证书配置（HTTP/2 必需）
     ssl_certificate /path/to/certificate.crt;
     ssl_certificate_key /path/to/private.key;
     
@@ -73,27 +73,27 @@ server {
     ssl_session_cache shared:SSL:10m;
     ssl_session_timeout 10m;
     
-    # 安全头 (与 DEPLOYMENT.md 一致)
+    # 安全头（与 DEPLOYMENT.md 一致）
     add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
     add_header X-Frame-Options "SAMEORIGIN" always;
     add_header X-Content-Type-Options "nosniff" always;
     add_header X-XSS-Protection "1; mode=block" always;
     
-    # HTTP/2 服务器推送 (可选)
+    # HTTP/2 服务器推送（可选）
     location = / {
         http2_push /assets/css/index-DpLcXCsr.css;
         http2_push /assets/js/vue-vendor-CoPnbFnN.js;
         http2_push /assets/js/element-plus-tx2s2pn9.js;
     }
     
-    # Gzip 压缩 (虽然 HTTP/2 有头部压缩，但仍建议启用)
+    # Gzip 压缩（虽然 HTTP/2 有头部压缩，但仍建议启用）
     gzip on;
     gzip_vary on;
     gzip_min_length 1024;
     gzip_types text/plain text/css text/xml text/javascript 
                application/javascript application/xml+rss application/json;
     
-    # Brotli 压缩 (需要 ngx_brotli 模块)
+    # Brotli 压缩（需要 ngx_brotli 模块）
     brotli on;
     brotli_comp_level 6;
     brotli_types text/plain text/css text/xml text/javascript 
@@ -155,7 +155,7 @@ a2enmod deflate
     # 启用 HTTP/2
     Protocols h2 http/1.1
     
-    # SSL 配置 (HTTP/2 必需)
+    # SSL 配置（HTTP/2 必需）
     SSLEngine on
     SSLCertificateFile /path/to/certificate.crt
     SSLCertificateKeyFile /path/to/private.key
@@ -171,7 +171,7 @@ a2enmod deflate
     Header always set X-Content-Type-Options "nosniff"
     Header always set X-XSS-Protection "1; mode=block"
     
-    # HTTP/2 服务器推送 (可选)
+    # HTTP/2 服务器推送（可选）
     <Location />
         H2PushResource /assets/css/index-DpLcXCsr.css
         H2PushResource /assets/js/vue-vendor-CoPnbFnN.js
@@ -222,7 +222,7 @@ systemctl reload apache2
 
 ---
 
-### Caddy 配置 (最简单)
+### Caddy 配置（最简单）
 
 Caddy 自动启用 HTTP/2 和 HTTPS，配置极其简单：
 
@@ -268,7 +268,7 @@ Caddy 会自动:
 
 ### 方法 2: 命令行工具
 ```bash
-# 使用 curl (需要支持 HTTP/2)
+# 使用 curl（需要支持 HTTP/2）
 curl -I --http2 https://your-domain.com
 
 # 应该看到类似输出:
@@ -288,25 +288,25 @@ curl -I --http2 https://your-domain.com
 | 指标 | 改善 |
 |------|------|
 | 加载时间 | -740ms |
-| 并发连接数 | 6 → 无限制 (多路复用) |
-| 头部数据 | -30% (头部压缩) |
-| 首屏渲染 | -15% (服务器推送) |
+| 并发连接数 | 6 → 无限制（多路复用） |
+| 头部数据 | -30%（头部压缩） |
+| 首屏渲染 | -15%（服务器推送） |
 
 ---
 
 ## 🎯 最佳实践
 
 ### 1. 域名分片不再需要
-HTTP/1.1 时代，为了绕过浏览器的并发连接限制，通常会使用域名分片 (domain sharding)。
+HTTP/1.1 时代，为了绕过浏览器的并发连接限制，通常会使用域名分片。
 
 **HTTP/2 下不需要了！** 多路复用使得单个连接就能处理所有请求。
 
 ```html
-<!-- HTTP/1.1 做法 (不推荐) -->
+<!-- HTTP/1.1 做法（不推荐） -->
 <script src="https://cdn1.example.com/app.js"></script>
 <script src="https://cdn2.example.com/vendor.js"></script>
 
-<!-- HTTP/2 做法 (推荐) -->
+<!-- HTTP/2 做法（推荐） -->
 <script src="https://example.com/app.js"></script>
 <script src="https://example.com/vendor.js"></script>
 ```
@@ -359,10 +359,10 @@ certbot --nginx -d your-domain.com
 
 ## 📚 相关资源
 
-- [HTTP/2 Official Website](https://http2.github.io/)
+- [HTTP/2 官方网站](https://http2.github.io/)
 - [Can I Use HTTP/2](https://caniuse.com/http2)
 - [Let's Encrypt](https://letsencrypt.org/)
-- [Nginx HTTP/2 Guide](https://nginx.org/en/docs/http/ngx_http_v2_module.html)
+- [Nginx HTTP/2 指南](https://nginx.org/en/docs/http/ngx_http_v2_module.html)
 
 ---
 
@@ -370,14 +370,14 @@ certbot --nginx -d your-domain.com
 
 部署 HTTP/2 前的检查清单:
 
-- [ ] 服务器版本支持 HTTP/2 (Nginx 1.9.5+, Apache 2.4.17+)
+- [ ] 服务器版本支持 HTTP/2（Nginx 1.9.5+, Apache 2.4.17+）
 - [ ] 已获取有效的 SSL 证书
 - [ ] 已配置 HTTPS
 - [ ] 已在 listen 指令中添加 http2 (Nginx) 或 Protocols h2 (Apache)
 - [ ] 已配置 HTTP 到 HTTPS 重定向
 - [ ] 已配置安全头
 - [ ] 已配置缓存策略
-- [ ] 已配置压缩 (Gzip/Brotli)
+- [ ] 已配置压缩（Gzip/Brotli）
 - [ ] 已测试验证 HTTP/2 正常工作
 - [ ] 已在浏览器中验证 Protocol 为 h2
 

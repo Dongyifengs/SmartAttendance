@@ -107,7 +107,7 @@ export default defineConfig(({ mode }) => {
       viteCompression({
         verbose: true,
         disable: false,
-        threshold: 10240, // Only compress files larger than 10KB
+        threshold: 10240, // 仅压缩大于 10KB 的文件
         algorithm: 'gzip',
         ext: '.gz',
       }),
@@ -119,9 +119,9 @@ export default defineConfig(({ mode }) => {
         ext: '.br',
       }),
     ],
-    // Build optimization
+    // 构建优化
     build: {
-      // Enable minification
+      // 启用代码压缩
       minify: 'terser',
       terserOptions: {
         compress: {
@@ -130,16 +130,16 @@ export default defineConfig(({ mode }) => {
           pure_funcs: mode === 'production' ? ['console.log'] : [],
         },
       },
-      // Chunk splitting for better caching
+      // 代码分割以改善缓存
       rollupOptions: {
         output: {
           manualChunks: {
-            // Vendor chunks for better caching
+            // 为更好的缓存进行分块
             'vue-vendor': ['vue', 'vue-router'],
             'element-plus': ['element-plus', '@element-plus/icons-vue'],
             'utils': ['dayjs', 'axios', 'js-base64', 'jsencrypt'],
           },
-          // Better asset naming with hash for cache busting
+          // 使用 hash 命名资源以实现缓存破坏
           chunkFileNames: 'assets/js/[name]-[hash].js',
           entryFileNames: 'assets/js/[name]-[hash].js',
           assetFileNames: (assetInfo) => {
@@ -156,11 +156,11 @@ export default defineConfig(({ mode }) => {
           },
         },
       },
-      // Source maps for production debugging (can be disabled for smaller builds)
+      // 生产环境调试的 Source maps（可禁用以减小构建体积）
       sourcemap: false,
-      // Chunk size warning limit
+      // 分块大小警告限制
       chunkSizeWarningLimit: 1000,
-      // Report compressed size
+      // 报告压缩后的大小
       reportCompressedSize: true,
     },
     // 定义环境变量
