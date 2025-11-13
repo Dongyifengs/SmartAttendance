@@ -9,3 +9,4 @@ export { useOneCard } from './useOneCard';
 export { usePaymentQR } from './usePaymentQR';
 export { useAirConditioning } from './useAirConditioning';
 export { useAttendance } from './useAttendance';
+export { useLoading, useMultipleLoading } from './useLoading';
