@@ -5,6 +5,7 @@ import AutoImport from 'unplugin-auto-import/vite';
 import Components from 'unplugin-vue-components/vite';
 import IconsResolver from 'unplugin-icons/resolver';
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers';
+import viteCompression from 'vite-plugin-compression';
 import { resolve } from 'path';
 import { execSync } from 'child_process';
 import dayjs from 'dayjs';
@@ -102,7 +103,66 @@ export default defineConfig(({ mode }) => {
       Components({
         resolvers: [ElementPlusResolver(), IconsResolver({ enabledCollections: ['ep'] })],
       }),
+      // Compression plugin for gzip and brotli
+      viteCompression({
+        verbose: true,
+        disable: false,
+        threshold: 10240, // Only compress files larger than 10KB
+        algorithm: 'gzip',
+        ext: '.gz',
+      }),
+      viteCompression({
+        verbose: true,
+        disable: false,
+        threshold: 10240,
+        algorithm: 'brotliCompress',
+        ext: '.br',
+      }),
     ],
+    // Build optimization
+    build: {
+      // Enable minification
+      minify: 'terser',
+      terserOptions: {
+        compress: {
+          drop_console: mode === 'production',
+          drop_debugger: mode === 'production',
+          pure_funcs: mode === 'production' ? ['console.log'] : [],
+        },
+      },
+      // Chunk splitting for better caching
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            // Vendor chunks for better caching
+            'vue-vendor': ['vue', 'vue-router'],
+            'element-plus': ['element-plus', '@element-plus/icons-vue'],
+            'utils': ['dayjs', 'axios', 'js-base64', 'jsencrypt'],
+          },
+          // Better asset naming with hash for cache busting
+          chunkFileNames: 'assets/js/[name]-[hash].js',
+          entryFileNames: 'assets/js/[name]-[hash].js',
+          assetFileNames: (assetInfo) => {
+            const info = assetInfo.name?.split('.') || [];
+            const ext = info[info.length - 1];
+            if (/\.(png|jpe?g|gif|svg|webp|ico)$/i.test(assetInfo.name || '')) {
+              return 'assets/images/[name]-[hash].[ext]';
+            } else if (/\.(woff2?|eot|ttf|otf)$/i.test(assetInfo.name || '')) {
+              return 'assets/fonts/[name]-[hash].[ext]';
+            } else if (ext === 'css') {
+              return 'assets/css/[name]-[hash].[ext]';
+            }
+            return 'assets/[name]-[hash].[ext]';
+          },
+        },
+      },
+      // Source maps for production debugging (can be disabled for smaller builds)
+      sourcemap: false,
+      // Chunk size warning limit
+      chunkSizeWarningLimit: 1000,
+      // Report compressed size
+      reportCompressedSize: true,
+    },
     // 定义环境变量
     define: {
       // 在生产环境下，将编译信息注入到环境变量中

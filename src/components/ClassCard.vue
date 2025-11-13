@@ -508,7 +508,7 @@
 
   .class-index {
     font-size: 11px;
-    color: #86868b;
+    color: #6e6e73; /* Improved contrast from #86868b to #6e6e73 for WCAG AA compliance */
     font-weight: 500;
   }
 
@@ -600,17 +600,17 @@
 
   .sign-label {
     font-weight: 500;
-    color: #86868b;
+    color: #6e6e73; /* Improved contrast from #86868b to #6e6e73 for WCAG AA compliance */
     min-width: 50px;
   }
 
   .sign-text {
     font-weight: 500;
-    color: #00d2ff;
+    color: #0098d1; /* Improved contrast from #00d2ff to #0098d1 for WCAG AA compliance */
   }
 
   .sign-text.pending {
-    color: #fa709a;
+    color: #d6366f; /* Improved contrast from #fa709a to #d6366f for WCAG AA compliance */
   }
 
   .time-selector {
