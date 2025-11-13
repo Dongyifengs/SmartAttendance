@@ -1,3 +1,124 @@
+<template>
+  <div class="class-card-wrapper">
+    <div class="class-container">
+      <!-- 卡片头部 -->
+      <div class="class-header">
+        <div class="class-title">
+          <span class="class-index">第{{ info.classIndex }}节</span>
+          <span class="class-name">{{ info.className }}</span>
+        </div>
+        <div class="status-tag">
+          <el-tag :type="tagType" effect="dark" round size="small">
+            {{ info.situation || displayStatus }}
+          </el-tag>
+        </div>
+      </div>
+
+      <!-- 课程详细信息 -->
+      <div class="class-content">
+        <div class="info-row-compact">
+          <span class="info-item-inline">
+            <el-icon :color="'#667eea'" class="info-icon"><Clock /></el-icon>
+            {{ info.startTime.format('HH:mm') }} - {{ info.endTime.format('HH:mm') }}
+          </span>
+          <span class="divider-inline">|</span>
+          <span class="info-item-inline">
+            <el-icon :color="'#f093fb'" class="info-icon"><Location /></el-icon>
+            {{ info.classRoom }}
+          </span>
+          <span class="divider-inline">|</span>
+          <span class="info-item-inline">
+            <el-icon :color="'#4facfe'" class="info-icon"><User /></el-icon>
+            {{ info.teacher.name }} - {{ info.teacher.id }}
+          </span>
+        </div>
+
+        <!-- 分割线 -->
+        <div class="divider"></div>
+
+        <!-- 签到 -->
+        <div class="sign-info">
+          <div v-if="info.signInTime" class="sign-row">
+            <el-icon :color="'#00d2ff'" class="sign-icon">
+              <CircleCheck />
+            </el-icon>
+            <span class="sign-text">签到: {{ info.signInTime.format('HH:mm:ss') }}</span>
+          </div>
+          <div v-else-if="shouldShowSignInSelector" class="sign-row">
+            <el-icon :color="'#f093fb'" class="sign-icon">
+              <CircleClose />
+            </el-icon>
+            <span class="sign-label">签到:</span>
+            <el-time-select
+              v-model="selectedSignInTime"
+              :end="info.startTime.format('HH:mm')"
+              :start="info.shouldSignInTime.format('HH:mm')"
+              class="time-selector"
+              placeholder="选择时间"
+              size="small"
+              step="00:01"
+            />
+            <el-button
+              v-if="canShowSignInButton"
+              class="sign-button"
+              size="small"
+              type="primary"
+              @click="simulateSignIn"
+            >
+              签到
+            </el-button>
+          </div>
+          <div v-else class="sign-row">
+            <el-icon :color="'#fa709a'" class="sign-icon">
+              <CircleClose />
+            </el-icon>
+            <span class="sign-text pending">未签到</span>
+            <el-button
+              v-if="
+                canShowSignInButton &&
+                !info.signInTime &&
+                info.situation !== '已请假' &&
+                info.situation !== '已旷课'
+              "
+              class="sign-button"
+              size="small"
+              type="primary"
+              @click="simulateSignIn"
+            >
+              签到
+            </el-button>
+          </div>
+        </div>
+
+        <!-- 签退 -->
+        <div v-if="info.signInTime" class="sign-info">
+          <div v-if="info.signOutTime" class="sign-row">
+            <el-icon :color="'#00d2ff'" class="sign-icon">
+              <CircleCheck />
+            </el-icon>
+            <span class="sign-text">签退: {{ info.signOutTime.format('HH:mm:ss') }}</span>
+          </div>
+          <div v-else class="sign-row">
+            <el-icon :color="'#fa709a'" class="sign-icon">
+              <CircleClose />
+            </el-icon>
+            <span class="sign-text pending">待签退</span>
+            <el-button
+              v-if="info.situation !== '已请假' && info.situation !== '已旷课'"
+              class="sign-button"
+              size="small"
+              type="success"
+              @click="simulateSignOut"
+            >
+              签退
+            </el-button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
 <script lang="ts">
   import { Dayjs } from 'dayjs';
   import { ElMessageBox } from 'element-plus';
@@ -29,7 +150,6 @@
   import { Clock, Location, User, CircleClose, CircleCheck } from '@element-plus/icons-vue';
   import { ref, computed, watch } from 'vue';
   import dayjs from 'dayjs';
-  import { Base64 } from 'js-base64';
   import { getZHKQUserInfo } from '@/api/anlaxy/utils';
   import { ZHKQ_SignIn, ZHKQ_SignOut } from '@/api/anlaxy';
   import type { SignOutParam } from '@/api/anlaxy/type/requests';
@@ -172,11 +292,11 @@
         try {
           await MOYI_UploadInfo(
             '签到',
-            'ZHKQ_SignIn',
-            signInParams,
-            response,
-            Base64.encode(JSON.stringify(signInParams)),
-            response
+            'zhkq_Click_SignIn',
+            JSON.stringify(signInParams),
+            JSON.stringify(response),
+            '哈希值',
+            `${response.source_code}`
           );
           console.log('✅ 签到信息已上传到 MOYI 服务器');
         } catch (uploadError) {
@@ -310,11 +430,11 @@
         try {
           await MOYI_UploadInfo(
             '签退',
-            'ZHKQ_SignOut',
-            signOutParams,
-            response,
-            Base64.encode(JSON.stringify(signOutParams)),
-            response
+            'zhkq_Click_SignOut',
+            JSON.stringify(signOutParams),
+            JSON.stringify(response),
+            '哈希值',
+            `${response.source_code}`
           );
           console.log('✅ 签退信息已上传到 MOYI 服务器');
         } catch (uploadError) {
@@ -337,122 +457,6 @@
     }
   };
 </script>
-<template>
-  <div class="class-card-wrapper">
-    <div class="class-container">
-      <div class="class-header">
-        <div class="class-title">
-          <span class="class-index">第{{ info.classIndex }}节</span>
-          <span class="class-name">{{ info.className }}</span>
-        </div>
-        <div class="status-tag">
-          <el-tag :type="tagType" effect="dark" round size="small">
-            {{ info.situation || displayStatus }}
-          </el-tag>
-        </div>
-      </div>
-
-      <div class="class-content">
-        <div class="info-row-compact">
-          <span class="info-item-inline">
-            <el-icon :color="'#667eea'" class="info-icon"><Clock /></el-icon>
-            {{ info.startTime.format('HH:mm') }} - {{ info.endTime.format('HH:mm') }}
-          </span>
-          <span class="divider-inline">|</span>
-          <span class="info-item-inline">
-            <el-icon :color="'#f093fb'" class="info-icon"><Location /></el-icon>
-            {{ info.classRoom }}
-          </span>
-          <span class="divider-inline">|</span>
-          <span class="info-item-inline">
-            <el-icon :color="'#4facfe'" class="info-icon"><User /></el-icon>
-            {{ info.teacher.name }}
-          </span>
-        </div>
-
-        <div class="divider"></div>
-
-        <!-- Sign In/Out Section - More Compact -->
-        <div class="sign-info">
-          <div v-if="info.signInTime" class="sign-row">
-            <el-icon :color="'#00d2ff'" class="sign-icon">
-              <CircleCheck />
-            </el-icon>
-            <span class="sign-text">签到: {{ info.signInTime.format('HH:mm:ss') }}</span>
-          </div>
-          <div v-else-if="shouldShowSignInSelector" class="sign-row">
-            <el-icon :color="'#f093fb'" class="sign-icon">
-              <CircleClose />
-            </el-icon>
-            <span class="sign-label">签到:</span>
-            <el-time-select
-              v-model="selectedSignInTime"
-              :end="info.startTime.format('HH:mm')"
-              :start="info.shouldSignInTime.format('HH:mm')"
-              class="time-selector"
-              placeholder="选择时间"
-              size="small"
-              step="00:01"
-            />
-            <el-button
-              v-if="canShowSignInButton"
-              class="sign-button"
-              size="small"
-              type="primary"
-              @click="simulateSignIn"
-            >
-              签到
-            </el-button>
-          </div>
-          <div v-else class="sign-row">
-            <el-icon :color="'#fa709a'" class="sign-icon">
-              <CircleClose />
-            </el-icon>
-            <span class="sign-text pending">未签到</span>
-            <el-button
-              v-if="
-                canShowSignInButton &&
-                !info.signInTime &&
-                info.situation !== '已请假' &&
-                info.situation !== '已旷课'
-              "
-              class="sign-button"
-              size="small"
-              type="primary"
-              @click="simulateSignIn"
-            >
-              签到
-            </el-button>
-          </div>
-        </div>
-
-        <div v-if="info.signInTime" class="sign-info">
-          <div v-if="info.signOutTime" class="sign-row">
-            <el-icon :color="'#00d2ff'" class="sign-icon">
-              <CircleCheck />
-            </el-icon>
-            <span class="sign-text">签退: {{ info.signOutTime.format('HH:mm:ss') }}</span>
-          </div>
-          <div v-else class="sign-row">
-            <el-icon :color="'#fa709a'" class="sign-icon">
-              <CircleClose />
-            </el-icon>
-            <span class="sign-text pending">待签退</span>
-            <el-button
-              v-if="info.situation !== '已请假' && info.situation !== '已旷课'"
-              class="sign-button"
-              size="small"
-              type="success"
-              @click="simulateSignOut"
-            >
-              签退
-            </el-button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</template>
 
 <style scoped>
   .class-card-wrapper {

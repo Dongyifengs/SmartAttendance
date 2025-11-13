@@ -1,9 +1,3 @@
-<script lang="ts" setup>
-  import type { Component } from 'vue';
-
-  const { icon, color = 'gray' } = defineProps<{ icon: Component; color?: string }>();
-</script>
-
 <template>
   <div class="icon-text-container">
     <el-icon :color="color">
@@ -12,6 +6,12 @@
     <slot name="default" />
   </div>
 </template>
+
+<script lang="ts" setup>
+  import type { Component } from 'vue';
+
+  const { icon, color = 'gray' } = defineProps<{ icon: Component; color?: string }>();
+</script>
 
 <style scoped>
   .icon-text-container {

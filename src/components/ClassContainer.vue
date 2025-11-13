@@ -1,14 +1,14 @@
-<script lang="ts" setup>
-  import ClassCard, { type ClassInfo } from '@/components/ClassCard.vue';
-
-  const data = defineModel<ClassInfo[]>({ required: true });
-</script>
-
 <template>
   <div class="class-list-container">
     <class-card v-for="(_, index) of data" :key="index" v-model="data[index]"></class-card>
   </div>
 </template>
+
+<script lang="ts" setup>
+  import ClassCard, { type ClassInfo } from '@/components/ClassCard.vue';
+
+  const data = defineModel<ClassInfo[]>({ required: true });
+</script>
 
 <style scoped>
   .class-list-container {
