@@ -29,6 +29,7 @@ const result = await execute(async () => await someApiCall(), {
 - 缓存学号、姓名和 IP 地址
 - 1 小时后自动刷新缓存
 - 提供获取单个用户属性的辅助方法
+- 使用统一的存储工具
 
 **用法：**
 
@@ -40,6 +41,46 @@ await loadUserInfo();
 
 // 获取缓存信息而不重新获取
 const cachedInfo = getCachedUserInfo();
+```
+
+### useLoading
+
+用于管理加载状态的组合式函数。提供简单的加载状态管理和异步函数包装。
+
+**特性：**
+
+- 简单的加载状态管理
+- 异步函数自动包装
+- 多个加载状态管理
+
+**用法：**
+
+```typescript
+import { useLoading, useMultipleLoading } from '@/composables';
+
+// 单个加载状态
+const { loading, startLoading, stopLoading, withLoading } = useLoading();
+
+// 手动控制
+startLoading();
+await someAsyncOperation();
+stopLoading();
+
+// 自动管理
+await withLoading(async () => {
+  // 异步操作
+  await someAsyncOperation();
+});
+
+// 多个加载状态
+const loadings = useMultipleLoading({
+  data: false,
+  user: false,
+});
+
+await loadings.data.withLoading(async () => {
+  // 加载数据
+});
 ```
 
 ### useOneCard
@@ -156,12 +197,25 @@ const courseList = await attendance.getDayCourseList({ date, userKey }, gitHash)
 5. **性能**：内置缓存和优化
 6. **可维护性**：更容易更新和维护隔离的逻辑
 7. **操作日志**：自动记录关键操作到 MOYI API
+8. **统一工具**：使用统一的存储和错误处理工具
 
 ## 最佳实践
 
 1. 始终在 `setup()` 函数或 `<script setup>` 中使用组合式函数
 2. 利用 TypeScript 实现类型安全
 3. 在适当的地方使用 `useApiCall` 优雅地处理错误
-4. 尽可能缓存数据以减少不必要的 API 调用
-5. 在 `onUnmounted` 钩子中清理计时器和订阅
-6. 为关键操作传递 gitHash 参数以启用日志记录
+4. 使用 `useLoading` 管理加载状态，提升用户体验
+5. 尽可能缓存数据以减少不必要的 API 调用
+6. 在 `onUnmounted` 钩子中清理计时器和订阅
+7. 为关键操作传递 gitHash 参数以启用日志记录
+8. 使用 `@/utils` 中的工具函数处理通用操作
+
+## 导入方式
+
+```typescript
+// 从入口文件统一导入
+import { useUserInfo, useLoading, useAttendance } from '@/composables';
+
+// 或单独导入
+import { useUserInfo } from '@/composables/useUserInfo';
+```
