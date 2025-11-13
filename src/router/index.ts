@@ -1,9 +1,10 @@
-import { createRouter, createWebHashHistory } from 'vue-router'; // 路由配置
+import { createRouter, createWebHashHistory } from 'vue-router';
+import { ROUTE_PATHS } from '@/utils/constants';
 
 // 路由配置
 export const routes = [
   {
-    path: '/',
+    path: ROUTE_PATHS.LOGIN,
     component: () => import('@/view/login/PageLogin.vue'),
     meta: {
       requiresAuth: true,
@@ -11,7 +12,7 @@ export const routes = [
     },
   },
   {
-    path: '/home',
+    path: ROUTE_PATHS.HOME,
     component: () => import('@/view/home/PageHome.vue'),
     meta: {
       requiresAuth: true,
@@ -19,7 +20,7 @@ export const routes = [
     },
   },
   {
-    path: '/classListDev',
+    path: ROUTE_PATHS.CLASS_LIST_DEV,
     component: () => import('@/view/anlaxy-dev/ClassListDev.vue'),
     meta: {
       requiresAuth: true,
@@ -27,7 +28,7 @@ export const routes = [
     },
   },
   {
-    path: '/AttendanceDev',
+    path: ROUTE_PATHS.ATTENDANCE_DEV,
     component: () => import('@/view/anlaxy-dev/AttendanceDev.vue'),
     meta: {
       requiresAuth: true,
@@ -35,7 +36,7 @@ export const routes = [
     },
   },
   {
-    path: '/LeaveDev',
+    path: ROUTE_PATHS.LEAVE_DEV,
     component: () => import('@/view/anlaxy-dev/LeaveDev.vue'),
     meta: {
       requiresAuth: true,
@@ -43,7 +44,7 @@ export const routes = [
     },
   },
   {
-    path: '/dev/home',
+    path: ROUTE_PATHS.DEV_HOME,
     component: () => import('@/view/newHome/DevHome.vue'),
     meta: {
       requiresAuth: true,
@@ -57,9 +58,11 @@ const router = createRouter({
   history: createWebHashHistory(),
   routes,
 });
+
 router.beforeEach((to) => {
   if (to.meta.title) {
     document.title = to.meta.title as string;
   }
 });
+
 export default router;

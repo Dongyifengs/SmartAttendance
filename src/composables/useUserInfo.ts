@@ -1,5 +1,6 @@
 import { ref } from 'vue';
 import axios from 'axios';
+import { getStorageItem, setStorageItem, removeStorageItem, STORAGE_KEYS } from '@/utils/storage';
 
 interface CachedUserInfo {
   studentId: string;
@@ -22,32 +23,16 @@ export function useUserInfo() {
    * 从 localStorage 获取学号
    */
   function getStudentId(): string | null {
-    const userInfoStr = localStorage.getItem('SA-ZHKQ-USERINFO');
-    if (!userInfoStr) return null;
-
-    try {
-      const parsed = JSON.parse(userInfoStr);
-      return parsed.user_code || null;
-    } catch (error) {
-      console.error('[getStudentId] 解析错误:', error);
-      return null;
-    }
+    const userInfo = getStorageItem<any>(STORAGE_KEYS.ZHKQ_USERINFO);
+    return userInfo?.user_code || null;
   }
 
   /**
    * 从 localStorage 获取学生姓名
    */
   function getStudentName(): string | null {
-    const userInfoStr = localStorage.getItem('SA-ZHKQ-USERINFO');
-    if (!userInfoStr) return null;
-
-    try {
-      const parsed = JSON.parse(userInfoStr);
-      return parsed.user_name || null;
-    } catch (error) {
-      console.error('[getStudentName] 解析错误:', error);
-      return null;
-    }
+    const userInfo = getStorageItem<any>(STORAGE_KEYS.ZHKQ_USERINFO);
+    return userInfo?.user_name || null;
   }
 
   /**
@@ -80,19 +65,13 @@ export function useUserInfo() {
    */
   async function loadUserInfo(): Promise<CachedUserInfo | null> {
     // 检查是否有有效的缓存数据
-    const cachedStr = localStorage.getItem(CACHE_KEY);
-    if (cachedStr) {
-      try {
-        const cached = JSON.parse(cachedStr) as CachedUserInfo;
-        const now = Date.now();
-
-        // 如果缓存仍然有效，使用它
-        if (now - cached.timestamp < CACHE_DURATION) {
-          cachedInfo.value = cached;
-          return cached;
-        }
-      } catch (error) {
-        console.error('[loadUserInfo] 缓存解析错误:', error);
+    const cached = getStorageItem<CachedUserInfo>(CACHE_KEY);
+    if (cached) {
+      const now = Date.now();
+      // 如果缓存仍然有效，使用它
+      if (now - cached.timestamp < CACHE_DURATION) {
+        cachedInfo.value = cached;
+        return cached;
       }
     }
 
@@ -114,7 +93,7 @@ export function useUserInfo() {
     };
 
     // 保存到缓存
-    localStorage.setItem(CACHE_KEY, JSON.stringify(freshInfo));
+    setStorageItem(CACHE_KEY, freshInfo);
     cachedInfo.value = freshInfo;
 
     return freshInfo;
@@ -128,14 +107,10 @@ export function useUserInfo() {
       return cachedInfo.value;
     }
 
-    const cachedStr = localStorage.getItem(CACHE_KEY);
-    if (cachedStr) {
-      try {
-        cachedInfo.value = JSON.parse(cachedStr) as CachedUserInfo;
-        return cachedInfo.value;
-      } catch (error) {
-        console.error('[getCachedUserInfo] 解析错误:', error);
-      }
+    const cached = getStorageItem<CachedUserInfo>(CACHE_KEY);
+    if (cached) {
+      cachedInfo.value = cached;
+      return cached;
     }
 
     return null;
@@ -145,7 +120,7 @@ export function useUserInfo() {
    * 清除用户信息缓存
    */
   function clearCache(): void {
-    localStorage.removeItem(CACHE_KEY);
+    removeStorageItem(CACHE_KEY);
     cachedInfo.value = null;
   }
 

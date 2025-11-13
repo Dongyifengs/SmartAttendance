@@ -1,14 +1,19 @@
+/**
+ * 全局应用样式
+ * Global Application Styles
+ */
+
 /* 按钮样式（适配 el-button） */
 .custom_btn {
-  margin-right: 0.8rem !important; /* 按钮之间的水平间距 */
-  margin-bottom: 0.5rem !important; /* 按钮之间的垂直间距（换行时） */
+  margin-right: 0.8rem !important;
+  margin-bottom: 0.5rem !important;
   background-color: rgba(248, 232, 213, 0.8) !important;
-  color: #8b7355 !important;
+  color: var(--color-text-tertiary) !important;
   border: 1px solid rgba(255, 255, 255, 0.6) !important;
-  border-radius: 8px !important; /* 中等圆角，比主卡片小 */
+  border-radius: var(--radius-md) !important;
   font-size: 0.9rem !important;
-  padding: 0.4rem 0.9rem !important; /* 紧凑按钮尺寸 */
-  transition: all 0.2s ease !important;
+  padding: 0.4rem 0.9rem !important;
+  transition: all var(--transition-fast) !important;
 }
 
 .custom_btn:hover {

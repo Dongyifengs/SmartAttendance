@@ -1,0 +1,230 @@
+/**
+ * 全局通用样式
+ * Global Common Styles
+ */
+
+@import './variables.css';
+
+/* 动画定义 - Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes cardFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes tagPulse {
+  0% {
+    transform: scale(0.85);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.03);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* 通用工具类 - Utility Classes */
+.fade-in {
+  animation: fadeIn var(--transition-slow);
+}
+
+.slide-down {
+  animation: slideDown 0.5s ease-out;
+}
+
+.card-fade-in {
+  animation: cardFadeIn var(--transition-slow);
+}
+
+/* 通用卡片样式 - Common Card Styles */
+.card {
+  background: var(--color-bg-white);
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-card);
+  transition: all var(--transition-normal);
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-card-hover);
+}
+
+/* 通用按钮样式 - Common Button Styles */
+.btn {
+  border-radius: var(--radius-md);
+  transition: all var(--transition-fast);
+  cursor: pointer;
+}
+
+/* 通用输入框样式 - Common Input Styles */
+.input-wrapper {
+  border-radius: var(--radius-md);
+  transition: all var(--transition-fast);
+}
+
+.input-wrapper:hover {
+  box-shadow: var(--shadow-sm);
+}
+
+/* 通用加载状态 - Loading States */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+}
+
+/* 通用空状态 - Empty States */
+.empty-state {
+  text-align: center;
+  color: var(--color-text-secondary);
+  padding: var(--spacing-xl);
+}
+
+/* 通用分割线 - Dividers */
+.divider {
+  height: 1px;
+  background: var(--gradient-divider);
+  margin: var(--spacing-xs) 0;
+}
+
+.divider-inline {
+  color: var(--color-border-light);
+  font-weight: var(--font-weight-light);
+}
+
+/* 响应式辅助类 - Responsive Helpers */
+.mobile-only {
+  display: none;
+}
+
+.desktop-only {
+  display: block;
+}
+
+@media (max-width: 768px) {
+  .mobile-only {
+    display: block;
+  }
+
+  .desktop-only {
+    display: none;
+  }
+}
+
+/* 文本辅助类 - Text Helpers */
+.text-primary {
+  color: var(--color-text-primary);
+}
+
+.text-secondary {
+  color: var(--color-text-secondary);
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-clickable {
+  cursor: pointer;
+  transition: color var(--transition-fast);
+}
+
+.text-clickable:hover {
+  text-decoration: underline;
+}
+
+/* Flex 布局辅助类 - Flex Helpers */
+.flex {
+  display: flex;
+}
+
+.flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.flex-wrap {
+  flex-wrap: wrap;
+}
+
+/* 间距辅助类 - Spacing Helpers */
+.gap-xs {
+  gap: var(--spacing-xs);
+}
+
+.gap-sm {
+  gap: var(--spacing-sm);
+}
+
+.gap-md {
+  gap: var(--spacing-md);
+}
+
+.gap-lg {
+  gap: var(--spacing-lg);
+}
+
+/* 边距辅助类 - Margin Helpers */
+.mb-xs {
+  margin-bottom: var(--spacing-xs);
+}
+
+.mb-sm {
+  margin-bottom: var(--spacing-sm);
+}
+
+.mb-md {
+  margin-bottom: var(--spacing-md);
+}
+
+.mb-lg {
+  margin-bottom: var(--spacing-lg);
+}
+
+.mb-xl {
+  margin-bottom: var(--spacing-xl);
+}
