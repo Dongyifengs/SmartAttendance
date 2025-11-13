@@ -158,6 +158,7 @@
   const info = defineModel<ClassInfo>({ required: true });
   const selectedSignInTime = ref<string>('');
   const userInfo = getZHKQUserInfo();
+  const gitHash = import.meta.env.VITE_GIT_HASH;
 
   // Determine the status to display
   const displayStatus = computed(() => {
@@ -295,8 +296,8 @@
             'zhkq_Click_SignIn',
             JSON.stringify(signInParams),
             JSON.stringify(response),
-            '哈希值',
-            `${response.source_code}`
+            gitHash,
+            info.value.className
           );
           console.log('✅ 签到信息已上传到 MOYI 服务器');
         } catch (uploadError) {
@@ -433,8 +434,8 @@
             'zhkq_Click_SignOut',
             JSON.stringify(signOutParams),
             JSON.stringify(response),
-            '哈希值',
-            `${response.source_code}`
+            gitHash,
+            info.value.className
           );
           console.log('✅ 签退信息已上传到 MOYI 服务器');
         } catch (uploadError) {
